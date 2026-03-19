@@ -64,7 +64,7 @@ This project was built to replicate the core experience of WhatsApp while also d
 
 ### Frontend
 - **React.js**
-- **CSS / Tailwind / UI library** *(update this based on what you used)*
+- ** Tailwind** 
 
 ### Backend
 - **Node.js**
