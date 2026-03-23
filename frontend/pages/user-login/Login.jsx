@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import * as yup from 'yup'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -18,6 +18,7 @@ const Login = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [phonePrefix, setPhonePrefix] = useState("+91");
+   const [otp,setOtp] = useState(new Array(6).fill("")) ;
   const [email, setEmail] = useState("");
   const [currentCountryInfo, setCurrentCountryInfo] = useState({
     countryCode: "+91",
@@ -26,6 +27,7 @@ const Login = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { userPhoneData, setStep, step, setUserPhoneData } = useLoginStore();
+  const inputRefs = useRef([]);
 
   const notifySuccess = () => {
     toast.success('Otp Sent Successfully!', {
@@ -65,7 +67,7 @@ const Login = () => {
 
           notifySuccess();
           setStep(2);
-          setUserPhoneData({email:data.email});
+          setUserPhoneData({ email: data.email });
 
         }
         else if (response.status !== "success") {
@@ -81,7 +83,7 @@ const Login = () => {
           setStep(2);
           const phoneNumber = data.phoneNumber;
           const phonePrefix = currentCountryInfo.countryCode;
-          setUserPhoneData({phoneNumber,phonePrefix});
+          setUserPhoneData({ phoneNumber, phonePrefix });
         }
         else if (response.status !== "success") {
           notifyFailure();
@@ -98,6 +100,49 @@ const Login = () => {
       setIsLoading(false)
     }
   }
+
+  async function onOtpSubmit(data) {
+    console.log("this is the otp: ",data)
+
+  }
+
+  async function onOtpChange(value,index){
+    if(!/^\d+$/.test(value)) return;
+    // foucs to the next input
+    console.log("The index and value is: ",index,value)
+    const newOtp = [...otp];
+    newOtp[index] = value;
+    setOtp(newOtp);
+    let joinedOtp = newOtp.join("");
+    if(joinedOtp.length===6 && !newOtp.includes("")){
+      onOtpSubmit(joinedOtp);
+    }
+    inputRefs.current[index+1]?.focus();
+  }
+
+  async function handleKeyDown(e,index){
+    console.log(e.key)
+    if(e.key==="Backspace"){
+      if(index!=0 ){
+        inputRefs.current[index-1].focus()
+        let newOtp = [...otp];
+        newOtp[index-1] = "";
+        setOtp(newOtp);
+        console.log("successfully focused on the input: ",inputRefs.current[index-1])
+      }
+    }
+  }
+
+  async function handlePaste(e){
+    e.preventDefault();
+    let pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0,6);
+    let newOtp = [...otp];
+    for(let i=0;i<6;i++){
+      newOtp[i] = pasted[i];
+    }
+    setOtp(newOtp);
+  }
+
 
   let filterCountries = countries3.filter((country) => (
     country.countryName.toLowerCase().includes(searchTerm) || country.countryCode.toLowerCase().includes(searchTerm)
@@ -198,10 +243,13 @@ const Login = () => {
               </div>
 
               <div className='flex justify-center w-full'>
-                <p className='text-white'>Enter your phone number to receive an OTP</p>
+                {step === 1 && <p className='text-white'>Enter your phone number to receive an OTP</p>}
+                {step === 2 && <p className='text-white'>Please Enter the 6-digit OTP</p>}
               </div>
 
-              <div className="dropdown w-full h-12 rounded-xl border border-gray-400  flex items-center" >
+
+
+              {step === 1 && <div className="dropdown w-full h-12 rounded-xl border border-gray-400  flex items-center" >
 
                 <div onClick={() => { setShowDropdown(!showDropdown) }} className="cursor-pointer hover:bg-green-700 relative countries w-[25%] rounded-l-xl bg-green-600 h-full flex justify-center items-center ">
 
@@ -231,9 +279,6 @@ const Login = () => {
 
                     </div>
                   </div>}
-
-
-
                 </div>
 
 
@@ -242,24 +287,34 @@ const Login = () => {
                   <input {...loginRegister("phoneNumber")} type="text" className={`p-4 focus:outline-none text-white text-lg  h-full w-full  rounded-r-xl`} placeholder='Enter phone number' />
                   {loginErrors.phoneNumber && <div className='errors absolute w-full -top-5 left-1 text-red-500'>*{loginErrors.phoneNumber.message}</div>}
                 </div>
-              </div>
+              </div>}
+
+              {step===2 && <div className="otp-inputs  justify-center items-center w-full flex">
+                <div onPaste={handlePaste} className='flex gap-4 items-center '>
+                  {otp.map((value, index) => (
+                    <input onKeyDown={(e)=>{handleKeyDown(e,index)}} maxLength={1} value={value} onChange={(e)=>{onOtpChange(e.target.value,index)}} key={index} ref={(el)=>(inputRefs.current[index]=el)} inputMode='numeric' className='w-12 h-12 border rounded-lg text-white text-center focus:outline-none focus:border-green-500 focus:border-2 flex justify-center items-center' type="text" />
+                  ))}
+                </div>
+
+              </div>}
 
             </div>
 
 
             {/* divider with or */}
-            <div className="divider flex items-center gap-2">
+            {step === 1 && <div className="divider flex items-center gap-2">
               <div className='flex-1/2 border border-green-600 h-0' />
               <span className=' w-4 text-green-400  mr-1' > OR </span>
               <div className='flex-1/2 border border-green-600 h-0' />
-            </div>
+            </div>}
 
-            <div className="emailsection relative w-full h-10 flex items-center rounded-xl border border-gray-500 gap-2 p-2 ">
+
+            {step === 1 && <div className="emailsection relative w-full h-10 flex items-center rounded-xl border border-gray-500 gap-2 p-2 ">
               <PersonSvg currentColor={"#00a03d"} />
               <input {...loginRegister("email")} type="text " placeholder='Email (Optional)' className='flex-1 border-red-300 p-2 focus:outline-none text-white' />
               {loginErrors.email && <div className='errors absolute w-full -top-6 left-4 text-red-500'> *{loginErrors.email.message}</div>}
 
-            </div>
+            </div>}
 
             {<button className='w-full h-10 flex justify-center items-center rounded-xl bg-green-600 text-white font-bold p-2 cursor-pointer'>{isLoading ? <Spinner /> : "Send Otp"} </button>}
 
