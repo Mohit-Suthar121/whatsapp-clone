@@ -11,11 +11,14 @@ import Send from './icons/Send'
 import TextareaAutosize from 'react-textarea-autosize';
 import LaptopSvg from './icons/LaptopSvg'
 import MessageBubble from './MessageBubble'
+import { useThemeStore } from '../../../store/useThemeStore'
 
 const Chat = ({ userClick, setUserClick }) => {
 
     const [isEmpty, setIsEmpty] = useState(true);
     const scrollRef = useRef();
+    const {theme} = useThemeStore();
+    const [isActiveCard,setIsActiveCard] = useState(null);
 
     useEffect(()=>{
         if(userClick){
@@ -28,22 +31,23 @@ const Chat = ({ userClick, setUserClick }) => {
         if (e.target.value.trim() != "") setIsEmpty(false);
         else setIsEmpty(true);
     }
-    function handleClick() {
+    function handleClick(userId) {
         setUserClick(true);
+        setIsActiveCard(userId)
     }
     return (
 
-        <div className='w-full flex'>
-            <div className=" maincontent w-115 h-full flex flex-col border-r border-r-[#2E2F2F]">
+        <div className='w-full flex '>
+            <div className={`  maincontent w-115 h-full flex flex-col border-r ${theme==="dark"? "border-r-[#2E2F2F]":"border-r-[#DEDCDA]"} ${theme==="dark"?"bg-[#161717]":"bg-[#FFFFFF]"}`} >
                 <div className='headers p-4 w-full h-16 justify-between flex items-center'>
-                    <div className="name text-white font-semibold tracking-tighter text-2xl">
+                    <div className={`name ${theme==="dark"?"text-white":"text-[#1DAA61]"} font-semibold tracking-tighter text-2xl`}>
                         WhatsApp
                     </div>
                     <div className="icons flex">
-                        <div className="addmessage flex justify-center items-center p-2 hover:bg-[#292A2A] rounded-full w-10 h-10 ">
+                        <div className={`addmessage flex justify-center items-center p-2 ${theme === "dark"?"hover:bg-[#292A2A]":"hover:bg-[#E7E6E4]"} rounded-full w-10 h-10 `}>
                             <NewChat />
                         </div>
-                        <div className="three-dots flex justify-center items-center p-2 hover:bg-[#292A2A] rounded-full w-10 h-10 ">
+                        <div className={`three-dots flex justify-center items-center p-2 ${theme === "dark"?"hover:bg-[#292A2A]":"hover:bg-[#E7E6E4]"} rounded-full w-10 h-10 `}>
                             <ThreeDots />
                         </div>
                     </div>
@@ -51,12 +55,14 @@ const Chat = ({ userClick, setUserClick }) => {
 
                 <div className='pl-4 pr-4 pb-4'>
 
-                    <div className="inputbardiv h-10 rounded-4xl bg-[#2e2f2f] p-2 flex items-center gap-1 focus-within:bg-[#161717] focus-within:border-2 focus-within:border-[#20BD61] ">
+                    <div className={`inputbardiv h-10 rounded-4xl ${theme==="dark"?"bg-[#2e2f2f]":"bg-[#F6F5F4]"} p-2 flex items-center gap-1
+                    ${theme==="dark"?"focus-within:bg-[#161717]":"focus-within:bg-[#ffffff]"}
+                      focus-within:border-2 focus-within:border-[#20BD61] `}>
                         <div className="serachIcon flex justify-center items-center p-2 hover:bg-[#292A2A] w-10 h-10">
-                            <Search />
+                            <Search currentColor={theme==="dark"?"#ffffff":"#626262"}/>
                         </div>
                         <div className="inputBar w-full">
-                            <input placeholder='Search or start a new chat' className='text-white focus:outline-none w-full ' id='inputbar' type="text" />
+                            <input placeholder='Search or start a new chat' className={`${theme==="dark"?" text-white":"text-[#899DB2]"} focus:outline-none w-full `} id='inputbar' type="text" />
                         </div>
                     </div>
 
@@ -64,10 +70,13 @@ const Chat = ({ userClick, setUserClick }) => {
 
 
 
-                <div className="chats-section w-full p-2 flex flex-col flex-1 overflow-auto gap-2 profileScroller border-t border-[#2E2F2F]">
-                    <UserProfile width={12.5} height={12.5} username={"Username"} lastmessage={"hello bro how are you?"} time={"Yesterday"} isSelfStatus={false} onClick={handleClick} />
-                    <UserProfile width={12.5} height={12.5} username={"Username"} lastmessage={"hello bro how are you?"} time={"Yesterday"} isSelfStatus={false} onClick={handleClick} />
-                    <UserProfile width={12.5} height={12.5} username={"Username"} lastmessage={"hello bro how are you?"} time={"Yesterday"} isSelfStatus={false} onClick={handleClick} />
+                <div className={`chats-section w-full p-2 flex flex-col flex-1 overflow-auto gap-2 profileScroller border-t ${theme==="dark"?"border-[#2E2F2F]":"border-[#DEDCDA]"} `}>
+                    <UserProfile width={12.5} height={12.5} username={"Username"} lastmessage={"hello bro how are you?"} time={"Yesterday"} isSelfStatus={false} 
+                     onClick={ ()=>{ handleClick("user1")}} isActiveCard={isActiveCard}  userId={"user1"} />
+                    <UserProfile width={12.5} height={12.5} username={"Username"} lastmessage={"hello bro how are you?"} time={"Yesterday"} isSelfStatus={false}
+                     onClick={ ()=>{ handleClick("user2")}} isActiveCard={isActiveCard} userId={"user2"} />
+                    <UserProfile width={12.5} height={12.5} username={"Username"} lastmessage={"hello bro how are you?"} time={"Yesterday"} isSelfStatus={false}
+                     onClick={ ()=>{ handleClick("user3")}} isActiveCard={isActiveCard} userId={"user3"} />
                 </div>
 
 
@@ -76,7 +85,7 @@ const Chat = ({ userClick, setUserClick }) => {
 
 
             {userClick && <div className="backgroundWrapper flex-1">
-                <div className="right-side-section w-full h-full  flex-1 flex pl-4 pr-4 pb-4 flex-col">
+                <div className={`right-side-section w-full h-full  flex-1 flex pl-4 pr-4 pb-4 flex-col ${theme==="dark"?"bg-[#161717]":"bg-[#F7F5F3]"}`}>
                     <div className="profile-nav w-full bg-[#161717] p-2 ">
 
                         <div className="userProfile flex text-white w-full gap-4 shrink-0 cursor-pointer">
@@ -177,11 +186,11 @@ const Chat = ({ userClick, setUserClick }) => {
                 </div>
             </div>}
 
-            {!userClick && <div className="right-side-section flex-1 flex justify-center items-center">
+            {!userClick && <div className={`right-side-section flex-1 flex justify-center items-center ${theme==="dark"?"bg-[#161717]":"bg-[#F7F5F3]"}`}>
                 <div className="content flex flex-col ">
-                    <div className="box1 w-88 h-91 rounded-2xl bg-[#1D1F1F] flex items-center flex-col gap-12 p-4">
+                    <div className={`box1 w-88 h-91 rounded-2xl ${theme === "dark"? "bg-[#1D1F1F]":"bg-white"} flex items-center flex-col gap-12 p-4`}>
                         <LaptopSvg />
-                        <div className='text-white text-2xl font-bold w-full flex justify-center items-center  text-center'>Select a Conversation to Start Chatting</div>
+                        <div className={`${ theme==="dark"?"text-white":"text-black"} text-2xl font-bold w-full flex justify-center items-center  text-center`}>Select a Conversation to Start Chatting</div>
                     </div>
                 </div>
             </div>}

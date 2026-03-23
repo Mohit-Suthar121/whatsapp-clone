@@ -27,9 +27,22 @@
     color: #51515100;
 }
 
+.profileScroller2::-webkit-scrollbar-thumb{
+  color: #cccccc;
+}
+
 .profileScroller::-webkit-scrollbar-thumb:hover,.whatsapp-input::-webkit-scrollbar-thumb:hover,.scrollwrapperr::-webkit-scrollbar-thumb:hover{
     background-color: rgb(127, 127, 127);
 }
+.profileScroller2::-webkit-scrollbar-thumb:hover{
+  background-color: #5a5a5a;
+  color: #5a5a5a;
+}
+
+.profileScroller3::-webkit-scrollbar-thumb{
+  color: rgb(255, 255, 255);
+}
+
 .profileScroller::-webkit-scrollbar-button,.whatsapp-input::-webkit-scrollbar-button,.scrollwrapper::-webkit-scrollbar-button {
 	width: 0;
 	height: 0;

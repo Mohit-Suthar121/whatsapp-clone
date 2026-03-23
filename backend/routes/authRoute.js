@@ -2,7 +2,6 @@ import express from 'express';
 import { getAllUsers, logout, sendOtp, updateProfile, userAuthenticated, verifyOtp } from '../controllers/authController.js';
 import { authMiddleware } from '../middleware/authMiddleware.js';
 import { multerMiddleware } from '../config/cloudinaryConfig.js';
-
 const router = express.Router();
 
 router.post('/send-otp',sendOtp)

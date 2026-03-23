@@ -1,12 +1,21 @@
 import React from 'react'
+import { useThemeStore } from '../../../store/useThemeStore'
 
-const UserProfile = ({username,lastmessage,time,isSelfStatus,statusSize,width,height,onClick}) => {
+const UserProfile = ({
+    username, lastmessage, time, isSelfStatus, width, height, onClick, isActiveCard, userId,uploadTime
+}) => {
+
+
+    const { theme } = useThemeStore();
+    const hoverBg = theme === "dark" ? "hover:bg-[#2E2F2F]" : "hover:bg-[#F6F5F4]";
+    const activeBg = (isActiveCard && userId )?(isActiveCard?.trim() === userId ? theme === "dark" ? "bg-[#2E2F2F]" : "bg-[#F6F5F4]" : ""):"";
+
+
     return (
-        <div onClick={onClick} className= {` userProfile flex items-center text-white w-full gap-4 shrink-0 cursor-pointer rounded-xl p-4 hover:bg-[#2E2F2F]`}>
 
-            {/* w-12.5,10,16 */}
+        <div onClick={onClick} className={` userProfile flex items-center ${theme==="dark"? "text-white":"text-black"} w-full gap-4 shrink-0 cursor-pointer rounded-xl p-4 ${hoverBg} ${activeBg}`}>
 
-            <div className={` ${isSelfStatus && "addBeforeElement"} userImage w-${width} h-${height} rounded-full shrink-0 `}>
+            <div className={` ${isSelfStatus ? "addBeforeElement":""} userImage w-${width} h-${height} rounded-full shrink-0 `}>
                 <img className='w-full h-full rounded-full' src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRm2-IiCQnnEHH1dk5HN2K60xrv8Wyu8VRW7Q&s" alt="" />
             </div>
 
@@ -15,10 +24,10 @@ const UserProfile = ({username,lastmessage,time,isSelfStatus,statusSize,width,he
 
                 <div className="textDetails w-full overflow-x-hidden text-ellipsis whitespace-nowrap">
                     <h3 className='text-lg font-semibold'>{username}</h3>
-                    <p className='text-sm text-gray-400 font-semibold w-full overflow-x-hidden text-ellipsis whitespace-nowrap'>{lastmessage}</p>
+                    <p className='text-sm text-gray-400 font-semibold w-full overflow-x-hidden text-ellipsis whitespace-nowrap'>{lastmessage || uploadTime}</p>
                 </div>
+                {time&&<div className="time text-sm text-gray-400 font-semibold">{time}</div>}
 
-                <div className="time text-sm text-gray-400 font-semibold">{time}</div>
             </div>
 
         </div>
