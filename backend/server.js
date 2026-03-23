@@ -17,9 +17,15 @@ const corsOptions = {
   origin: process.env.FRONTEND_URL,
   credentials: true
 }
-
-
 app.use(cors(corsOptions))
+
+
+app.use((req,res,next)=>{
+  req.io = io;
+  req.socketUserMap = io.socketuserMap
+  next();
+})
+
 app.use(express.json())
 app.use(cookieParser())
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -35,11 +41,7 @@ app.get('/', (req, res) => {
 
 const io = initializeSocket(server)
 
-app.use((req,res,next)=>{
-  req.io = io;
-  req.socketUserMap = io.socketuserMap
-  next();
-})
+
 
 connectDb().then(() => {
   server.listen(port, () => {
