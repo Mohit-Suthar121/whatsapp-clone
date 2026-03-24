@@ -1,7 +1,7 @@
 import { axiosInstance } from "./url.service";
 
 
-export const sendOtp = async ( phoneNo, email, phoneNoPrefix ) => {
+export const sendOtp = async ( {phoneNo, email, phoneNoPrefix} ) => {
     try {
         const response = await axiosInstance.post('/auth/send-otp', { phoneNo, email, phoneNoPrefix })
         console.log("The response from the post request of send-otp is: ", response)
@@ -13,7 +13,7 @@ export const sendOtp = async ( phoneNo, email, phoneNoPrefix ) => {
 
 }
 
-export const verifyOtp = async ( email, phoneNo, phoneNoPrefix, otp ) => {
+export const verifyOtp = async ( {email, phoneNo, phoneNoPrefix, otp} ) => {
     try {
         const response = await axiosInstance.post('/auth/verify-otp', { email, phoneNo, phoneNoPrefix, otp })
         return response.data;
@@ -23,7 +23,8 @@ export const verifyOtp = async ( email, phoneNo, phoneNoPrefix, otp ) => {
 
 }
 
-export const updateProfile =async(username,agreed,about)=>{
+
+export const updateProfile =async({username,agreed,about})=>{
     try {
         const response = await axiosInstance.put('/auth/update-profile',{username,agreed,about});
         return response.data
