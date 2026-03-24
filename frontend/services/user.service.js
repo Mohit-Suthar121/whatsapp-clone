@@ -23,10 +23,9 @@ export const verifyOtp = async ( {email, phoneNo, phoneNoPrefix, otp} ) => {
 
 }
 
-
-export const updateProfile =async({username,agreed,about})=>{
+export const updateProfile =async(data)=>{
     try {
-        const response = await axiosInstance.put('/auth/update-profile',{username,agreed,about});
+        const response = await axiosInstance.put('/auth/update-profile',data);
         return response.data
     } catch (error) {
         throw error.response?error.response.data:error.message;

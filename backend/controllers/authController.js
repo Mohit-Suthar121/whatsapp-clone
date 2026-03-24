@@ -72,14 +72,14 @@ const verifyOtp = async (req, res) => {
             user.emailOtp = null
             user.emailOtpExpiry = null
             const token = generateToken(user?._id)
-        res.cookie("auth_token", token, {
-            httpOnly: true,
-            secure: true,
-            maxAge: 365 * 24 * 60 * 60 * 1000
-        })
-        
+            res.cookie("auth_token", token, {
+                httpOnly: true,
+                secure: true,
+                maxAge: 365 * 24 * 60 * 60 * 1000
+            })
+
             await user.save();
-            return response(res, "Email successfully verified!", 200,{email})
+            return response(res, "Email successfully verified!", 200, { user })
         }
 
 
@@ -87,6 +87,7 @@ const verifyOtp = async (req, res) => {
             return response(res, "Phone number and phone suffix are required!", 400)
         };
 
+        // if user sends otp via phone number, not email: 
         let user;
         user = await User.findOne({ phoneNo })
         if (!user) {
@@ -105,7 +106,7 @@ const verifyOtp = async (req, res) => {
             maxAge: 365 * 24 * 60 * 60 * 1000
         })
         await user.save();
-        return response(res, "otp verified successfully!", 200,{phoneNo})
+        return response(res, "Phone number verified successfully!", 200, { user })
 
     } catch (error) {
         return response(res, "Internal server error", 500)
@@ -115,78 +116,77 @@ const verifyOtp = async (req, res) => {
 
 
 
-const updateProfile = async(req,res)=>{
-    const {username,agreed,about} = req.body;
+const updateProfile = async (req, res) => {
+    const { username, agreed, profilePicture } = req.body;
+    const file = req.file;
     const userId = req.user.userId;
 
     try {
         const user = await User.findById(userId)
-        if(!user) return response(res,"User not found!",404)
-        const file = req.file;
-        if(file){
+        if (!user) return response(res, "User not found!", 404)
+        if (file) {
             const uploadResult = await uploadToCloudinary(file);
             user.profilePicture = uploadResult.secure_url;
-            
-        }else if(req.body.profilePicture) user.profilePicture = req.body.profilePicture;
-        if(username) user.username = username;
-        if(agreed !== undefined) user.agreed = agreed;
-        if(about) user.about = about;
+
+        } else if (profilePicture) user.profilePicture = profilePicture;
+        if (username) user.username = username;
+        if (agreed !== undefined) user.agreed = agreed;
         await user.save();
-        return response(res,"profile updated successfully!",200,user)
-            
+        return response(res, "profile updated successfully!", 200, user)
+
     } catch (error) {
-        console.log("some error occured in the authController updateProfile!",error)
-        return response(res,"Internal server error!",500)
+        console.log("some error occured in the authController updateProfile!", error)
+        return response(res, "Internal server error!", 500)
     }
 }
 
 
-const userAuthenticated = async (req,res)=>{
+const userAuthenticated = async (req, res) => {
     try {
         const userId = req.user.userId;
-       const user =  await User.findById(userId);
-       if(!user){
-        return response(res,"User not found!",404);
-       }
-       return response(res,"User is successfully authorized and ready to use the app",200,user)
+        const user = await User.findById(userId);
+        if (!user) {
+            return response(res, "User not found!", 404);
+        }
+        return response(res, "User is successfully authorized and ready to use the app", 200, user)
 
     } catch (error) {
         console.error(error);
-        return response(res,"Internal server error",500)
+        return response(res, "Internal server error", 500)
     }
 }
 
 
-const logout = (req,res)=>{
+const logout = (req, res) => {
     try {
-        
-    res.clearCookie("auth_token",{httpOnly:true,secure:true});
-    return response(res,"Logged out successfully!",200);
+
+        res.clearCookie("auth_token", { httpOnly: true, secure: true });
+        return response(res, "Logged out successfully!", 200);
     } catch (error) {
-        return response(res,"Internal server error!",500)
+        return response(res, "Internal server error!", 500)
     }
 }
 
 
-const getAllUsers = async(req,res) =>{
+const getAllUsers = async (req, res) => {
     try {
-        
-    const loggedInUser = req.user.userId;
-    const users = await User.find({_id: {$ne:loggedInUser}}).select("username profilePicture about isOnline lastSeen").lean();
 
-    const usersWithConversation = await Promise.all(users.map( async (user)=>{
-        const conversation = await  Conversation.findOne({participants:{$all :[loggedInUser,user._id]}}).populate({
-            path:"lastMessage",
-            select:"content createdAt sender receiver"
-        }).lean();
-        return {...user,conversation:conversation||null}
-    }))
-    return response(res,"users retrieved successfully!",200,usersWithConversation);
+        const loggedInUser = req.user.userId;
+        const users = await User.find({ _id: { $ne: loggedInUser } }).select("username profilePicture about isOnline lastSeen").lean();
 
-    
+        const usersWithConversation = await Promise.all(users.map(async (user) => {
+            const conversation = await Conversation.findOne({ participants: { $all: [loggedInUser, user._id] } }).populate({
+                path: "lastMessage",
+                select: "content createdAt sender receiver"
+            }).lean();
+            return { ...user, conversation: conversation || null }
+        }))
+        return response(res, "users retrieved successfully!", 200, usersWithConversation);
+
+
     } catch (error) {
         console.error(error);
-        return response(res,"Internal server error!",500)
+        return response(res, "Internal server error!", 500)
 
     }
 
@@ -194,6 +194,6 @@ const getAllUsers = async(req,res) =>{
 }
 
 
-export { verifyOtp, sendOtp,updateProfile,logout,userAuthenticated,getAllUsers }
+export { verifyOtp, sendOtp, updateProfile, logout, userAuthenticated, getAllUsers }
 
 

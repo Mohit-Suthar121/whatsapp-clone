@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import * as yup from 'yup'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -9,12 +9,15 @@ import { IoIosArrowDown } from "react-icons/io";
 import DropDownCountry from '../../src/assets/components/DropDownCountry'
 import PersonSvg from '../../src/assets/components/icons/PersonSvg'
 import Spinner from '../../utils/Spinner'
-import { sendOtp, verifyOtp } from '../../services/user.service'
+import { sendOtp, updateProfile, verifyOtp } from '../../services/user.service'
 import { Bounce, ToastContainer, toast } from 'react-toastify'
+import { useUserStore } from '../../store/useUserStore'
 import { useLoginStore } from '../../store/useLoginStore'
+import { useNavigate } from 'react-router'
+import LeftArrow from '../../src/assets/components/icons/LeftArrow'
 const Login = () => {
 
-
+  const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [phonePrefix, setPhonePrefix] = useState("+91");
@@ -27,7 +30,12 @@ const Login = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { userPhoneData, setStep, step, setUserPhoneData } = useLoginStore();
+  const { setUser } = useUserStore();
+  const [selectedAvatar, setSelectedAvatar] = useState("https://api.dicebear.com/6.x/avataaars/svg?seed=Felix");
   const inputRefs = useRef([]);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState("");
+
 
   const notifySuccess = (text) => {
     toast.success(text, {
@@ -42,8 +50,9 @@ const Login = () => {
       transition: Bounce,
     });
   }
-  const notifyFailure = () => {
-    toast.error('Some Error Occured ! Please Try Again', {
+
+  const notifyFailure = (text) => {
+    toast.error(text, {
       position: "top-right",
       autoClose: 5000,
       hideProgressBar: false,
@@ -59,7 +68,7 @@ const Login = () => {
 
   async function onLoginSubmit(data) {
     console.log(data);
-    if(!data){
+    if (!data) {
       console.error("Form data is missing");
       notifyFailure("Form data is missing!");
       return;
@@ -73,7 +82,7 @@ const Login = () => {
           setStep(2);
           setUserPhoneData({ email: data.email });
         }
-        else{
+        else {
           notifyFailure("Some Error Occured ! Please Try Again");
         }
       }
@@ -91,7 +100,7 @@ const Login = () => {
         }
       }
     } catch (error) {
-      console.error("Some Error occured!",error)
+      console.error("Some Error occured!", error)
     } finally {
       setIsLoading(false)
     }
@@ -107,6 +116,15 @@ const Login = () => {
       if (response.status === "success") {
         notifySuccess("Otp Verified Successfully!")
         console.log("Otp verified successfully with response: ", response)
+        let user = response?.user;
+        if (user?.username && user?.profilePicture) {
+          notifySuccess(`Welcome back to whatsapp ${response.data.username}`)
+          setUser(user);
+          navigate('/')
+        }
+        else {
+          setStep(3);
+        }
       }
       else {
         notifyFailure("Some Error Occured ! Please Try Again");
@@ -116,11 +134,51 @@ const Login = () => {
     } catch (error) {
       notifyFailure("Some error occured, please try again later!")
       console.error('some error occured!', error)
-    } finally{
+    } finally {
       setIsLoading(false);
     }
 
   }
+
+  async function onProfileSubmit(data) {
+    try {
+    setIsLoading(true);
+    const { username, agreed } = data;
+    let media;
+    let profilePicture;
+    if(imageFile){
+      media = imageFile
+    }
+    else if(selectedAvatar){
+      profilePicture = selectedAvatar
+    }
+    const newData = {
+      username,
+      agreed,
+      media,
+      profilePicture
+    }
+    console.log(newData);
+    const response = await updateProfile(newData);
+    if(response.status === "success"){
+      console.log("profile submitted Successfully! and the response data is: ",response.data)
+      notifySuccess("profile created successfully!")
+
+      navigate("/")
+    }
+    else{
+      console.error("Some Error with the response: ",response.message)
+    }
+    } catch (error) {
+      console.error("some error occured!",error);
+      notifyFailure("Some error Occcured!")
+    }finally{
+      setIsLoading(false);
+    }
+    
+  }
+
+
 
   async function onOtpChange(value, index) {
     if (!/^\d+$/.test(value)) return;
@@ -136,6 +194,7 @@ const Login = () => {
     inputRefs.current[index + 1]?.focus();
   }
 
+
   async function handleKeyDown(e, index) {
     console.log(e.key)
     if (e.key === "Backspace") {
@@ -148,6 +207,8 @@ const Login = () => {
       }
     }
   }
+
+
 
   async function handlePaste(e) {
     e.preventDefault();
@@ -168,13 +229,26 @@ const Login = () => {
     onOtpSubmit(joinedOtp);
   }
 
+  async function handleFileUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    setImageFile(file);
+    setSelectedAvatar("")
+    if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
+    const imageUrl = URL.createObjectURL(file);
+    setImagePreviewUrl(imageUrl);
+    console.log(file)
+  }
+
+
 
 
   let filterCountries = countries3.filter((country) => (
     country.countryName.toLowerCase().includes(searchTerm) || country.countryCode.toLowerCase().includes(searchTerm)
   ))
 
- 
+
+
   const loginValidation = yup.object({
     phoneNo: yup.string().notRequired().nullable().matches(/^\d+$/, "Phone number should be digit!").transform((value, originalValue) => originalValue.trim() === "" ? null : value),
 
@@ -190,12 +264,12 @@ const Login = () => {
     otp: yup.string().required("OTP is reqired!").length(6, "OTP should be exactly of length 6")
   })
 
-  
+
 
   const profileValidation = yup.object({
     username: yup.string().required("Username is required!"),
     about: yup.string().notRequired().nullable(),
-    agreed: yup.bool().oneOf([true], "You must agree with our terms and conditions")
+    agreed: yup.boolean().oneOf([true], "You must agree with our terms and conditions")
   })
 
 
@@ -229,6 +303,7 @@ const Login = () => {
   } = useForm({ resolver: yupResolver(otpValidation) })
 
 
+
   const {
     register: profileRegister,
     handleSubmit: handleProfileSubmit,
@@ -236,46 +311,52 @@ const Login = () => {
     watch
   } = useForm({ resolver: yupResolver(profileValidation) })
 
-
+  useEffect(() => {
+    return () => {
+      if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
+    }
+  }, [imagePreviewUrl])
 
   return (
     <div className="main-container w-full h-screen relative">
-      <form onSubmit={handleLoginSubmit(onLoginSubmit)}>
+      <InteractiveGridPattern />
+
+      <div className="wrapper flex justify-center items-center relative h-screen z-10 pointer-events-none ">
+
+        <div className={`box1 w-120 min-h-100 bg-[#1b4b52] rounded-2xl pointer-events-auto p-8 flex flex-col gap-2`}>
 
 
-        <InteractiveGridPattern />
+          <div className='w-full flex flex-col gap-6 '>
 
-        <div className="wrapper flex justify-center items-center relative h-full z-10 pointer-events-none">
-          <div className="box1 w-120 min-h-100 bg-[#1b4b52] rounded-2xl  pointer-events-auto p-8 flex flex-col gap-6">
-
-
-            <div className='w-full flex flex-col gap-6'>
-
-              <div className='w-full flex justify-center'>
-                <div className="whatsapplogo w-22 h-22 rounded-full bg-green-500 flex justify-center items-center">
-                  <FaWhatsapp
-                    className='w-16 h-16 text-white'
-                  />
-                </div>
+            <div className='w-full flex justify-center'>
+              <div className="whatsapplogo w-22 h-22 rounded-full bg-green-500 flex justify-center items-center">
+                <FaWhatsapp
+                  className='w-16 h-16 text-white'
+                />
               </div>
+            </div>
 
-              <div className="text-white font-bold text-4xl flex justify-center">
-                <span>Whatsapp Login</span>
-              </div>
+            <div className="text-white font-bold text-4xl flex justify-center">
+              <span>Whatsapp Login</span>
+            </div>
 
-              <div className="progressBar w-full rounded-xl h-2 bg-gray-200">
+            <div className="progressBar w-full rounded-xl h-2 bg-gray-200">
+              <div className={`bg-green-500 rounded-xl  h-full`} style={{ width: `${Math.floor((step / 3) * 100)}%` }}></div>
+            </div>
 
-                <div className={`bg-green-500 rounded-xl  h-full`} style={{ width: `${Math.floor((step / 3) * 100)}%` }}></div>
-              </div>
+          </div>
+
+
+
+          {step === 1 && <form onSubmit={handleLoginSubmit(onLoginSubmit)}>
+
+            <div className="step1 w-full flex flex-col gap-4 ">
 
               <div className='flex justify-center w-full'>
-                {step === 1 && <p className='text-white'>Enter your phone number to receive an OTP</p>}
-                {step === 2 && <p className='text-white'>Please Enter the 6-digit OTP</p>}
+                <p className='text-white'>Enter your phone number to receive an OTP</p>
               </div>
 
-
-
-              {step === 1 && <div className="dropdown w-full h-12 rounded-xl border border-gray-400  flex items-center" >
+              <div className="dropdown w-full h-12 rounded-xl border border-gray-400  flex items-center" >
 
                 <div onClick={() => { setShowDropdown(!showDropdown) }} className="cursor-pointer hover:bg-green-700 relative countries w-[25%] rounded-l-xl bg-green-600 h-full flex justify-center items-center ">
 
@@ -313,43 +394,110 @@ const Login = () => {
                   <input {...loginRegister("phoneNo")} type="text" className={`p-4 focus:outline-none text-white text-lg  h-full w-full  rounded-r-xl`} placeholder='Enter phone number' />
                   {loginErrors.phoneNo && <div className='errors absolute w-full -top-5 left-1 text-red-500'>*{loginErrors.phoneNo.message}</div>}
                 </div>
-              </div>}
+              </div>
 
-              {step === 2 && <div className="otp-inputs  justify-center items-center w-full flex">
-                <div onPaste={handlePaste} className='flex gap-4 items-center '>
-                  {otp.map((value, index) => (
-                    <input onKeyDown={(e) => { handleKeyDown(e, index) }} maxLength={1} value={value} onChange={(e) => { onOtpChange(e.target.value, index) }} key={index} ref={(el) => (inputRefs.current[index] = el)} inputMode='numeric' className='w-12 h-12 border rounded-lg text-white text-center focus:outline-none focus:border-green-500 focus:border-2 flex justify-center items-center' type="text" />
-                  ))}
-                </div>
+              {/* divider with or */}
+              <div className="divider flex items-center gap-2">
+                <div className='flex-1/2 border border-green-600 h-0' />
+                <span className=' w-4 text-green-400  mr-1' > OR </span>
+                <div className='flex-1/2 border border-green-600 h-0' />
+              </div>
 
-              </div>}
 
+              <div className="emailsection relative w-full h-10 flex items-center rounded-xl border border-gray-500 gap-2 p-2 ">
+                <PersonSvg currentColor={"#00a03d"} />
+                <input {...loginRegister("email")} type="text " placeholder='Email (Optional)' className='flex-1 border-red-300 p-2 focus:outline-none text-white' />
+                {loginErrors.email && <div className='errors absolute w-full -top-6 left-4 text-red-500'> *{loginErrors.email.message}</div>}
+
+              </div>
+              <button className='w-full h-10 flex justify-center items-center rounded-xl bg-green-600 text-white font-bold p-2 cursor-pointer'>{isLoading ? <Spinner /> : "Send Otp"} </button>
+
+            </div>
+          </form>}
+
+
+          {step === 2 && <div className="step2 w-full flex flex-col gap-4">
+            <div className='flex justify-center w-full'>
+              <p className='text-white'>Please Enter the 6-digit OTP</p>
+            </div>
+
+            <div className="otp-inputs justify-center items-center w-full flex">
+              <div onPaste={handlePaste} className='flex gap-4 items-center '>
+                {otp.map((value, index) => (
+                  <input onKeyDown={(e) => { handleKeyDown(e, index) }} maxLength={1} value={value} onChange={(e) => { onOtpChange(e.target.value, index) }} key={index} ref={(el) => (inputRefs.current[index] = el)} inputMode='numeric' className='w-12 h-12 border rounded-lg text-white text-center focus:outline-none focus:border-green-500 focus:border-2 flex justify-center items-center' type="text" />
+                ))}
+              </div>
+
+            </div>
+
+            <div className='w-full flex flex-col gap-2'>
+
+              {step === 2 && <button className='w-full h-10 flex justify-center items-center rounded-xl bg-green-600 text-white font-bold p-2 cursor-pointer'>{isLoading ? <Spinner /> : "Verify Otp"} </button>}
+
+
+              <button type='button' onClick={() => {
+                setStep(1);
+              }} className='w-full cursor-pointer rounded-xl font-bold p-2 flex justify-center items-center bg-gray-400 text-white' >Wrong Number? Go Back {<LeftArrow currentColor={"#ffffff"} />}</button>
 
             </div>
 
 
-            {/* divider with or */}
-            {step === 1 && <div className="divider flex items-center gap-2">
-              <div className='flex-1/2 border border-green-600 h-0' />
-              <span className=' w-4 text-green-400  mr-1' > OR </span>
-              <div className='flex-1/2 border border-green-600 h-0' />
-            </div>}
+          </div>}
+
+          {step == 3 && <form onSubmit={handleProfileSubmit(onProfileSubmit)}>
+
+            <div className="step3 flex flex-col gap-4">
+
+              <div className="avatarSection w-full flex flex-col justify-center items-center gap-2">
 
 
-            {step === 1 && <div className="emailsection relative w-full h-10 flex items-center rounded-xl border border-gray-500 gap-2 p-2 ">
-              <PersonSvg currentColor={"#00a03d"} />
-              <input {...loginRegister("email")} type="text " placeholder='Email (Optional)' className='flex-1 border-red-300 p-2 focus:outline-none text-white' />
-              {loginErrors.email && <div className='errors absolute w-full -top-6 left-4 text-red-500'> *{loginErrors.email.message}</div>}
+                <label onChange={handleFileUpload} htmlFor="ProfilePicture" className='relative BigPicture rounded-full w-22 h-22 ProfilePictureDecorator bg-[#2b7985] flex cursor-pointer'>
+                  <div className="imageWrapper overflow-hidden w-full h-full rounded-full">
+                    {!imagePreviewUrl && <img src={selectedAvatar} width={88} height={88} alt="profilePic" className='object-contain' />}
+                    {imagePreviewUrl && <img src={imagePreviewUrl} width={88} height={88} alt="profilePic" className='w-full h-full object-cover object-center'/>}
+                  </div>
+                  <div className=""></div>
+                  <input type="file" name="ProfilePicture" className='hidden' id="ProfilePicture" />
+                </label>
 
-            </div>}
+                <div className="text-white">Choose an Avatar</div>
 
-            {step === 1 && <button className='w-full h-10 flex justify-center items-center rounded-xl bg-green-600 text-white font-bold p-2 cursor-pointer'>{isLoading ? <Spinner /> : "Send Otp"} </button>}
+                <div className="otherAvatars flex gap-2 justify-center">
+                  {avatars.map((avatar, index) => (
 
-            {step === 2 && <button className='w-full h-10 flex justify-center items-center rounded-xl bg-green-600 text-white font-bold p-2 cursor-pointer'>{isLoading ? <Spinner /> : "Verify Otp"} </button>}
+                    <label htmlFor={avatar} key={avatar} className={`avatar cursor-pointer rounded-full w-12 h-12  ${selectedAvatar === avatar ? "border-3 border-green-500" : ""} `} style={{ backgroundImage: `url(${avatar})` }}>
+                      <input onChange={() => { setSelectedAvatar(avatar),setImagePreviewUrl("")}} type="radio" name="avatar" id={avatar} className='hidden' />
+                    </label>
 
-          </div>
+                  ))}
+                </div>
+              </div>
+
+
+              <div className="username relative w-full h-10 flex items-center rounded-xl border border-gray-500 gap-2 p-2 ">
+                <PersonSvg currentColor={"#00a03d"} />
+                <input {...profileRegister("username")} type="text " placeholder='Username' className='flex-1 border-red-300 p-2 focus:outline-none text-white' />
+                {profileErrors?.username?.message}
+              </div>
+
+
+              <div className="checkbox flex gap-2">
+                <input {...profileRegister("agreed")} type="checkbox" id="agreebox" />
+                <label htmlFor="agreebox" className='text-white'>I agree to the <span className='text-green-400 hover:underline cursor-pointer'>Terms and Conditions</span> </label>
+                {profileErrors?.agreed?.message}
+              </div>
+
+
+              <button className='w-full h-10 flex justify-center items-center rounded-xl bg-green-600 text-white font-bold p-2 cursor-pointer'>{isLoading ? <Spinner /> : "Create Profile"} </button>
+            </div>
+
+          </form>}
+
         </div>
-      </form>
+      </div>
+
+
+
       <ToastContainer
         position="top-right"
         autoClose={5000}
