@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 import LaptopSvg from './icons/LaptopSvg'
-import Settings from './Settings'
-import Status from './Status'
-import Chat from './Chat'
+// import Settings from '../../pages/settingSection/Settings'
+// import Status from './Status'
+import Chat from '../../pages/chatSection/Chat'
 import SideBar from './SideBar'
-import Profile from './Profile'
+// import Profile from '../../pages/profile/Profile'
 import { useThemeStore } from '../../../store/useThemeStore'
 
 const Home = () => {
@@ -22,11 +22,13 @@ const Home = () => {
 
     return (
         <div className='main-container flex w-full h-screen'>
-            <SideBar  setIsActive={setIsActive} isActive={isActive}/>
-            {isActive == "chat" && <Chat userClick={userClick} setUserClick={setUserClick} />}
+            {/* <SideBar  setIsActive={setIsActive} isActive={isActive}/> */}
+            <Chat userClick={userClick} setUserClick={setUserClick} />
+            
+            {/* {isActive == "chat" && <Chat userClick={userClick} setUserClick={setUserClick} />}
             {isActive == "status" && <Status />}
             {isActive == "settings" && <Settings theme={theme} setTheme={setTheme} setIsActive={setIsActive}/>}
-            {isActive=="profile" && <Profile/>}
+            {isActive=="profile" && <Profile/>} */}
 
         </div>
     )

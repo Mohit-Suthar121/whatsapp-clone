@@ -1,26 +1,25 @@
 import {React ,useState} from 'react'
-import SettingsCards from './SettingsCards'
-import AccountSvg from './icons/AccountSvg'
-import ChatSvg from './icons/ChatSvg'
-import HelpIcon from './icons/HelpIcon'
-import DarkModeSvg from './icons/DarkModeSvg'
-import LogOutSvg from './icons/LogOutSvg'
-import UserProfile from './UserProfile'
-import SettingsFilled from './icons/Settings_fill'
-import RightSideSection from './RightSideSection'
+import SettingsCards from '../../assets/components/SettingsCards'
+import AccountSvg from '../../assets/components/icons/AccountSvg'
+import ChatSvg from '../../assets/components/icons/ChatSvg'
+import HelpIcon from '../../assets/components/icons/HelpIcon'
+import DarkModeSvg from '../../assets/components/icons/DarkModeSvg'
+import LogOutSvg from '../../assets/components/icons/LogOutSvg'
+import UserProfile from '../../assets/components/UserProfile'
+import SettingsFilled from '../../assets/components/icons/Settings_fill'
+import RightSideSection from '../../assets/components/RightSideSection'
+import { useThemeStore } from '../../../store/useThemeStore'
 
-const Settings = ({ setIsActive, theme, setTheme }) => {
-
+const Settings = ({ setIsActive,}) => {
 
     function handleClick(text) {
         setIsActive(text);
     }
     const [settingsActive, setSettingsActive] = useState("");
-
-
+    const {theme,setTheme} = useThemeStore()
 
     return (
-        <div className='flex w-full'>
+        <div className='flex w-full h-full'>
 
             <div className='flex w-full'>
 

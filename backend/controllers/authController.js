@@ -135,7 +135,7 @@ const updateProfile = async (req, res) => {
         return response(res, "profile updated successfully!", 200, user)
 
     } catch (error) {
-        console.log("some error occured in the authController updateProfile!", error)
+        console.    log("some error occured in the authController updateProfile!", error)
         return response(res, "Internal server error!", 500)
     }
 }
@@ -170,7 +170,6 @@ const logout = (req, res) => {
 
 const getAllUsers = async (req, res) => {
     try {
-
         const loggedInUser = req.user.userId;
         const users = await User.find({ _id: { $ne: loggedInUser } }).select("username profilePicture about isOnline lastSeen").lean();
 

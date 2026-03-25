@@ -1,12 +1,11 @@
 import React, { useState } from 'react'
-import UserProfile from './UserProfile'
-import ThreeDots from './icons/ThreeDots'
-import AddSvgCircle from './icons/AddSvgCircle'
-import StatusFilled from './icons/Status_fill'
+import UserProfile from '../../assets/components/UserProfile'
+import ThreeDots from '../../assets/components/icons/ThreeDots'
+import AddSvgCircle from '../../assets/components/icons/AddSvgCircle'
+import StatusFilled from '../../assets/components/icons/Status_fill'
 import { useThemeStore } from '../../../store/useThemeStore'
-import RightSideSection from './RightSideSection'
-import CircledButton from './CircledButton'
-
+import RightSideSection from '../../assets/components/RightSideSection'
+import CircledButton from '../../assets/components/CircledButton'
 const Status = () => {
     const { theme } = useThemeStore();
     const [isActiveStatus, setIsActiveStatus] = useState("");

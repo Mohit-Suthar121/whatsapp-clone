@@ -1,9 +1,9 @@
 
 import { useState } from 'react'
-import LaptopSvg from './icons/LaptopSvg'
-import UserSelfInfo from './UserSelfInfo'
-import AccountFilledSvg from './icons/Account_filled'
-import RightSideSection from './RightSideSection'
+import LaptopSvg from '../../assets/components/icons/LaptopSvg'
+import UserSelfInfo from '../../assets/components/UserSelfInfo'
+import AccountFilledSvg from '../../assets/components/icons/Account_filled'
+import RightSideSection from '../../assets/components/RightSideSection'
 import { useThemeStore } from '../../../store/useThemeStore'
 
 const Profile = () => {

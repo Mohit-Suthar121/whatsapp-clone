@@ -112,7 +112,6 @@ const Login = () => {
       const newData = { ...userPhoneData, otp: joinedOtp }
       console.log(newData)
       const response = await verifyOtp(newData);
-
       if (response.status === "success") {
         notifySuccess("Otp Verified Successfully!")
         console.log("Otp verified successfully with response: ", response)

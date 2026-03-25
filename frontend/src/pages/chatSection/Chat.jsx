@@ -1,16 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react'
-import UserProfile from './UserProfile'
-import Search from './icons/Search'
-import NewChat from './icons/NewChat'
-import ThreeDots from './icons/ThreeDots'
-import VideoCall from './icons/VideoCall'
-import AddIcon from './icons/AddIcon'
-import EmojiIcon from './icons/EmojiIcon'
-import MicIcon from './icons/MicIcon'
-import Send from './icons/Send'
+import UserProfile from '../../assets/components/UserProfile'
+import Search from '../../assets/components/icons/Search'
+import NewChat from '../../assets/components/icons/NewChat'
+import ThreeDots from '../../assets/components/icons/ThreeDots'
+import VideoCall from '../../assets/components/icons/VideoCall'
+import AddIcon from '../../assets/components/icons/AddIcon'
+import EmojiIcon from '../../assets/components/icons/EmojiIcon'
+import MicIcon from '../../assets/components/icons/MicIcon'
+import Send from '../../assets/components/icons/Send'
 import TextareaAutosize from 'react-textarea-autosize';
-import LaptopSvg from './icons/LaptopSvg'
-import MessageBubble from './MessageBubble'
+import LaptopSvg from '../../assets/components/icons/LaptopSvg'
+import MessageBubble from '../../assets/components/MessageBubble'
 import { useThemeStore } from '../../../store/useThemeStore'
 
 const Chat = ({ userClick, setUserClick }) => {
@@ -37,7 +37,7 @@ const Chat = ({ userClick, setUserClick }) => {
     }
     return (
 
-        <div className='w-full flex '>
+        <div className='w-full flex h-full'>
             <div className={`  maincontent w-115 h-full flex flex-col border-r ${theme==="dark"? "border-r-[#2E2F2F]":"border-r-[#DEDCDA]"} ${theme==="dark"?"bg-[#161717]":"bg-[#FFFFFF]"}`} >
                 <div className='headers p-4 w-full h-16 justify-between flex items-center'>
                     <div className={`name ${theme==="dark"?"text-white":"text-[#1DAA61]"} font-semibold tracking-tighter text-2xl`}>
