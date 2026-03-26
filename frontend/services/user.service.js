@@ -25,12 +25,20 @@ export const verifyOtp = async ( {email, phoneNo, phoneNoPrefix, otp} ) => {
 
 export const updateProfile =async(data)=>{
     try {
-        const response = await axiosInstance.put('/auth/update-profile',data);
+        const response = await axiosInstance.put('/auth/update-profile',data,{
+            headers:{
+                'Content-Type':'multipart/form-data',
+            }
+        });
+        console.log("The response received from the axios after sending requrest to update-profile end with data as:",data);
+        console.log("the data received:",response)
         return response.data
     } catch (error) {
         throw error.response?error.response.data:error.message;
     }
 }
+
+
 
 
 export const checkAuth =async()=>{

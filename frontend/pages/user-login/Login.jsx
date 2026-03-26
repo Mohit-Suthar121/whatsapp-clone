@@ -143,26 +143,21 @@ const Login = () => {
     try {
     setIsLoading(true);
     const { username, agreed } = data;
-    let media;
-    let profilePicture;
+    const formdata = new FormData();
+    formdata.append("username",username);
+    formdata.append("agreed",agreed);
     if(imageFile){
-      media = imageFile
+      formdata.append("media",imageFile)
     }
     else if(selectedAvatar){
-      profilePicture = selectedAvatar
+      formdata.append("profilePicture",selectedAvatar)
     }
-    const newData = {
-      username,
-      agreed,
-      media,
-      profilePicture
-    }
-    console.log(newData);
-    const response = await updateProfile(newData);
+    console.log("form which has to be sent:",formdata);
+    const response = await updateProfile(formdata);
     if(response.status === "success"){
       console.log("profile submitted Successfully! and the response data is: ",response.data)
       notifySuccess("profile created successfully!")
-
+      setUser(response.data)
       navigate("/")
     }
     else{

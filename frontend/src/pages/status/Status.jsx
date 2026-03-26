@@ -6,9 +6,11 @@ import StatusFilled from '../../assets/components/icons/Status_fill'
 import { useThemeStore } from '../../../store/useThemeStore'
 import RightSideSection from '../../assets/components/RightSideSection'
 import CircledButton from '../../assets/components/CircledButton'
+import { useUserStore } from '../../../store/useUserStore'
 const Status = () => {
     const { theme } = useThemeStore();
     const [isActiveStatus, setIsActiveStatus] = useState("");
+    const {user} = useUserStore();
 
     function handleClick(userId){
         setIsActiveStatus(userId)
@@ -62,7 +64,7 @@ const Status = () => {
     );
 
     return (
-        <div className='flex w-full'>
+        <div className='flex w-full h-full'>
 
             <div className={` maincontent w-115 h-full flex flex-col border-r ${theme==="dark"? "border-r-[#2E2F2F]":"border-r-[#DEDCDA]"} ${theme === "dark" ? "bg-[#161717]" : "bg-[#ffffff]"}`}>
 
@@ -80,7 +82,7 @@ const Status = () => {
                 <div className={`profileScroller w-full flex-1 ${theme==="dark"?"":"profileScroller2"}`}>
 
                     <div className="chats-section w-full p-2 flex flex-col gap-2 border-[#2E2F2F]">
-                        <UserProfile width={10} height={10} username={myStatus.username} uploadTime={myStatus.uploadTime} isSelfStatus={true} />
+                        <UserProfile profilePicture={user?.profilePicture} width={10} height={10} username={myStatus.username} uploadTime={myStatus.uploadTime} isSelfStatus={true} />
                     </div>
 
                     <div className="recent-status p-3 flex flex-col gap-2 ">
@@ -107,7 +109,7 @@ const Status = () => {
             </div>
 
 
-            <RightSideSection svgComponent={<StatusFilled width={"66px"} height={"66px"} />} text={"Share Status Updates"} />
+            <RightSideSection svgComponent={<StatusFilled currentColor={theme==="dark"?"#999A9A":"#C6C4C2"} width={"66px"} height={"66px"} />} text={"Share Status Updates"} />
         </div>
 
 

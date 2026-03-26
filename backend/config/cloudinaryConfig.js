@@ -9,6 +9,7 @@ cloudinary.config({
 })
 
 
+
 const uploadToCloudinary = (file) => {
 
     const options = {

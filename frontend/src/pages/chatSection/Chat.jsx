@@ -12,13 +12,16 @@ import TextareaAutosize from 'react-textarea-autosize';
 import LaptopSvg from '../../assets/components/icons/LaptopSvg'
 import MessageBubble from '../../assets/components/MessageBubble'
 import { useThemeStore } from '../../../store/useThemeStore'
+import { useUserStore } from '../../../store/useUserStore'
 
-const Chat = ({ userClick, setUserClick }) => {
+const Chat = ({ userClick }) => {
 
     const [isEmpty, setIsEmpty] = useState(true);
     const scrollRef = useRef();
     const {theme} = useThemeStore();
     const [isActiveCard,setIsActiveCard] = useState(null);
+    const {user} = useUserStore();
+    
 
     useEffect(()=>{
         if(userClick){
@@ -32,7 +35,6 @@ const Chat = ({ userClick, setUserClick }) => {
         else setIsEmpty(true);
     }
     function handleClick(userId) {
-        setUserClick(true);
         setIsActiveCard(userId)
     }
     return (
@@ -71,12 +73,8 @@ const Chat = ({ userClick, setUserClick }) => {
 
 
                 <div className={`chats-section w-full p-2 flex flex-col flex-1 overflow-auto gap-2 profileScroller border-t ${theme==="dark"?"border-[#2E2F2F]":"border-[#DEDCDA]"} `}>
-                    <UserProfile width={12.5} height={12.5} username={"Username"} lastmessage={"hello bro how are you?"} time={"Yesterday"} isSelfStatus={false} 
-                     onClick={ ()=>{ handleClick("user1")}} isActiveCard={isActiveCard}  userId={"user1"} />
-                    <UserProfile width={12.5} height={12.5} username={"Username"} lastmessage={"hello bro how are you?"} time={"Yesterday"} isSelfStatus={false}
-                     onClick={ ()=>{ handleClick("user2")}} isActiveCard={isActiveCard} userId={"user2"} />
-                    <UserProfile width={12.5} height={12.5} username={"Username"} lastmessage={"hello bro how are you?"} time={"Yesterday"} isSelfStatus={false}
-                     onClick={ ()=>{ handleClick("user3")}} isActiveCard={isActiveCard} userId={"user3"} />
+                    <UserProfile width={12.5} height={12.5} profilePicture={user?.profilePicture} username={user?.username} lastmessage={"hello bro how are you?"} time={"Yesterday"} isSelfStatus={false} 
+                     onClick={ ()=>{ handleClick(user?._id)}} isActiveCard={isActiveCard}  userId={user?._id} />
                 </div>
 
 
