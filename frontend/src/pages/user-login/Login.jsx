@@ -2,19 +2,20 @@ import React, { useEffect, useRef, useState } from 'react'
 import * as yup from 'yup'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { InteractiveGridPattern } from '../../src/assets/components/InteractiveGridPattern'
+import { InteractiveGridPattern } from '../../assets/components/InteractiveGridPattern'
 import { FaWhatsapp } from 'react-icons/fa'
-import { countries3 } from '../../utils/countries3'
+import { countries3 } from '../../../utils/countries3'
 import { IoIosArrowDown } from "react-icons/io";
-import DropDownCountry from '../../src/assets/components/DropDownCountry'
-import PersonSvg from '../../src/assets/components/icons/PersonSvg'
-import Spinner from '../../utils/Spinner'
-import { sendOtp, updateProfile, verifyOtp } from '../../services/user.service'
-import { Bounce, ToastContainer, toast } from 'react-toastify'
-import { useUserStore } from '../../store/useUserStore'
-import { useLoginStore } from '../../store/useLoginStore'
+import DropDownCountry from '../../assets/components/DropDownCountry'
+import PersonSvg from '../../assets/components/icons/PersonSvg'
+import Spinner from '../../../utils/Spinner'
+import { sendOtp, updateProfile, verifyOtp } from '../../../services/user.service'
+import { useUserStore } from '../../../store/useUserStore'
+import { useLoginStore } from '../../../store/useLoginStore'
 import { useNavigate } from 'react-router'
-import LeftArrow from '../../src/assets/components/icons/LeftArrow'
+import LeftArrow from '../../assets/components/icons/LeftArrow'
+import { notifyFailure,notifySuccess } from '../../../utils/Toasts'
+
 const Login = () => {
 
   const navigate = useNavigate();
@@ -35,35 +36,9 @@ const Login = () => {
   const inputRefs = useRef([]);
   const [imageFile, setImageFile] = useState(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState("");
+  
 
-
-  const notifySuccess = (text) => {
-    toast.success(text, {
-      position: "top-right",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: false,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "dark",
-      transition: Bounce,
-    });
-  }
-
-  const notifyFailure = (text) => {
-    toast.error(text, {
-      position: "top-right",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: false,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "dark",
-      transition: Bounce,
-    });
-  }
+  
 
 
   async function onLoginSubmit(data) {
@@ -106,6 +81,7 @@ const Login = () => {
     }
   }
 
+  
   async function onOtpSubmit(joinedOtp) {
     try {
       setIsLoading(true);
@@ -113,13 +89,12 @@ const Login = () => {
       console.log(newData)
       const response = await verifyOtp(newData);
       if (response.status === "success") {
-        notifySuccess("Otp Verified Successfully!")
         console.log("Otp verified successfully with response: ", response)
-        let user = response?.user;
+        let user = response?.data?.user;
         if (user?.username && user?.profilePicture) {
-          notifySuccess(`Welcome back to whatsapp ${response.data.username}`)
           setUser(user);
           navigate('/')
+          notifySuccess(`Welcome back to whatsapp ${user?.username}`)
         }
         else {
           setStep(3);
@@ -404,7 +379,7 @@ const Login = () => {
                 {loginErrors.email && <div className='errors absolute w-full -top-6 left-4 text-red-500'> *{loginErrors.email.message}</div>}
 
               </div>
-              <button className='w-full h-10 flex justify-center items-center rounded-xl bg-green-600 text-white font-bold p-2 cursor-pointer'>{isLoading ? <Spinner /> : "Send Otp"} </button>
+              <button disabled={isLoading}  className='w-full h-10 flex justify-center items-center rounded-xl bg-green-600 text-white font-bold p-2 cursor-pointer disabled:opacity-50'>{isLoading ? <Spinner /> : "Send Otp"} </button>
 
             </div>
           </form>}
@@ -492,19 +467,7 @@ const Login = () => {
 
 
 
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick={false}
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="dark"
-        transition={Bounce}
-      />
+      
     </div>
   )
 }

@@ -8,7 +8,8 @@ const UserProfile = ({
 
     const { theme } = useThemeStore();
     const hoverBg = theme === "dark" ? "hover:bg-[#2E2F2F]" : "hover:bg-[#F6F5F4]";
-    const activeBg = (isActiveCard && userId )?(isActiveCard?.trim() === userId ? theme === "dark" ? "bg-[#2E2F2F]" : "bg-[#F6F5F4]" : ""):"";
+    const activeBg = (isActiveCard && userId )?(isActiveCard?.id?.trim() === userId ? theme === "dark" ? "bg-[#2E2F2F]" : "bg-[#F6F5F4]" : ""):"";
+    
 
 
     return (
@@ -26,7 +27,7 @@ const UserProfile = ({
                     <h3 className='text-lg font-semibold'>{username}</h3>
                     <p className='text-sm text-gray-400 font-semibold w-full overflow-x-hidden text-ellipsis whitespace-nowrap'>{lastmessage || uploadTime}</p>
                 </div>
-                {time&&<div className="time text-sm text-gray-400 font-semibold">{time}</div>}
+                {time&&<div className="time text-sm text-gray-400 font-semibold whitespace-nowrap">{time}</div>}
 
             </div>
 

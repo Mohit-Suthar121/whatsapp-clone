@@ -115,22 +115,25 @@ const verifyOtp = async (req, res) => {
 
 
 const updateProfile = async (req, res) => {
-    const { username, agreed, profilePicture } = req.body;
+    const { username, agreed, profilePicture,about } = req.body;
     const file = req.file;
     const userId = req.user.userId;
 
     try {
-        const user = await User.findById(userId)
+        const user = await User.findById(userId) 
         if (!user) return response(res, "User not found!", 404)
         if (file) {
             const uploadResult = await uploadToCloudinary(file);
-            user.profilePicture = uploadResult.secure_url;
-
+            user.profilePicture = uploadResult.secure_url; 
         } else if (profilePicture) user.profilePicture = profilePicture;
         if (username) user.username = username;
+        if(about) user.about = about;
         if (agreed !== undefined) user.agreed = agreed;
         await user.save();
         return response(res, "profile updated successfully!", 200, user)
+
+        
+
 
     } catch (error) {
         console.    log("some error occured in the authController updateProfile!", error)

@@ -39,8 +39,6 @@ export const updateProfile =async(data)=>{
 }
 
 
-
-
 export const checkAuth =async()=>{
     try {
         const response = await axiosInstance.get('/auth/check-auth');
@@ -56,6 +54,7 @@ export const checkAuth =async()=>{
 }
 
 
+
 export const logOut =async()=>{
     try {
         const response = await axiosInstance.get('/auth/logout');
@@ -64,6 +63,7 @@ export const logOut =async()=>{
         throw error.response?error.response.data:error.message;
     }
 }
+
 
 
 export const getAllUsers =async()=>{
