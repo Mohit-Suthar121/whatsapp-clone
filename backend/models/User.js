@@ -38,7 +38,11 @@ const userSchema = new mongoose.Schema({
     lastSeen:{type:Date},
     agreed:{type:Boolean,default:false},
     profilePicture:{type:String},
-    about:{type:String}
+    about:{type:String},
+    isRegistrationCompleted:{
+        type:Boolean,
+        default:false
+    }
 
 
 },{timestamps:true})

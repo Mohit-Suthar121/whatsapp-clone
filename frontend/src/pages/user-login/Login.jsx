@@ -31,7 +31,7 @@ const Login = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { userPhoneData, setStep, step, setUserPhoneData } = useLoginStore();
-  const { setUser } = useUserStore();
+  const { setUser,clearUser } = useUserStore();
   const [selectedAvatar, setSelectedAvatar] = useState("https://api.dicebear.com/6.x/avataaars/svg?seed=Felix");
   const inputRefs = useRef([]);
   const [imageFile, setImageFile] = useState(null);
@@ -209,6 +209,12 @@ const Login = () => {
     console.log(file)
   }
 
+  async function handleGoBack(){
+    clearUser();
+    setOtp(new Array(6).fill(""));
+    setStep(1);
+  }
+
 
 
 
@@ -277,7 +283,6 @@ const Login = () => {
     register: profileRegister,
     handleSubmit: handleProfileSubmit,
     formState: { errors: profileErrors },
-    watch
   } = useForm({ resolver: yupResolver(profileValidation) })
 
   useEffect(() => {
@@ -405,12 +410,9 @@ const Login = () => {
 
 
               <button type='button' onClick={() => {
-                setStep(1);
+                handleGoBack();
               }} className='w-full cursor-pointer rounded-xl font-bold p-2 flex justify-center items-center bg-gray-400 text-white' >Wrong Number? Go Back {<LeftArrow currentColor={"#ffffff"} />}</button>
-
             </div>
-
-
           </div>}
 
           {step == 3 && <form onSubmit={handleProfileSubmit(onProfileSubmit)}>

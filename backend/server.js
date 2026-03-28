@@ -9,6 +9,7 @@ import { initializeSocket } from './services/SocketService.js';
 import http from 'http';
 import cors from 'cors'
 import { statusRouter } from './routes/statusRoute.js';
+import { cleanUpUnverifedUsersJob } from './utils/cleanUpUnverifiedUsers.js';
 const app = express()
 const port = 3000
 const server = http.createServer(app)
@@ -49,4 +50,5 @@ connectDb().then(() => {
   })
 })
 
+cleanUpUnverifedUsersJob();
 

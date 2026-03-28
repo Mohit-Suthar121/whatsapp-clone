@@ -129,12 +129,9 @@ const updateProfile = async (req, res) => {
         if (username) user.username = username;
         if(about) user.about = about;
         if (agreed !== undefined) user.agreed = agreed;
+        user.isRegistrationCompleted = true;
         await user.save();
         return response(res, "profile updated successfully!", 200, user)
-
-        
-
-
     } catch (error) {
         console.    log("some error occured in the authController updateProfile!", error)
         return response(res, "Internal server error!", 500)
@@ -172,7 +169,7 @@ const logout = (req, res) => {
 const getAllUsers = async (req, res) => {
     try {
         const loggedInUser = req.user.userId;
-        const users = await User.find({ _id: { $ne: loggedInUser } }).select("username profilePicture about isOnline lastSeen").lean();
+        const users = await User.find({ _id: { $ne: loggedInUser },isRegistrationCompleted:true }).select("username profilePicture about isOnline lastSeen").lean();
 
         const usersWithConversation = await Promise.all(users.map(async (user) => {
             const conversation = await Conversation.findOne({ participants: { $all: [loggedInUser, user._id] } }).populate({
@@ -192,6 +189,7 @@ const getAllUsers = async (req, res) => {
 
 
 }
+
 
 
 export { verifyOtp, sendOtp, updateProfile, logout, userAuthenticated, getAllUsers }

@@ -8,6 +8,7 @@ import { useThemeStore } from '../../../store/useThemeStore'
 import { useUserStore } from '../../../store/useUserStore'
 import { getAllUsers } from '../../../services/user.service'
 import UserConversation from '../../assets/components/UserConversation'
+import { formatConversationTime } from '../../../utils/TimeFormatter'
 
 
 const Chat = () => {
@@ -17,79 +18,25 @@ const Chat = () => {
         id:"",
         profilePicture:"",
         username:"",
-        lastSeen:""
+        lastSeen:"",
+        conversationId:""
     });
     const { user } = useUserStore();
     const [userClick, setUserClick] = useState(false);
     const [showConversation, setShowConversation] = useState("");
-    const [conversations, setConversations] = useState([
-         {
-        _id: "chat_001",
-        participants: [
-            {
-                _id: "642f8c3a1f1a2b6d5e7a9b02",
-                username: "Aarav",
-                profilePicture: "https://randomuser.me/api/portraits/men/32.jpg",
-            },
-            {
-                _id: user?._id,
-                username: user?.username,
-                profilePicture: user?.profilePicture,
-            }
-        ],
-
-        lastMessage: "Hey, are you coming to the party?",
-        unreadCount: 2
-    },
-    {
-        _id: "chat_002",
-        participants: [
-            {
-                _id: "642f8c3a1f1a2b6d5e7a9b03",
-                username: "Priya",
-                profilePicture: "https://randomuser.me/api/portraits/women/44.jpg",
-            },
-            {
-                _id: user?._id,
-                username: user?.username,
-                profilePicture: user?.profilePicture,
-            }
-        ],
-        lastMessage: "Can you send me the notes from today?",
-        unreadCount: 0
-    },
-    {
-        _id: "chat_003",
-        participants: [
-            {
-                _id: "642f8c3a1f1a2b6d5e7a9b04",
-                username: "Rohit",
-                profilePicture: "https://randomuser.me/api/portraits/men/56.jpg",
-            },
-            {
-                _id: user?._id,
-                username: user?.username,
-                profilePicture: user?.profilePicture,
-            }
-        ],
-        lastMessage: "Meeting at 5 PM, right?",
-        unreadCount: 1
-    }
-    ])
-
+    const [conversationIds, setConversationIds] = useState([])
     const [allUsers, setAllUsers] = useState([])
 
 
 
     function handleClick(userId) {
-        // const currentUser = allUsers.filter(user=> user._id===userId)[0];
         const currentUser = allUsers.find(user=> user._id===userId);
         setIsActiveCard({
             id:userId,
             profilePicture:currentUser.profilePicture,
             lastSeen:currentUser.lastMessageTime,
-            username:currentUser.username
-
+            username:currentUser.username,
+            conversationId:currentUser.conversation?._id
         });
         setShowConversation(userId);
         setUserClick(true);
@@ -102,7 +49,7 @@ const Chat = () => {
 
             const response = await getAllUsers();
             setAllUsers(response.data);
-            console.log(response)
+            console.log(response.data)
         }
         catch{
             console.error("Some Error Occured",error)
@@ -157,16 +104,16 @@ const Chat = () => {
 
                 <div className={`chats-section w-full p-2 flex flex-col flex-1 overflow-auto gap-2 profileScroller border-t ${theme === "dark" ? "border-[#2E2F2F]" : "border-[#DEDCDA]"} `}>
 
-                    {allUsers.map(user => (
-                        <UserProfile  key={user._id} width={12.5} height={12.5} profilePicture={user.profilePicture} username={user.username} lastmessage={user.lastMessage} time={user.lastMessageTime}
-                            onClick={() => { handleClick(user._id) }}  isActiveCard={isActiveCard} userId={user._id} />
+                    {allUsers.map(otherUser => (
+                        <UserProfile unreadCount={otherUser.conversation?.unreadCount[user._id]}   key={otherUser._id} width={12.5} height={12.5} profilePicture={otherUser.profilePicture} username={otherUser.username} lastmessage={otherUser.conversation?.lastMessage?otherUser.conversation?.lastMessage.content:""} time={otherUser.conversation?.lastMessage?formatConversationTime(otherUser.conversation?.lastMessage.createdAt):""}
+                            onClick={() => { handleClick(otherUser._id) }}  isActiveCard={isActiveCard} userId={otherUser._id} />
                     ))}
 
                 </div>
 
             </div>
 
-            {userClick && <UserConversation profilePicture={isActiveCard.profilePicture} username={isActiveCard.username} lastSeen={isActiveCard.lastSeen} />}
+            {userClick && <UserConversation conversationId={isActiveCard.conversationId} receiverId={isActiveCard.id} profilePicture={isActiveCard.profilePicture} username={isActiveCard.username} lastSeen={isActiveCard.lastSeen} senderId={user._id} />}
             {!userClick && <div className={`right-side-section flex-1 flex justify-center items-center ${theme === "dark" ? "bg-[#161717]" : "bg-[#F7F5F3]"}`}>
                 <div className="content flex flex-col ">
                     <div className={`box1 w-88 h-91 rounded-2xl ${theme === "dark" ? "bg-[#1D1F1F]" : "bg-white"} flex items-center flex-col gap-12 p-4`}>

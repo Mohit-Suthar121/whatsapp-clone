@@ -2,21 +2,20 @@ import React from 'react'
 import { useThemeStore } from '../../../store/useThemeStore'
 
 const UserProfile = ({
-    username, lastmessage, time, isSelfStatus, width, height, onClick, isActiveCard, userId,uploadTime,profilePicture
+    username, lastmessage, time, isSelfStatus, width, height, onClick, isActiveCard, userId, uploadTime, profilePicture, unreadCount
 }) => {
-
 
     const { theme } = useThemeStore();
     const hoverBg = theme === "dark" ? "hover:bg-[#2E2F2F]" : "hover:bg-[#F6F5F4]";
-    const activeBg = (isActiveCard && userId )?(isActiveCard?.id?.trim() === userId ? theme === "dark" ? "bg-[#2E2F2F]" : "bg-[#F6F5F4]" : ""):"";
-    
+    const activeBg = (isActiveCard && userId) ? (isActiveCard?.id?.trim() === userId ? theme === "dark" ? "bg-[#2E2F2F]" : "bg-[#F6F5F4]" : "") : "";
+
 
 
     return (
 
-        <div onClick={onClick} className={` userProfile flex items-center ${theme==="dark"? "text-white":"text-black"} w-full gap-4 shrink-0 cursor-pointer rounded-xl p-4 ${hoverBg} ${activeBg}`}>
+        <div onClick={onClick} className={` userProfile flex items-center ${theme === "dark" ? "text-white" : "text-black"} w-full gap-4 shrink-0 cursor-pointer rounded-xl p-4 ${hoverBg} ${activeBg}`}>
 
-            <div className={` ${isSelfStatus ? "addBeforeElement":""} userImage w-${width} h-${height} rounded-full shrink-0 `}>
+            <div className={` ${isSelfStatus ? "addBeforeElement" : ""} userImage w-${width} h-${height} rounded-full shrink-0 `}>
                 <img className='w-full h-full rounded-full' src={profilePicture} alt="" />
             </div>
 
@@ -25,11 +24,17 @@ const UserProfile = ({
 
                 <div className="textDetails w-full overflow-x-hidden text-ellipsis whitespace-nowrap">
                     <h3 className='text-lg font-semibold'>{username}</h3>
-                    <p className='text-sm text-gray-400 font-semibold w-full overflow-x-hidden text-ellipsis whitespace-nowrap'>{lastmessage || uploadTime}</p>
+                    <p className='text-sm text-gray-400 font-semibold w-full overflow-x-hidden text-ellipsis whitespace-nowrap'>{lastmessage ? lastmessage : uploadTime}</p>
                 </div>
-                {time&&<div className="time text-sm text-gray-400 font-semibold whitespace-nowrap">{time}</div>}
+                {time && !unreadCount && <div className="time text-sm text-gray-400 font-semibold whitespace-nowrap">{time}</div>}
 
             </div>
+
+
+            {unreadCount > 0 && <div className='flex flex-col justify-center items-center gap-1 text-sm'>
+                <div className="time text-sm font-semibold whitespace-nowrap text-[#21C063]">{time}</div>
+                <div className={`unreadCount w-5 h-5 rounded-full bg-[#21C063] ${theme === "dark" ? "text-black" : "text-white"} flex justify-center items-center`}>{unreadCount}</div>
+            </div>}
 
         </div>
     )

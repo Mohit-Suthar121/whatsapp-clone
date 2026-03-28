@@ -4,8 +4,9 @@ import response from '../utils/responseHandler.js'
 import Message from '../models/Message.js';
 
 
-export const sendMessage = async (req, res) => { // handling normal message and file or video using this function 
-    const { senderId, receiverId, content, messageStatus } = req.body;
+export const sendMessage = async (req, res) => { // handling normal message and file or video using this function
+    const {  receiverId, content, messageStatus } = req.body;
+    const senderId = req.user.userId;
     const file = req.file
     try {
         const participants = [senderId, receiverId].sort();
@@ -14,7 +15,6 @@ export const sendMessage = async (req, res) => { // handling normal message and 
             conversation = new Conversation({ participants });
             await conversation.save();
         }
-
         let media = {
             url:"",
             publicCloudinaryId:""
@@ -57,9 +57,10 @@ export const sendMessage = async (req, res) => { // handling normal message and 
         })
 
         await message.save();
-
         conversation.lastMessage = message._id;
-        conversation.unreadCount += 1;
+        const currentCount = conversation.unreadCount.get(receiverId) || 0;
+        conversation.unreadCount.set(receiverId,currentCount+1);
+        console.log("The conversation is: ",conversation)
         await conversation.save();
 
         const populatedMessage = await Message.findOne({ _id: message._id }).populate("sender", "username profilePicture").populate("receiver", "username profilePicture")
@@ -109,7 +110,7 @@ export const getMessages = async (req, res) => {
     try {
         let conversation = await Conversation.findById(conversationId);
         if (!conversation) {
-            return response(res, "There is no conversation between both yet! start a new conversation", 200);
+            return response(res, "There is no conversation between both yet! start a new conversation", 404);
         }
         if (!conversation.participants.includes(userId)) {
             return response(res, "User is not authorized", 403)
@@ -120,14 +121,9 @@ export const getMessages = async (req, res) => {
             receiver: userId,
             messageStatus: { $in: ["sent", "delivered"] },
         }, { $set: { messageStatus: "read" } })
-        conversation.unreadCount = 0;
+        conversation.unreadCount.set(userId,0);
         await conversation.save();
-
-
         let messages = await Message.find({ conversation: conversationId }).populate("sender", "username profilePicture").populate("receiver", "username profilePicture").sort("createdAt");
-
-
-
 
         return response(res, "Messages retrieved successfully!", 200, messages)
 
