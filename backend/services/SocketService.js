@@ -35,6 +35,7 @@ export const initializeSocket = (server) => {
             socket.join(conversationId)
         })
 
+
         socket.on("user_connected", async (connectingUserId) => {
             try {
                 userId = connectingUserId;
@@ -52,6 +53,8 @@ export const initializeSocket = (server) => {
             }
         })
 
+
+
         //return online status on requested user!
         socket.on("get_user_status", async (requestedUserId, callback) => {
             let isOnline = onlineUsers.has(requestedUserId);
@@ -64,6 +67,7 @@ export const initializeSocket = (server) => {
                 isOnline
             })
         })
+
 
 
         // THERE ARE SOME CHANGES IN THE CODE MADE BY ME USING CHATGPT , HERE I DIDN'T FOLLOW THE YOUTUBER: AT : 4:13:00 
@@ -83,8 +87,9 @@ export const initializeSocket = (server) => {
             }
         })
 
-        //handle reading messages
 
+
+        //handle reading messages
         socket.on("read_messages", async (messageIds, senderId, conversationId) => {
             try {
                 io.to(senderId).emit("message_status_update", {

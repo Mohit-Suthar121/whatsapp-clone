@@ -10,8 +10,23 @@ import Settings from './pages/settingSection/Settings'
 import MainLayout from './assets/components/MainLayout'
 import Chat from './pages/chatSection/Chat'
 import { ToastContainer, Bounce } from 'react-toastify'
+import { useUserStore } from '../store/useUserStore'
+import { useEffect } from 'react'
+import { disconnectSocket, initializeSocket } from '../services/chat.service'
 
 function App() {
+  const {user} = useUserStore();
+
+  useEffect(()=>{
+    if(user?._id){
+      const socket = initializeSocket();
+    }
+    return ()=>{
+      disconnectSocket()
+    }
+  },[user])
+
+  
 
   return (
     <>

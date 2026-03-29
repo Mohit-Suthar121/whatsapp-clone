@@ -12,6 +12,7 @@ import { useRef, useState, useEffect } from 'react'
 import ThreeDots from '../../assets/components/icons/ThreeDots'
 import { getMessages, sendMessage } from '../../../services/message.service'
 import { formatLiveChatTimeStamp } from '../../../utils/TimeFormatter'
+import { useChatStore } from '../../../store/chat.store'
 
 
 const UserConversation = ({ profilePicture, username, lastSeen, receiverId,conversationId,senderId }) => {
@@ -19,7 +20,7 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId,conve
     const scrollRef = useRef();
     const [messageContent, setMessageContent] = useState("");
     const [isEmpty, setIsEmpty] = useState(true);
-    const [conversationMessages,setConversationMessages] = useState([])
+    const {messages,setMessages} = useChatStore();
 
 
 
@@ -51,15 +52,17 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId,conve
     }
 
 
+
+    // fetching all the messages of a conversation through mongoDb and insert it to zustand store
     async function getUserMessages(){
         try {
             console.log(conversationId)
             if(!conversationId){
-                setConversationMessages([]);
+                setMessages([]);
                 return;
             }
             const response = await getMessages(conversationId);
-            setConversationMessages(response.data);
+            setMessages(response.data)
             console.log("The message of conversation id:",conversationId);
             console.log("all messages of this conversation:",response.data);
         } catch (error) {
@@ -68,14 +71,17 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId,conve
     }
 
 
+
     useEffect(() => {
         getUserMessages();
-    }, [conversationId])
+    }, [conversationId,setMessages])
 
+
+    
     useEffect(()=>{
-        console.log("The conversations messages are: ",conversationMessages)
+        console.log("This conversation's messages are: ",messages)
         scrollRef.current.scrollIntoView({ behavior: "smooth" })
-    },[conversationMessages])
+    },[messages])
 
 
     return (
@@ -117,7 +123,7 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId,conve
                 <div className="scrollwrapper flex-1 overflow-y-auto w-full">
 
                     <div className="messagesBox  min-h-full w-full flex flex-col justify-end gap-2 pr-10 pb-5 pl-10">
-                        {conversationMessages.map(message=>(<MessageBubble key={message._id} isMe={senderId===message.sender._id?true:false} message={message.content} time={formatLiveChatTimeStamp(message.createdAt)} />))}
+                        {messages.map(message=>(<MessageBubble key={message._id} isMe={senderId===message.sender._id?true:false} message={message.content} time={formatLiveChatTimeStamp(message.createdAt)} />))}
 
                         <div ref={scrollRef}></div>
                     </div>

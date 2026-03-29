@@ -9,6 +9,7 @@ import { useUserStore } from '../../../store/useUserStore'
 import { getAllUsers } from '../../../services/user.service'
 import UserConversation from '../../assets/components/UserConversation'
 import { formatConversationTime } from '../../../utils/TimeFormatter'
+import { useChatStore } from '../../../store/chat.store'
 
 
 const Chat = () => {
@@ -24,8 +25,8 @@ const Chat = () => {
     const { user } = useUserStore();
     const [userClick, setUserClick] = useState(false);
     const [showConversation, setShowConversation] = useState("");
-    const [conversationIds, setConversationIds] = useState([])
     const [allUsers, setAllUsers] = useState([])
+    const {subscribeToMessages,unsubscribeFromMessages,setCurrentConversation} = useChatStore();
 
 
 
@@ -39,8 +40,13 @@ const Chat = () => {
             conversationId:currentUser.conversation?._id
         });
         setShowConversation(userId);
+        if(currentUser.conversation){
+            setCurrentConversation(currentUser.conversation)
+        }
+        else{
+            setCurrentConversation({_id:null});
+        }
         setUserClick(true);
-
         console.log("The card was clicked!")
     }
 
@@ -57,13 +63,18 @@ const Chat = () => {
 
     }
 
-    async function getTheConversation(id){
-        setShowConversation(id);
-    }
 
     useEffect(()=>{
         gettingAllUsers();
     },[])
+
+    
+    useEffect(()=>{
+        subscribeToMessages()
+        return ()=>unsubscribeFromMessages();
+    },[subscribeToMessages,unsubscribeFromMessages])
+
+
 
 
 
