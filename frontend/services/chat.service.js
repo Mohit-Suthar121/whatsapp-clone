@@ -1,25 +1,23 @@
 import { io } from "socket.io-client";
-import { useUserStore } from "../store/useUserStore";
 
 
 let socket = null;
 
 export const initializeSocket = () => {
     if (socket) return;
-    const {user} = useUserStore();
 
     const BACKEND_URL = import.meta.env.VITE_APP_API_URL
     socket = io(BACKEND_URL, {
         withCredentials: true,
         transports: ["websocket", "polling"],
         reconnectionAttempts: 5,
-        reconnectionDelay: 1000
+        reconnectionDelay: 1000,
+        autoConnect:false
     })
 
     //connecting with the socket io
     socket.on("connect",()=>{
         console.log("socket connected!",socket.id);
-        socket.emit("user_connected",user._id);
     })
 
     //error in the socket
@@ -45,7 +43,7 @@ export const getSocket = ()=>{
 
 export const disconnectSocket = () =>{
     if(socket){
-        socket.disconnet();
+        socket.disconnect();
         socket = null;
     }
 }

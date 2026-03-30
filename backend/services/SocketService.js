@@ -2,7 +2,7 @@ import { Server } from 'socket.io';
 import User from '../models/User.js'
 import Message from '../models/Message.js';
 import Conversation from '../models/Conversation.js'
-let onlineUsers = new Map();
+export let onlineUsers = new Map();
 let typingUsers = new Map();
 
 
@@ -12,7 +12,6 @@ export const initializeSocket = (server) => {
             origin: process.env.FRONTEND_URL,
             credentials: true,
             methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
-
         },
         pingTimeout: 60000
     });
@@ -25,7 +24,7 @@ export const initializeSocket = (server) => {
         console.log("User connected with socketId: " + socket.id);
 
         socket.on("join_conversation", async (conversationId) => {
-            if(!userId) return;
+            if (!userId) return;
             const existingRooms = Array.from(socket.rooms);
             existingRooms.forEach(room => {
                 if (room !== userId && room !== socket.id) {
@@ -38,7 +37,7 @@ export const initializeSocket = (server) => {
 
         socket.on("user_connected", async (connectingUserId) => {
             try {
-                userId = connectingUserId;
+                userId = connectingUserId.toString();
                 onlineUsers.set(userId, socket.id);
                 socket.join(userId);
                 //updating the user Status in mongoDb
@@ -58,7 +57,7 @@ export const initializeSocket = (server) => {
         //return online status on requested user!
         socket.on("get_user_status", async (requestedUserId, callback) => {
             let isOnline = onlineUsers.has(requestedUserId);
-            if(!isOnline){
+            if (!isOnline) {
                 const user = await User.findById(requestedUserId).select("isOnline")
                 isOnline = user?.isOnline || false;
             }
@@ -78,8 +77,8 @@ export const initializeSocket = (server) => {
                 if (receiverId) {
                     io.to(receiverId).emit("receive_message", message)
                 }
-                else{
-                    socket.emit("message_error",{error:"receiver not found!"})
+                else {
+                    socket.emit("message_error", { error: "receiver not found!" })
                 }
             } catch (error) {
                 console.error("Some error occured in sending message: ", error)
@@ -190,6 +189,21 @@ export const initializeSocket = (server) => {
         })
 
 
+        //get all the users who are online right now
+        socket.on("get_online_users", (callback) => {
+            try {
+                const allOnlineUsersIds = Array.from(onlineUsers.keys());
+                if (typeof callback === "function") {
+                    callback(allOnlineUsersIds);
+                }
+            } catch (error) {
+                console.error("Error fetching online users list: ",error)
+            }
+
+
+        })
+
+
         // handle disconnection of user
         socket.on("disconnect", async () => {
             try {
@@ -215,14 +229,16 @@ export const initializeSocket = (server) => {
                 })
 
             } catch (error) {
-                console.error("some error occured during the dissconnection of the user",error);
+                console.error("some error occured during the dissconnection of the user", error);
             }
 
         })
 
-        
+
+
+
     })
-io.socketUserMap = onlineUsers;
-        return io;
+    io.socketUserMap = onlineUsers;
+    return io;
 
 }

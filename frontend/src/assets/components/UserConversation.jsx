@@ -4,23 +4,27 @@ import VideoCall from '../../assets/components/icons/VideoCall'
 import AddIcon from '../../assets/components/icons/AddIcon'
 import EmojiIcon from '../../assets/components/icons/EmojiIcon'
 import MicIcon from '../../assets/components/icons/MicIcon'
-import Send from '../../assets/components/icons/Send'
 import TextareaAutosize from 'react-textarea-autosize';
 import MessageBubble from '../../assets/components/MessageBubble'
+import SendIcon from './icons/SendIcon'
 import { useThemeStore } from '../../../store/useThemeStore'
 import { useRef, useState, useEffect } from 'react'
 import ThreeDots from '../../assets/components/icons/ThreeDots'
 import { getMessages, sendMessage } from '../../../services/message.service'
 import { formatLiveChatTimeStamp } from '../../../utils/TimeFormatter'
 import { useChatStore } from '../../../store/chat.store'
+import MessageBubble2 from './MessageBubble2'
+import DeliveredIcon from './icons/DeliveredIcon'
+import MessageSentTickIcon from './icons/MessageSentTickIcon'
+import PendingMessageIcon from './icons/PendingMessageIcon'
 
 
-const UserConversation = ({ profilePicture, username, lastSeen, receiverId,conversationId,senderId }) => {
+const UserConversation = ({ profilePicture, username, lastSeen, receiverId,conversationId,senderId,isOnline }) => {
     const { theme } = useThemeStore();
     const scrollRef = useRef();
     const [messageContent, setMessageContent] = useState("");
     const [isEmpty, setIsEmpty] = useState(true);
-    const {messages,setMessages} = useChatStore();
+    const {messages,setMessages,setOptimisticMessage,updateMessageStatus} = useChatStore();
 
 
 
@@ -32,20 +36,40 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId,conve
         else setIsEmpty(true);
     }
 
+    function returnMessageStatus(message){
+        if(message.messageStatus==="read") return <DeliveredIcon currentColor={"#53bdeb"}/>
+        else if(message.messageStatus === "delivered") return <DeliveredIcon currentColor={"#8FABA0"}/>
+        else if(message.messageStatus === "pending") return <PendingMessageIcon currentColor={"#8FABA0"}/>
+        else return <MessageSentTickIcon currentColor={"#8FABA0"}/>
+    }
 
     async function handleSendMessage(receiverId) {
+        if(!messageContent.trim()) return ;
+
+        const clientId = Date.now().toString();
+        // a temprary message to save to the store for instant preview
+        const optimisticMessage = {
+            _id:clientId,
+            clientId,
+            content:messageContent,
+            messageStatus:"pending",
+            sender:{_id:senderId},
+            createdAt:new Date().toISOString(),
+        }
+        setOptimisticMessage(optimisticMessage);
         try {
-            console.log(messageContent);
-            console.log("The receiver is: ", receiverId);
+            const content = messageContent;
             setMessageContent("");
             setIsEmpty(true)
             const data = {
                 receiverId,
-                content: messageContent
+                content
             }
-            const response = await sendMessage(data);
-            console.log("The response from the send message is: ", response);
+
             
+            const response = await sendMessage(data);
+            updateMessageStatus(response.data,clientId)
+
         } catch (error) {
             console.error("Some error occured while sending the message",error);
         }
@@ -56,15 +80,12 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId,conve
     // fetching all the messages of a conversation through mongoDb and insert it to zustand store
     async function getUserMessages(){
         try {
-            console.log(conversationId)
             if(!conversationId){
                 setMessages([]);
                 return;
             }
             const response = await getMessages(conversationId);
             setMessages(response.data)
-            console.log("The message of conversation id:",conversationId);
-            console.log("all messages of this conversation:",response.data);
         } catch (error) {
             console.error("Some error occured while getting the user messages")
         }
@@ -79,7 +100,6 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId,conve
 
     
     useEffect(()=>{
-        console.log("This conversation's messages are: ",messages)
         scrollRef.current.scrollIntoView({ behavior: "smooth" })
     },[messages])
 
@@ -101,7 +121,7 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId,conve
 
                             <div className="textDetails w-full overflow-x-hidden text-ellipsis whitespace-nowrap">
                                 <h3 className='text-lg font-semibold'>{username}</h3>
-                                <p className='text-sm text-gray-400 font-semibold w-full overflow-x-hidden text-ellipsis whitespace-nowrap'> {lastSeen}</p>
+                                <p className='text-sm text-gray-400 font-semibold w-full overflow-x-hidden text-ellipsis whitespace-nowrap'>{isOnline?"online":lastSeen}</p>
                             </div>
 
                             <div className="videocall-and-other flex items-center">
@@ -123,11 +143,10 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId,conve
                 <div className="scrollwrapper flex-1 overflow-y-auto w-full">
 
                     <div className="messagesBox  min-h-full w-full flex flex-col justify-end gap-2 pr-10 pb-5 pl-10">
-                        {messages.map(message=>(<MessageBubble key={message._id} isMe={senderId===message.sender._id?true:false} message={message.content} time={formatLiveChatTimeStamp(message.createdAt)} />))}
+                        {messages.map(message=>(<MessageBubble2 messageStatusIcon={senderId===message.sender?._id ? returnMessageStatus(message):""} key={message._id} isMe={senderId===message.sender?._id?true:false} message={message.content} time={formatLiveChatTimeStamp(message.createdAt)} />))}
 
                         <div ref={scrollRef}></div>
                     </div>
-
 
 
                 </div>
@@ -162,7 +181,7 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId,conve
                     {!isEmpty && <div role='textbox' onClick={() => {
                         handleSendMessage(receiverId)
                     }} className=" flex justify-center items-center p-2 hover:bg-[#21C063] rounded-full w-10 h-10 self-end bg-[#37C572] cursor-pointer">
-                        <Send />
+                        <SendIcon />
                     </div>}
 
                 </div>

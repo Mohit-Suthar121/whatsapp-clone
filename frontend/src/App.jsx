@@ -15,18 +15,7 @@ import { useEffect } from 'react'
 import { disconnectSocket, initializeSocket } from '../services/chat.service'
 
 function App() {
-  const {user} = useUserStore();
 
-  useEffect(()=>{
-    if(user?._id){
-      const socket = initializeSocket();
-    }
-    return ()=>{
-      disconnectSocket()
-    }
-  },[user])
-
-  
 
   return (
     <>

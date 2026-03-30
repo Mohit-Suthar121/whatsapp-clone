@@ -2,7 +2,7 @@ import React from 'react'
 import { useThemeStore } from '../../../store/useThemeStore'
 
 const UserProfile = ({
-    username, lastmessage, time, isSelfStatus, width, height, onClick, isActiveCard, userId, uploadTime, profilePicture, unreadCount
+    username, lastmessage, time, isSelfStatus, width, height, onClick, isActiveCard, userId, uploadTime, profilePicture, unreadCount,isOnline
 }) => {
 
     const { theme } = useThemeStore();
@@ -15,8 +15,9 @@ const UserProfile = ({
 
         <div onClick={onClick} className={` userProfile flex items-center ${theme === "dark" ? "text-white" : "text-black"} w-full gap-4 shrink-0 cursor-pointer rounded-xl p-4 ${hoverBg} ${activeBg}`}>
 
-            <div className={` ${isSelfStatus ? "addBeforeElement" : ""} userImage w-${width} h-${height} rounded-full shrink-0 `}>
+            <div className={` ${isSelfStatus ? "addBeforeElement" : ""} userImage w-${width} h-${height} rounded-full shrink-0 relative`}>
                 <img className='w-full h-full rounded-full' src={profilePicture} alt="" />
+                {isOnline==="online" && <div className="absolute right-0 bottom-0 bg-[#21BE62] w-3 h-3 rounded-full border-black border-2"></div>}
             </div>
 
 

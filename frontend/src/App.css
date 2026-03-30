@@ -152,7 +152,7 @@
 
 
 
-.speech-wrapper {
+/* .speech-wrapper {
   .bubble {
     width: fit-content;
     max-width: 570px;
@@ -164,7 +164,6 @@
     .txt {
       padding: 8px;
       padding-bottom: 30px;
-
       .timestamp {
         font-size: 11px;
         position: absolute;
@@ -216,4 +215,27 @@
   .bubble.other .bubble-arrow:after {
     border-top: 9px solid #242626;
   }
+} */
+
+
+.messageBubble:after,.otherMessageBubble:after{
+	content: ' ';
+	position: absolute;
+	width: 0;
+	height: 0;
+  left: auto;
+	right: -10px;
+  top: 44px;
+	bottom: auto;
+	border: 8px solid;
+  border-color: #144E37 transparent transparent #144E37;
 }
+
+.otherMessageBubble:after{
+  right: 0;
+  left: -10px;
+  border-color: #242626 transparent transparent #242626;
+  transform: rotateY(180deg);
+
+}
+

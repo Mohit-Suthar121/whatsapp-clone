@@ -26,7 +26,8 @@ const Chat = () => {
     const [userClick, setUserClick] = useState(false);
     const [showConversation, setShowConversation] = useState("");
     const [allUsers, setAllUsers] = useState([])
-    const {subscribeToMessages,unsubscribeFromMessages,setCurrentConversation} = useChatStore();
+    const {subscribeToMessages,unsubscribeFromMessages,setCurrentConversation,onlineUsers,subscribeToUserStatus,unsubscribeFromUserStatus,connectSocket} = useChatStore();
+    console.log(onlineUsers);
 
 
 
@@ -50,12 +51,13 @@ const Chat = () => {
         console.log("The card was clicked!")
     }
 
+
+
     async function gettingAllUsers(){
         try{
 
             const response = await getAllUsers();
             setAllUsers(response.data);
-            console.log(response.data)
         }
         catch{
             console.error("Some Error Occured",error)
@@ -69,10 +71,22 @@ const Chat = () => {
     },[])
 
     
+
     useEffect(()=>{
+        if(!user?._id) return;
         subscribeToMessages()
-        return ()=>unsubscribeFromMessages();
-    },[subscribeToMessages,unsubscribeFromMessages])
+        subscribeToUserStatus(user._id)
+        connectSocket(user._id)
+            onlineUsers.forEach(user=>{
+                console.log(user);
+            })
+            
+            console.log(onlineUsers)
+        return ()=>{
+            unsubscribeFromMessages();
+            unsubscribeFromUserStatus();
+        }
+    },[user?._id])
 
 
 
@@ -116,15 +130,14 @@ const Chat = () => {
                 <div className={`chats-section w-full p-2 flex flex-col flex-1 overflow-auto gap-2 profileScroller border-t ${theme === "dark" ? "border-[#2E2F2F]" : "border-[#DEDCDA]"} `}>
 
                     {allUsers.map(otherUser => (
-                        <UserProfile unreadCount={otherUser.conversation?.unreadCount[user._id]}   key={otherUser._id} width={12.5} height={12.5} profilePicture={otherUser.profilePicture} username={otherUser.username} lastmessage={otherUser.conversation?.lastMessage?otherUser.conversation?.lastMessage.content:""} time={otherUser.conversation?.lastMessage?formatConversationTime(otherUser.conversation?.lastMessage.createdAt):""}
+                        <UserProfile isOnline={onlineUsers.get(otherUser?._id)} unreadCount={otherUser.conversation?.unreadCount[user._id]}   key={otherUser._id} width={12.5} height={12.5} profilePicture={otherUser.profilePicture} username={otherUser.username} lastmessage={otherUser.conversation?.lastMessage?otherUser.conversation?.lastMessage.content:""} time={otherUser.conversation?.lastMessage?formatConversationTime(otherUser.conversation?.lastMessage.createdAt):""}
                             onClick={() => { handleClick(otherUser._id) }}  isActiveCard={isActiveCard} userId={otherUser._id} />
                     ))}
-
                 </div>
 
             </div>
 
-            {userClick && <UserConversation conversationId={isActiveCard.conversationId} receiverId={isActiveCard.id} profilePicture={isActiveCard.profilePicture} username={isActiveCard.username} lastSeen={isActiveCard.lastSeen} senderId={user._id} />}
+            {userClick && <UserConversation  conversationId={isActiveCard.conversationId} receiverId={isActiveCard.id} profilePicture={isActiveCard.profilePicture} username={isActiveCard.username} lastSeen={isActiveCard.lastSeen} senderId={user._id} />}
             {!userClick && <div className={`right-side-section flex-1 flex justify-center items-center ${theme === "dark" ? "bg-[#161717]" : "bg-[#F7F5F3]"}`}>
                 <div className="content flex flex-col ">
                     <div className={`box1 w-88 h-91 rounded-2xl ${theme === "dark" ? "bg-[#1D1F1F]" : "bg-white"} flex items-center flex-col gap-12 p-4`}>

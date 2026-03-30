@@ -2,10 +2,10 @@ import Conversation from '../models/Conversation.js'
 import {deleteFromCloudinary, uploadToCloudinary} from '../config/cloudinaryConfig.js'
 import response from '../utils/responseHandler.js'
 import Message from '../models/Message.js';
-
+import { onlineUsers } from '../services/SocketService.js';
 
 export const sendMessage = async (req, res) => { // handling normal message and file or video using this function
-    const {  receiverId, content, messageStatus } = req.body;
+    const {  receiverId, content } = req.body;
     const senderId = req.user.userId;
     const file = req.file
     try {
@@ -46,6 +46,7 @@ export const sendMessage = async (req, res) => { // handling normal message and 
             return response(res, "content is needed to send message", 400)
         }
 
+        const  isReceiverOnline = onlineUsers.has(receiverId.toString());
         const message = new Message({
             conversation: conversation._id,
             sender: senderId,
@@ -53,7 +54,7 @@ export const sendMessage = async (req, res) => { // handling normal message and 
             content,
             media,
             contentType,
-            messageStatus:req.io?"delivered":"sent",
+            messageStatus:isReceiverOnline?"delivered":"sent",
         })
 
         await message.save();
@@ -70,7 +71,6 @@ export const sendMessage = async (req, res) => { // handling normal message and 
             req.io.to(receiverId.toString()).emit("receive_message",populatedMessage);
             req.io.to(senderId.toString()).emit("send_message_sync",populatedMessage);
         }
-
         return response(res, "message sent Successfully", 201, populatedMessage)
 
     } catch (error) {

@@ -2,6 +2,7 @@
 import { create } from "zustand"
 import { getSocket } from "../services/chat.service"
 
+
 export const useChatStore = create((set, get) => ({
     conversations: [],
     messages: [],
@@ -18,8 +19,8 @@ export const useChatStore = create((set, get) => ({
 
 
         socket.on("receive_message", (newMessage) => {
-            const { currentConversation, messages } = get();  
- 
+            const { currentConversation, messages } = get();
+
             //insert a new message to the opened chat window
             if (newMessage.conversation === currentConversation?._id) {
                 set({ messages: [...messages, newMessage] })
@@ -49,20 +50,74 @@ export const useChatStore = create((set, get) => ({
 
     //settings messages which we got to set to show in a conversation realtime
     setMessages: (messages) => set({ messages }),
-    setCurrentConversation: (conversation) => set({ currentConversation: conversation })
+    setCurrentConversation: (conversation) => set({ currentConversation: conversation }),
+
+    setOptimisticMessage: (message) => {
+        set((state) => ({
+            messages: [...state.messages, message]
+        }))
+    },
+
+
+    updateMessageStatus: (updatedMessage, clientId) => {
+        set((state) => ({
+            messages: state.messages.map(message => message.clientId === clientId ? updatedMessage : message)
+        }))
+    },
+
+
+    subscribeToUserStatus: (currentUserId) => {
+        const socket = getSocket();
+        if (!socket) return;
+        socket.on("user_status", ({ userId, isOnline, lastSeen }) => {
+            set((state) => {
+                const newMap = new Map(state.onlineUsers);
+                newMap.set(userId, isOnline ? "online" : lastSeen.toString())
+                return { onlineUsers: newMap }
+            })
+        })
+
+
+
+        socket.emit("get_online_users", (userIds) => {
+            set((state) => {
+                const newMap = new Map(state.onlineUsers);
+
+                userIds.forEach(userId => {
+                    if (userId !== currentUserId) newMap.set(userId, "online")
+                })
+                return { onlineUsers: newMap }
+            })
+
+        })
+
+    },
+
+    
+    unsubscribeFromUserStatus: () => {
+        const socket = getSocket()
+        if (socket) socket.off("user_status")
+    },
+
+    connectSocket: (userId) => {
+        const socket = getSocket();
+        if (!socket.connected) {
+            socket.connect();
+        }
+
+        socket.off("connect")
+        socket.on("connect", () => {
+            socket.emit("user_connected", userId);
+        })
+
+        if (socket.connected) {
+            socket.emit("user_connected", userId);
+        }
+
+    }
+
+
+
 }))
 
 
-export const initSocketListeners = () => {
-    const socket = getSocket();
-    if (!socket) return;
-    socket.off("user_connected")
-    socket.off("join_conversation")
-    socket.off("get_user_status")
-    socket.off("send_message")
-    socket.off("read_messages")
-    socket.off("typing_start")
-    socket.off("typing_stop")
-    socket.off("add_reaction")
-
-}
