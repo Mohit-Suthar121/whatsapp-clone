@@ -25,8 +25,20 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId,conve
     const [messageContent, setMessageContent] = useState("");
     const [isEmpty, setIsEmpty] = useState(true);
     const {messages,setMessages,setOptimisticMessage,updateMessageStatus} = useChatStore();
+    console.log("The online status of the user: ",isOnline)
+    console.log("The last seen is:  ",lastSeen)
 
-
+    const getDisplayStatus = ()=> {
+        if(isOnline && isOnline==="online"){
+            return isOnline
+        }
+        if(isOnline && isOnline !== "online"){
+            return `last seen at ${formatLiveChatTimeStamp(isOnline)}`
+        }
+        if(lastSeen){
+            return `last seen at ${formatLiveChatTimeStamp(lastSeen)}`
+        }
+    }
 
     function handleTextArea(e) {
         setMessageContent(e.target.value);
@@ -121,7 +133,7 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId,conve
 
                             <div className="textDetails w-full overflow-x-hidden text-ellipsis whitespace-nowrap">
                                 <h3 className='text-lg font-semibold'>{username}</h3>
-                                <p className='text-sm text-gray-400 font-semibold w-full overflow-x-hidden text-ellipsis whitespace-nowrap'>{isOnline?"online":lastSeen}</p>
+                                <p className='text-sm text-gray-400 font-semibold w-full overflow-x-hidden text-ellipsis whitespace-nowrap'>{getDisplayStatus()}</p>
                             </div>
 
                             <div className="videocall-and-other flex items-center">

@@ -27,19 +27,19 @@ const Chat = () => {
     const [showConversation, setShowConversation] = useState("");
     const [allUsers, setAllUsers] = useState([])
     const {subscribeToMessages,unsubscribeFromMessages,setCurrentConversation,onlineUsers,subscribeToUserStatus,unsubscribeFromUserStatus,connectSocket} = useChatStore();
-    console.log(onlineUsers);
-
-
 
     function handleClick(userId) {
         const currentUser = allUsers.find(user=> user._id===userId);
+        
+
         setIsActiveCard({
             id:userId,
             profilePicture:currentUser.profilePicture,
-            lastSeen:currentUser.lastMessageTime,
+            lastSeen:currentUser.lastSeen,
             username:currentUser.username,
             conversationId:currentUser.conversation?._id
         });
+
         setShowConversation(userId);
         if(currentUser.conversation){
             setCurrentConversation(currentUser.conversation)
@@ -48,6 +48,7 @@ const Chat = () => {
             setCurrentConversation({_id:null});
         }
         setUserClick(true);
+        console.log("The current user is: ",currentUser)
         console.log("The card was clicked!")
     }
 
@@ -137,7 +138,7 @@ const Chat = () => {
 
             </div>
 
-            {userClick && <UserConversation  conversationId={isActiveCard.conversationId} receiverId={isActiveCard.id} profilePicture={isActiveCard.profilePicture} username={isActiveCard.username} lastSeen={isActiveCard.lastSeen} senderId={user._id} />}
+            {userClick && <UserConversation  isOnline={onlineUsers.get(isActiveCard.id)} conversationId={isActiveCard.conversationId} receiverId={isActiveCard.id} profilePicture={isActiveCard.profilePicture} username={isActiveCard.username} lastSeen={isActiveCard.lastSeen} senderId={user._id} />}
             {!userClick && <div className={`right-side-section flex-1 flex justify-center items-center ${theme === "dark" ? "bg-[#161717]" : "bg-[#F7F5F3]"}`}>
                 <div className="content flex flex-col ">
                     <div className={`box1 w-88 h-91 rounded-2xl ${theme === "dark" ? "bg-[#1D1F1F]" : "bg-white"} flex items-center flex-col gap-12 p-4`}>
