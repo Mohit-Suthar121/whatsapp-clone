@@ -22,6 +22,5 @@ export const getMessages = async (conversationId)=>{
     } catch (error) {
         throw error.response?error.response.data:error.message;
     }
-    
 
 }

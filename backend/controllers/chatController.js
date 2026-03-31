@@ -134,17 +134,18 @@ export const getMessages = async (req, res) => {
 }
 
 
+
 export const markAsRead = async (req, res) => {
     try {
-
         const userId = req.user.userId;
         const { messageIds, senderId } = req.body;
         const participants = [userId, senderId].sort();
         await Message.updateMany({ _id: { $in: messageIds }, receiver: userId }, { $set: { messageStatus: "read" } });
         let conversation = await Conversation.findOne({ participants })
         if (!conversation) return response(res, "Conversation not found", 404)
-        conversation.unreadCount = 0;
+        conversation.unreadCount.set(userId,0);
         await conversation.save();
+
         if(req.io){
             req.io.to(senderId.toString()).emit("mark_as_read",{
                 messageIds,
@@ -164,6 +165,8 @@ export const markAsRead = async (req, res) => {
     }
 
 }
+
+
 
 export const deleteMessage = async (req, res) => {
     try {

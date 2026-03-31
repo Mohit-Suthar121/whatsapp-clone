@@ -26,11 +26,29 @@ const Chat = () => {
     const [userClick, setUserClick] = useState(false);
     const [showConversation, setShowConversation] = useState("");
     const [allUsers, setAllUsers] = useState([])
-    const {subscribeToMessages,unsubscribeFromMessages,setCurrentConversation,onlineUsers,subscribeToUserStatus,unsubscribeFromUserStatus,connectSocket,subscribeToTyping,unsubscribeFromTyping} = useChatStore();
+    const {subscribeToMessages,unsubscribeFromMessages,setCurrentConversation,onlineUsers,subscribeToUserStatus,unsubscribeFromUserStatus,connectSocket,subscribeToTyping,unsubscribeFromTyping,typingUsers,subscribeToMessageStatus,unsubscribeFromMessageStatus,conversations} = useChatStore();
+        
+
+    useEffect(()=>{
+        if(!user?._id) return;
+        connectSocket(user._id)
+        subscribeToMessages()
+        subscribeToUserStatus(user._id)
+        subscribeToTyping();
+        subscribeToMessageStatus();
+        return ()=>{
+            unsubscribeFromMessages();
+            unsubscribeFromUserStatus();
+            unsubscribeFromTyping();
+            unsubscribeFromMessageStatus();
+        }
+    },[user?._id])    
+
+
+
 
     function handleClick(userId) {
         const currentUser = allUsers.find(user=> user._id===userId);
-        
 
         setIsActiveCard({
             id:userId,
@@ -52,7 +70,11 @@ const Chat = () => {
         console.log("The card was clicked!")
     }
 
+    function tellIsTyping(conversationId,receiverId){
+        return typingUsers.get(conversationId)===receiverId;
+    }
 
+    
 
     async function gettingAllUsers(){
         try{
@@ -73,19 +95,7 @@ const Chat = () => {
 
     
 
-    useEffect(()=>{
-        if(!user?._id) return;
-        connectSocket(user._id)
-        subscribeToMessages()
-        subscribeToUserStatus(user._id)
-        subscribeToTyping();
-        console.log(onlineUsers)
-        return ()=>{
-            unsubscribeFromMessages();
-            unsubscribeFromUserStatus();
-            unsubscribeFromTyping();
-        }
-    },[user?._id])
+   
 
 
 
@@ -129,7 +139,7 @@ const Chat = () => {
                 <div className={`chats-section w-full p-2 flex flex-col flex-1 overflow-auto gap-2 profileScroller border-t ${theme === "dark" ? "border-[#2E2F2F]" : "border-[#DEDCDA]"} `}>
 
                     {allUsers.map(otherUser => (
-                        <UserProfile isOnline={onlineUsers.get(otherUser?._id)} unreadCount={otherUser.conversation?.unreadCount[user._id]}   key={otherUser._id} width={12.5} height={12.5} profilePicture={otherUser.profilePicture} username={otherUser.username} lastmessage={otherUser.conversation?.lastMessage?otherUser.conversation?.lastMessage.content:""} time={otherUser.conversation?.lastMessage?formatConversationTime(otherUser.conversation?.lastMessage.createdAt):""}
+                        <UserProfile isTyping={tellIsTyping(otherUser.conversation?._id,otherUser._id)} isOnline={onlineUsers.get(otherUser?._id)} unreadCount={otherUser.conversation?.unreadCount[user._id]}   key={otherUser._id} width={12.5} height={12.5} profilePicture={otherUser.profilePicture} username={otherUser.username} lastmessage={otherUser.conversation?.lastMessage?otherUser.conversation?.lastMessage.content:""} time={otherUser.conversation?.lastMessage?formatConversationTime(otherUser.conversation?.lastMessage.createdAt):""}
                             onClick={() => { handleClick(otherUser._id) }}  isActiveCard={isActiveCard} userId={otherUser._id} />
                     ))}
                 </div>

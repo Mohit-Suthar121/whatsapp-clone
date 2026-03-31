@@ -40,13 +40,27 @@ export const initializeSocket = (server) => {
                 userId = connectingUserId.toString();
                 onlineUsers.set(userId, socket.id);
                 socket.join(userId);
+
                 //updating the user Status in mongoDb
-                const user = await User.findByIdAndUpdate(userId, {
+                await User.findByIdAndUpdate(userId, {
                     isOnline: true
                 });
 
                 //notify all the users about the user being online:
                 io.emit("user_status", { userId, isOnline: true });
+
+
+                //after notifying the users , mark the sent messages as delivered
+                const pendingMessages = await Message.find({receiver:userId,messageStatus:"sent"});
+                if(pendingMessages.length>0){
+                    const uniqueUsers = [...new Set(pendingMessages.map(message=>message.sender.toString()))];
+                    const messageIds = pendingMessages.map(message=>message._id.toString());
+                    await Message.updateMany({_id:{$in:messageIds}},{$set:{messageStatus:"delivered"}});
+                    uniqueUsers.forEach((user)=>{
+                        const filteredMessageIds = pendingMessages.filter((message)=>message.sender.toString()===user.toString()).map((filteredmessage)=>filteredmessage._id);
+                        io.to(user).emit("update_message_status",{messageIds:filteredMessageIds,status:"delivered"})
+                    })
+                }
             } catch (error) {
                 console.error("Error while headling user connections", error)
             }
@@ -89,9 +103,9 @@ export const initializeSocket = (server) => {
 
 
         //handle reading messages
-        socket.on("read_messages", async (messageIds, senderId, conversationId) => {
+        socket.on("read_messages", async ({messageIds, senderId, conversationId}) => {
             try {
-                io.to(senderId).emit("message_status_update", {
+                io.to(senderId).emit("update_message_status", {
                     messageIds,
                     messageStatus: "read",
                     conversationId

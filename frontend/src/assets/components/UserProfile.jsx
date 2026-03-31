@@ -2,7 +2,7 @@ import React from 'react'
 import { useThemeStore } from '../../../store/useThemeStore'
 
 const UserProfile = ({
-    username, lastmessage, time, isSelfStatus, width, height, onClick, isActiveCard, userId, uploadTime, profilePicture, unreadCount,isOnline
+    username, lastmessage, time, isSelfStatus, width, height, onClick, isActiveCard, userId, uploadTime, profilePicture, unreadCount,isOnline,isTyping
 }) => {
 
     const { theme } = useThemeStore();
@@ -25,7 +25,9 @@ const UserProfile = ({
 
                 <div className="textDetails w-full overflow-x-hidden text-ellipsis whitespace-nowrap">
                     <h3 className='text-lg font-semibold'>{username}</h3>
-                    <p className='text-sm text-gray-400 font-semibold w-full overflow-x-hidden text-ellipsis whitespace-nowrap'>{lastmessage ? lastmessage : uploadTime}</p>
+                    
+                   {isTyping? <p className='text-sm text-green-500 font-semibold w-full overflow-x-hidden text-ellipsis whitespace-nowrap'>Typing...</p>:<p className='text-sm text-gray-400 font-semibold w-full overflow-x-hidden text-ellipsis whitespace-nowrap'>{lastmessage}</p>}
+
                 </div>
                 {time && !unreadCount && <div className="time text-sm text-gray-400 font-semibold whitespace-nowrap">{time}</div>}
 

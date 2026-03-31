@@ -92,45 +92,90 @@ export const useChatStore = create((set, get) => ({
 
     },
 
-    
+
     unsubscribeFromUserStatus: () => {
         const socket = getSocket()
         if (socket) socket.off("user_status")
     },
 
-    subscribeToTyping:()=>{
+    subscribeToTyping: () => {
         const socket = getSocket();
-        if(!socket) return;
+        if (!socket) return;
         socket.off("display_typing")
         socket.off("hide_typing")
 
-        socket.on("display_typing",({senderId,conversationId,isTyping})=>{
-            set((state)=>{
+        socket.on("display_typing", ({ senderId, conversationId, isTyping }) => {
+            set((state) => {
                 const newTypingUsers = new Map(state.typingUsers);
-                newTypingUsers.set(conversationId,senderId);
-                return {typingUsers:newTypingUsers};
+                newTypingUsers.set(conversationId, senderId);
+                return { typingUsers: newTypingUsers };
             })
         })
 
-        socket.on("hide_typing",({conversationId})=>{
-            set((state)=>{
+        socket.on("hide_typing", ({ conversationId }) => {
+            set((state) => {
                 const newTypingUsers = new Map(state.typingUsers);
                 newTypingUsers.delete(conversationId);
-                return {typingUsers:newTypingUsers};
+                return { typingUsers: newTypingUsers };
             })
         })
 
-        
+
     },
-    unsubscribeFromTyping:()=>{
+
+
+    unsubscribeFromTyping: () => {
         const socket = getSocket();
-        if(socket){
+        if (socket) {
             socket.off("display_typing");
             socket.off("hide_typing");
         }
     },
 
+    subscribeToMessageStatus: () => {
+        const socket = getSocket();
+        if (!socket) return;
 
+        socket.off("update_message_status");
+        socket.off("mark_as_read");
+
+
+        socket.on("update_message_status", ({ messageIds, status }) => {
+            const messageIdsSet = new Set(messageIds.map(id => id.toString()));
+            //update the message status of the opened conversation
+            set((state) => {
+                const updatedMessage = state.messages.map((message) => (messageIdsSet.has(message._id.toString()) ? { ...message, messageStatus: status } : message))
+                const updatedConversations = state.conversations.map((convo) => messageIdsSet.has(convo.lastMessage?._id?.toString()) ? { ...convo, lastMessage: { ...convo.lastMessage, messageStatus: status } } : convo)
+                return { messages: updatedMessage, conversations: updatedConversations }
+            })
+
+
+        })
+
+        socket.on("mark_as_read", ({ messageIds, conversationId }) => {
+            const messageIdsSet = new Set(messageIds.map(id => id.toString()));
+
+            set((state) => {
+                const updatedMessages = state.messages.map(message => messageIdsSet.has(message._id.toString()) ? { ...message, messageStatus: "read" } : message);
+                const updatedConversation = state.conversations.map(convo => {
+                    if (convo._id.toString() === conversationId.toString() && convo.lastMessage) {
+                        return { ...convo, lastMessage: { ...convo.lastMessage, messageStatus: "read" } }
+                    }
+                    return convo;
+                })
+
+                return { messages: updatedMessages, conversations: updatedConversation };
+            })
+        })
+
+    },
+
+
+    unsubscribeFromMessageStatus: () => {
+        const socket = getSocket();
+        if (!socket) return;
+        socket.off("update_message_status")
+    },
 
 
     connectSocket: (userId) => {
@@ -150,6 +195,8 @@ export const useChatStore = create((set, get) => ({
 
     }
 
+
+    
 
 
 }))
