@@ -2,7 +2,6 @@
 import { create } from "zustand"
 import { getSocket } from "../services/chat.service"
 
-
 export const useChatStore = create((set, get) => ({
     conversations: [],
     messages: [],
@@ -98,6 +97,41 @@ export const useChatStore = create((set, get) => ({
         const socket = getSocket()
         if (socket) socket.off("user_status")
     },
+
+    subscribeToTyping:()=>{
+        const socket = getSocket();
+        if(!socket) return;
+        socket.off("display_typing")
+        socket.off("hide_typing")
+
+        socket.on("display_typing",({senderId,conversationId,isTyping})=>{
+            set((state)=>{
+                const newTypingUsers = new Map(state.typingUsers);
+                newTypingUsers.set(conversationId,senderId);
+                return {typingUsers:newTypingUsers};
+            })
+        })
+
+        socket.on("hide_typing",({conversationId})=>{
+            set((state)=>{
+                const newTypingUsers = new Map(state.typingUsers);
+                newTypingUsers.delete(conversationId);
+                return {typingUsers:newTypingUsers};
+            })
+        })
+
+        
+    },
+    unsubscribeFromTyping:()=>{
+        const socket = getSocket();
+        if(socket){
+            socket.off("display_typing");
+            socket.off("hide_typing");
+        }
+    },
+
+
+
 
     connectSocket: (userId) => {
         const socket = getSocket();

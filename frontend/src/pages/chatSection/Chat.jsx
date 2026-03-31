@@ -26,7 +26,7 @@ const Chat = () => {
     const [userClick, setUserClick] = useState(false);
     const [showConversation, setShowConversation] = useState("");
     const [allUsers, setAllUsers] = useState([])
-    const {subscribeToMessages,unsubscribeFromMessages,setCurrentConversation,onlineUsers,subscribeToUserStatus,unsubscribeFromUserStatus,connectSocket} = useChatStore();
+    const {subscribeToMessages,unsubscribeFromMessages,setCurrentConversation,onlineUsers,subscribeToUserStatus,unsubscribeFromUserStatus,connectSocket,subscribeToTyping,unsubscribeFromTyping} = useChatStore();
 
     function handleClick(userId) {
         const currentUser = allUsers.find(user=> user._id===userId);
@@ -75,17 +75,15 @@ const Chat = () => {
 
     useEffect(()=>{
         if(!user?._id) return;
+        connectSocket(user._id)
         subscribeToMessages()
         subscribeToUserStatus(user._id)
-        connectSocket(user._id)
-            onlineUsers.forEach(user=>{
-                console.log(user);
-            })
-            
-            console.log(onlineUsers)
+        subscribeToTyping();
+        console.log(onlineUsers)
         return ()=>{
             unsubscribeFromMessages();
             unsubscribeFromUserStatus();
+            unsubscribeFromTyping();
         }
     },[user?._id])
 

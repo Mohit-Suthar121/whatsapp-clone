@@ -108,7 +108,7 @@ export const initializeSocket = (server) => {
 
 
         //handle real time typing... prompt, and stop after 3s
-        socket.on("typing_start", (conversationId, receiverId) => {
+        socket.on("typing_start", ({conversationId, receiverId}) => {
             if (!conversationId || !userId || !receiverId) return;
 
             if (typingUsers.has(userId)) {
@@ -129,7 +129,7 @@ export const initializeSocket = (server) => {
                     conversationId,
                     isTyping: false
                 })
-            }, 3000)
+            }, 1500)
 
             typingUsers.set(userId, timer)
 
@@ -137,7 +137,7 @@ export const initializeSocket = (server) => {
         })
 
         //if you wanna stop the typing... imidiately when you press send
-        socket.on("typing_stop", (conversationId, receiverId) => {
+        socket.on("typing_stop", ({conversationId, receiverId}) => {
             if (!conversationId || !userId || !receiverId) return;
             io.to(receiverId).emit("hide_typing", {
                 conversationId,

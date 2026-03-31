@@ -17,6 +17,7 @@ import MessageBubble2 from './MessageBubble2'
 import DeliveredIcon from './icons/DeliveredIcon'
 import MessageSentTickIcon from './icons/MessageSentTickIcon'
 import PendingMessageIcon from './icons/PendingMessageIcon'
+import { getSocket } from '../../../services/chat.service'
 
 
 const UserConversation = ({ profilePicture, username, lastSeen, receiverId,conversationId,senderId,isOnline }) => {
@@ -24,11 +25,15 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId,conve
     const scrollRef = useRef();
     const [messageContent, setMessageContent] = useState("");
     const [isEmpty, setIsEmpty] = useState(true);
-    const {messages,setMessages,setOptimisticMessage,updateMessageStatus} = useChatStore();
-    console.log("The online status of the user: ",isOnline)
-    console.log("The last seen is:  ",lastSeen)
+    const {messages,setMessages,setOptimisticMessage,updateMessageStatus,typingUsers} = useChatStore();
+    const isTyping = typingUsers.get(conversationId) === receiverId;
+    // console.log("The online status of the user: ",isOnline)
+    // console.log("The last seen is:  ",lastSeen)
+    console.log("typingUsers are: ",typingUsers)
 
     const getDisplayStatus = ()=> {
+        console.log("the senderId is: ",senderId)
+
         if(isOnline && isOnline==="online"){
             return isOnline
         }
@@ -42,10 +47,15 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId,conve
 
     function handleTextArea(e) {
         setMessageContent(e.target.value);
+        console.log("i'm changing")
         if (e.target.value.trim() != "") {
             setIsEmpty(false)
         }
         else setIsEmpty(true);
+
+        const socket = getSocket();
+        if(!socket || !conversationId) return;
+        socket.emit("typing_start",{conversationId,receiverId});
     }
 
     function returnMessageStatus(message){
@@ -57,8 +67,15 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId,conve
 
     async function handleSendMessage(receiverId) {
         if(!messageContent.trim()) return ;
-
         const clientId = Date.now().toString();
+
+         const socket = getSocket();
+        //stopping the typing... name
+        socket.emit("typing_stop",{conversationId,receiverId})
+       
+
+
+
         // a temprary message to save to the store for instant preview
         const optimisticMessage = {
             _id:clientId,
@@ -77,8 +94,6 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId,conve
                 receiverId,
                 content
             }
-
-            
             const response = await sendMessage(data);
             updateMessageStatus(response.data,clientId)
 
@@ -133,7 +148,7 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId,conve
 
                             <div className="textDetails w-full overflow-x-hidden text-ellipsis whitespace-nowrap">
                                 <h3 className='text-lg font-semibold'>{username}</h3>
-                                <p className='text-sm text-gray-400 font-semibold w-full overflow-x-hidden text-ellipsis whitespace-nowrap'>{getDisplayStatus()}</p>
+                                <p className='text-sm text-gray-400 font-semibold w-full overflow-x-hidden text-ellipsis whitespace-nowrap'>{isTyping?"Typing...": getDisplayStatus()}</p>
                             </div>
 
                             <div className="videocall-and-other flex items-center">
