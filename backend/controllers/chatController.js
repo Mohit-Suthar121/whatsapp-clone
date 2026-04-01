@@ -1,11 +1,11 @@
 import Conversation from '../models/Conversation.js'
-import {deleteFromCloudinary, uploadToCloudinary} from '../config/cloudinaryConfig.js'
+import { deleteFromCloudinary, uploadToCloudinary } from '../config/cloudinaryConfig.js'
 import response from '../utils/responseHandler.js'
 import Message from '../models/Message.js';
 import { onlineUsers } from '../services/SocketService.js';
 
 export const sendMessage = async (req, res) => { // handling normal message and file or video using this function
-    const {  receiverId, content } = req.body;
+    const { receiverId, content } = req.body;
     const senderId = req.user.userId;
     const file = req.file
     try {
@@ -16,8 +16,8 @@ export const sendMessage = async (req, res) => { // handling normal message and 
             await conversation.save();
         }
         let media = {
-            url:"",
-            publicCloudinaryId:""
+            url: "",
+            publicCloudinaryId: ""
         };
         let contentType = null;
         if (file) {
@@ -46,7 +46,7 @@ export const sendMessage = async (req, res) => { // handling normal message and 
             return response(res, "content is needed to send message", 400)
         }
 
-        const  isReceiverOnline = onlineUsers.has(receiverId.toString());
+        const isReceiverOnline = onlineUsers.has(receiverId.toString());
         const message = new Message({
             conversation: conversation._id,
             sender: senderId,
@@ -54,22 +54,21 @@ export const sendMessage = async (req, res) => { // handling normal message and 
             content,
             media,
             contentType,
-            messageStatus:isReceiverOnline?"delivered":"sent",
+            messageStatus: isReceiverOnline ? "delivered" : "sent",
         })
 
         await message.save();
         conversation.lastMessage = message._id;
         const currentCount = conversation.unreadCount.get(receiverId) || 0;
-        conversation.unreadCount.set(receiverId,currentCount+1);
-        console.log("The conversation is: ",conversation)
+        conversation.unreadCount.set(receiverId, currentCount + 1);
         await conversation.save();
 
         const populatedMessage = await Message.findOne({ _id: message._id }).populate("sender", "username profilePicture").populate("receiver", "username profilePicture")
 
         // sending message realtime through socket
-        if(req.io){
-            req.io.to(receiverId.toString()).emit("receive_message",populatedMessage);
-            req.io.to(senderId.toString()).emit("send_message_sync",populatedMessage);
+        if (req.io) {
+            req.io.to(receiverId.toString()).emit("receive_message", populatedMessage);
+            req.io.to(senderId.toString()).emit("send_message_sync", populatedMessage);
         }
         return response(res, "message sent Successfully", 201, populatedMessage)
 
@@ -116,12 +115,26 @@ export const getMessages = async (req, res) => {
             return response(res, "User is not authorized", 403)
         }
 
-        await Message.updateMany({
+        const messagesToUpdate = await Message.find({
             conversation: conversationId,
             receiver: userId,
-            messageStatus: { $in: ["sent", "delivered"] },
-        }, { $set: { messageStatus: "read" } })
-        conversation.unreadCount.set(userId,0);
+            messageStatus: { $in: ["sent", "delivered"] }
+        }).select("_id");
+        const messageIds = messagesToUpdate.map(msg => msg._id.toString());
+
+        if (messageIds.length > 0) {
+            await Message.updateMany({
+                conversation: conversationId,
+                receiver: userId,
+                messageStatus: { $in: ["sent", "delivered"] },
+            }, { $set: { messageStatus: "read" } })
+            conversation.unreadCount.set(userId, 0);
+            if(req.io){
+                const senderId = conversation.participants.find(p => p.toString() !== userId.toString());
+                req.io.to(senderId.toString()).emit("mark_as_read", { conversationId, messageIds })
+            }
+        }
+
         await conversation.save();
         let messages = await Message.find({ conversation: conversationId }).populate("sender", "username profilePicture").populate("receiver", "username profilePicture").sort("createdAt");
 
@@ -143,21 +156,22 @@ export const markAsRead = async (req, res) => {
         await Message.updateMany({ _id: { $in: messageIds }, receiver: userId }, { $set: { messageStatus: "read" } });
         let conversation = await Conversation.findOne({ participants })
         if (!conversation) return response(res, "Conversation not found", 404)
-        conversation.unreadCount.set(userId,0);
+        conversation.unreadCount.set(userId, 0);
         await conversation.save();
 
-        if(req.io){
-            req.io.to(senderId.toString()).emit("mark_as_read",{
+        if (req.io) {
+            req.io.to(senderId.toString()).emit("mark_as_read", {
                 messageIds,
-                conversationId:conversation._id,
-                reader:userId
+                conversationId: conversation._id,
+                reader: userId
             })
 
-            req.io.to(userId.toString()).emit("mark_as_read_sync",{
-                conversationId:conversation._id,
+            req.io.to(userId.toString()).emit("mark_as_read_sync", {
+                conversationId: conversation._id,
                 messageIds
             })
         }
+
         return response(res, "Messages Marked to read successfully!", 200);
     } catch (error) {
         console.error(error);
@@ -173,44 +187,44 @@ export const deleteMessage = async (req, res) => {
         const userId = req.user.userId;
         const { messageId } = req.body;
         const message = await Message.findById(messageId);
-        if(!message) return response(res,"Message not found!",404);
+        if (!message) return response(res, "Message not found!", 404);
         const publicCloudinaryId = message.media?.publicCloudinaryId;
         const conversationId = message.conversation;
-        if(message.sender.toString() !== userId) return response(res,"you're not authorized to delete the message!",403);
+        if (message.sender.toString() !== userId) return response(res, "you're not authorized to delete the message!", 403);
         await message.deleteOne();
 
         //if any file is deleted then delete that file from the cloudinary as well
 
-        if(publicCloudinaryId){
+        if (publicCloudinaryId) {
             try {
-            const fileType = message.contentType
-            await deleteFromCloudinary(publicCloudinaryId,fileType)
+                const fileType = message.contentType
+                await deleteFromCloudinary(publicCloudinaryId, fileType)
             } catch (error) {
-                console.error("some error occured while deleting the file from cloudinary",error)
+                console.error("some error occured while deleting the file from cloudinary", error)
             }
         }
 
-        
-        
+
+
         //update the conversation's last message if the deleted message was the latest one...
         const conversation = await Conversation.findById(conversationId);
-        if(conversation && conversation.lastMessage?.toString()=== messageId.toString()){
-            let newLastMessage =  await Message.findOne({conversation:conversationId}).sort({createdAt:-1});
-            conversation.lastMessage = newLastMessage?newLastMessage._id:null;
+        if (conversation && conversation.lastMessage?.toString() === messageId.toString()) {
+            let newLastMessage = await Message.findOne({ conversation: conversationId }).sort({ createdAt: -1 });
+            conversation.lastMessage = newLastMessage ? newLastMessage._id : null;
             await conversation.save();
         }
 
 
 
         // update realtime message deltetion through socketio
-        if(req.io){
-            req.io.to(message.receiver).emit("message_deleted",{
+        if (req.io) {
+            req.io.to(message.receiver.toString()).emit("message_deleted", {
                 messageId,
-                conversationId:message.conversation
+                conversationId: message.conversation
             })
-            req.io.to(message.sender).emit("message_deleted",{
+            req.io.to(message.sender.toString()).emit("message_deleted", {
                 messageId,
-                conversationId:message.conversation
+                conversationId: message.conversation
             })
         }
         return response(res, "Message deleted Successfully!", 200);

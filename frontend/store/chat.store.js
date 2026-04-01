@@ -2,6 +2,7 @@
 import { create } from "zustand"
 import { getSocket } from "../services/chat.service"
 
+
 export const useChatStore = create((set, get) => ({
     conversations: [],
     messages: [],
@@ -11,29 +12,49 @@ export const useChatStore = create((set, get) => ({
     onlineUsers: new Map(),
     error: null,
 
+     //settings messages which we got to set to show in a conversation realtime
+    setMessages: (messages) => set({ messages }),
+    setCurrentConversation: (conversation) => set({ currentConversation: conversation }),
+
+    //set the populated conversations to the store so that we have the access to the last messages
+    setConversations:(fetchedConversations)=>set({conversations:fetchedConversations}), 
+
+
     subscribeToMessages: () => {
         const socket = getSocket();
         if (!socket) return;
         socket.off("receive_message")
 
 
+
         socket.on("receive_message", (newMessage) => {
-            const { currentConversation, messages } = get();
+            const { currentConversation } = get();
 
             //insert a new message to the opened chat window
-            if (newMessage.conversation === currentConversation?._id) {
-                set({ messages: [...messages, newMessage] })
+            if (newMessage.conversation.toString() === currentConversation?._id?.toString()) {
+                set((state)=>({
+                    messages:[...state.messages,newMessage]
+                }))
             }
+
 
 
             //update the last message in the conversation
             set((state) => ({
                 conversations: state.conversations.map((convo) => (
-                    convo._id === newMessage.conversation ? { ...convo, lastMessage: newMessage } : convo
+                    convo._id.toString() === newMessage.conversation.toString() ? { ...convo, lastMessage: newMessage} : convo
                 ))
             }))
 
 
+            set((state)=>({
+                conversations:state.conversations.map((convo)=>{
+                    if(newMessage?.conversation?.toString()!==currentConversation?._id?.toString() && newMessage?.conversation?.toString() === convo?._id?.toString()){
+                        return {...convo,unreadCount:convo.unreadCount+1}
+                    }
+                    return convo
+                })
+            }))
 
         })
 
@@ -47,9 +68,7 @@ export const useChatStore = create((set, get) => ({
         }
     },
 
-    //settings messages which we got to set to show in a conversation realtime
-    setMessages: (messages) => set({ messages }),
-    setCurrentConversation: (conversation) => set({ currentConversation: conversation }),
+   
 
     setOptimisticMessage: (message) => {
         set((state) => ({
@@ -194,6 +213,8 @@ export const useChatStore = create((set, get) => ({
         }
 
     }
+
+
 
 
     

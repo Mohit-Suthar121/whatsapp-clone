@@ -35,6 +35,7 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId, conv
         try {
         console.log("messages before filter are: ",messages)
         const requiredMessagesIds = messages.filter((message)=>message.receiver._id?.toString()=== senderId && message.messageStatus !== "read").map((msg)=>msg._id)
+        console.log("The required messages are: ",requiredMessagesIds)
         if(requiredMessagesIds.length === 0) return;
         const response = await markMessagesAsReadApi({messageIds:requiredMessagesIds , senderId:receiverId});
         console.log("The response from the markmessage as read api: ",response);
@@ -79,7 +80,6 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId, conv
     async function handleSendMessage(receiverId) {
         if (!messageContent.trim()) return;
         const clientId = Date.now().toString();
-
         const socket = getSocket();
         //stopping the typing... name
         socket.emit("typing_stop", { conversationId, receiverId })
@@ -97,7 +97,10 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId, conv
             receiver:{_id:receiverId},
             createdAt: new Date().toISOString(),
         }
+
         setOptimisticMessage(optimisticMessage);
+
+
         try {
             const content = messageContent;
             setMessageContent("");
@@ -107,7 +110,7 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId, conv
                 content
             }
             const response = await sendMessage(data);
-            updateMessageStatus(response.data, clientId)
+           await updateMessageStatus(response.data, clientId)
 
         } catch (error) {
             console.error("Some error occured while sending the message", error);
