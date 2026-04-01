@@ -152,10 +152,11 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId, conv
 
 
     return (
-        <div className="backgroundWrapper flex-1">
+        <div className="flex-1 border relative">
+            <div className="backgroundWrapper"></div>
 
-            <div className={`right-side-section w-full h-full  flex-1 flex pl-4 pr-4 pb-4 flex-col ${theme === "dark" ? "bg-[#161717]" : "bg-[#F7F5F3]"}`}>
-                <div className="profile-nav w-full bg-[#161717] p-2 ">
+            <div className={`relative z-1 right-side-section w-full h-full  flex-1 flex flex-col ${theme === "dark" ? "bg-[#161717f4]" : "bg-[#f5f1ebed]"}`}>
+                <div className={`profile-nav w-full ${theme==="dark"?"bg-[#161717]":"bg-white"} p-2 pl-4 pr-4`}>
 
                     <div className="userProfile flex text-white w-full gap-4 shrink-0 cursor-pointer">
 
@@ -167,7 +168,7 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId, conv
                         <div className="userInfo flex justify-between items-center flex-1  min-w-0 " >
 
                             <div className="textDetails w-full overflow-x-hidden text-ellipsis whitespace-nowrap">
-                                <h3 className='text-lg font-semibold'>{username}</h3>
+                                <h3 className={`text-lg font-semibold ${theme==="dark"?"text-white":"text-black"}`}>{username}</h3>
                                 {isTyping ? <p className='text-sm text-green-500 font-semibold w-full overflow-x-hidden text-ellipsis whitespace-nowrap'>Typing...</p> : <p className='text-sm text-gray-400 font-semibold w-full overflow-x-hidden text-ellipsis whitespace-nowrap'> {getDisplayStatus()}</p>}
 
 
@@ -200,9 +201,9 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId, conv
 
                 </div>
 
+                <div className=" inputWrapper pl-4 pr-4 pb-3 w-full min-h-13 flex">
 
-                <div className="inputbox w-full min-h-13 flex items-center p-2 bg-[#242626] rounded-4xl">
-
+                <div className=" inputbox w-full h-full flex items-center p-2 bg-[#242626] rounded-4xl">
                     <div className="addIcon flex justify-center items-center p-2 hover:bg-[#393B3B] rounded-full w-10 h-10 self-end">
                         <AddIcon />
                     </div>
@@ -234,6 +235,10 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId, conv
                     </div>}
 
                 </div>
+                </div>
+
+
+
             </div>
         </div>
 

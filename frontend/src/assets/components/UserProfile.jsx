@@ -17,7 +17,7 @@ const UserProfile = ({
 
             <div className={` ${isSelfStatus ? "addBeforeElement" : ""} userImage w-${width} h-${height} rounded-full shrink-0 relative`}>
                 <img className='w-full h-full rounded-full' src={profilePicture} alt="" />
-                {isOnline==="online" && <div className="absolute right-0 bottom-0 bg-[#21BE62] w-3 h-3 rounded-full border-black border-2"></div>}
+                {isOnline==="online" && <div className={`absolute right-0 bottom-0 bg-[#21BE62] w-3 h-3 rounded-full ${theme==="dark"?"border-black":"border-white"}  border-2`}></div>}
             </div>
 
 

@@ -66,39 +66,17 @@
 .backgroundWrapper {
   width: 100%;
   height: 100%;
-  position: relative;
-}
-
-.backgroundWrapper::before {
-  content: "";
   position: absolute;
   background-image: url("./assets/images/y10n_fpni_211014.jpg");
-  opacity: 0.05;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   inset: 0;
   z-index: 0;
-  background-size: contain;
-}
-
-.backgroundWrapper>* {
-  position: relative;
-  z-index: 1;
+  pointer-events: none;
 
 }
 
-.notify {
-  position: relative;
-}
-
-.notify::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 8px;
-  height: 8px;
-  background-color: #21be62;
-  border-radius: 50%;
-}
 
 .ProfilePictureDecorator {
   position: relative;
@@ -149,74 +127,15 @@
 
 
 
+:root{
+  --my-bubble-bg:#144E37 transparent transparent #144E37;
+  --other-bubble-bg:#242626 transparent transparent #242626;
+}
 
-
-
-/* .speech-wrapper {
-  .bubble {
-    width: fit-content;
-    max-width: 570px;
-    display: block;
-    background: #144E37;
-    border-radius: 4px;
-    position: relative;
-
-    .txt {
-      padding: 8px;
-      padding-bottom: 30px;
-      .timestamp {
-        font-size: 11px;
-        position: absolute;
-        bottom: 8px;
-        right: 10px;
-        text-transform: uppercase;
-        color: #999
-      }
-    }
-
-
-    .bubble-arrow {
-      position: absolute;
-      width: 0;
-      bottom: 42px;
-      left: -16px;
-      height: 0;
-
-      &.alt {
-        right: -2px;
-        bottom: 30px;
-        left: auto;
-      }
-    }
-
-    .bubble-arrow:after {
-      content: "";
-      position: absolute;
-      border: 0 solid transparent;
-      border-top: 9px solid #144E37;
-      border-radius: 0 20px 0;
-      width: 15px;
-      height: 30px;
-      transform: rotate(145deg);
-    }
-
-    .bubble-arrow.alt:after {
-      transform: rotate(45deg) scaleY(-1);
-    }
-
-  }
-
-
-  .bubble.other {
-    background: #242626;
-    color: #111;
-  }
-
-  .bubble.other .bubble-arrow:after {
-    border-top: 9px solid #242626;
-  }
-} */
-
+.light-theme{
+  --my-bubble-bg:#D9FDD3 transparent transparent #D9FDD3;
+  --other-bubble-bg:#ffffff transparent transparent #ffffff;
+}
 
 .messageBubble:after,.otherMessageBubble:after{
 	content: ' ';
@@ -224,18 +143,21 @@
 	width: 0;
 	height: 0;
   left: auto;
-	right: -10px;
-  top: 44px;
 	bottom: auto;
 	border: 8px solid;
-  border-color: #144E37 transparent transparent #144E37;
+}
+
+.messageBubble::after{
+  right: -10px;
+  bottom: 1px;
+  border-color: var(--my-bubble-bg) ;
 }
 
 .otherMessageBubble:after{
   right: 0;
   left: -10px;
-  border-color: #242626 transparent transparent #242626;
+  bottom: 1px;
+  border-color: var(--other-bubble-bg);
   transform: rotateY(180deg);
-
 }
 

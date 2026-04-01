@@ -44,6 +44,16 @@ const Chat = () => {
         }
     }, [user?._id])
 
+    useEffect(()=>{
+        console.log("The current conversations is: ",currentConversation);
+    },[currentConversation])
+
+    useEffect(() => {
+        gettingAllUsers();
+    }, [])
+
+    
+
 
 
 
@@ -75,9 +85,9 @@ const Chat = () => {
     }
     
 
-    useEffect(()=>{
-        console.log("The current conversations is: ",currentConversation);
-    },[currentConversation])
+    
+
+
 
     function tellIsTyping(conversationId, receiverId) {
         return typingUsers.get(conversationId) === receiverId;
@@ -85,10 +95,14 @@ const Chat = () => {
 
 
 
+
+
     async function gettingAllUsers() {
         try {
             const response = await getAllUsers();
             setAllUsers(response.data);
+
+            //setting up all the conversations
             const allFilteredConversations = response.data.map((u)=>u.conversation).filter((convo)=>convo!=null).map((filteredConvo)=> ({...filteredConvo,unreadCount:filteredConvo.unreadCount?.[user._id.toString()]??0}));
             setConversations(allFilteredConversations);
         }
@@ -97,6 +111,8 @@ const Chat = () => {
         }
 
     }
+
+    
 
 
     function filterLastMessage(conversation){
@@ -107,15 +123,6 @@ const Chat = () => {
             time:filteredConversation?.lastMessage?.createdAt
         }
     }
-
-
-
-    useEffect(() => {
-        gettingAllUsers();
-    }, [])
-
-
-    
 
 
 

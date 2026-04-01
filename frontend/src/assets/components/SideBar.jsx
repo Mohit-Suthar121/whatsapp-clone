@@ -11,13 +11,17 @@ import { Link, useLocation, useNavigate } from 'react-router'
 import MediaSvg from './icons/MediaSvg'
 import { useThemeStore } from '../../../store/useThemeStore'
 import { useUserStore } from '../../../store/useUserStore'
-
+import { useChatStore } from '../../../store/chat.store'
+import { useEffect } from 'react'
+//This is the latest commit 
 const SideBar = () => {
     const { theme, setTheme } = useThemeStore();
     const location = useLocation();
     const isActive = (path) => path === location.pathname;
     const navigate = useNavigate();
     const {user} = useUserStore();
+    const {conversations} = useChatStore();
+    const totalCount = conversations.filter((convo)=>convo.unreadCount>0).length;
 
 
     return (
@@ -26,9 +30,12 @@ const SideBar = () => {
 
                 <div className="upperlogos flex flex-col justify-center gap-1">
 
-                    <div className="chatbox" onClick={() => { navigate("/") }}>
+                    <div className="chatbox relative" onClick={() => { navigate("/") }}>
                         <CircledButton notification={true} isActive={isActive("/")} svg={<ChatSvg currentColor={theme === "dark" ? "#A9AAAA" : "#5E5D5C"} />} filledSvg={<ChatFilled />}/>
+
+                       {totalCount > 0 &&<div className={`showNotifications absolute  top-0 right-0 -translate-y-[25%] translate-x-[25%] border-2  ${theme==="dark"?"border-black text-black":"border-white text-white"}  h-6 w-6 text-xs bg-[#21be62] rounded-full flex justify-center items-center p-2 font-semibold`}>{totalCount}</div>}
                     </div>
+
 
                     <div className="status" onClick={() => { navigate("/status") }}>
                         <CircledButton notification={true} isActive={isActive('/status')} svg={<StatusSvg currentColor={theme==="dark"?"#999A9A":"#5E5D5C"}/>} filledSvg={<StatusFilled currentColor={theme==="dark"?"white":"black"}/>}/>
@@ -42,7 +49,7 @@ const SideBar = () => {
 
                     <label htmlFor="media">
                         <div className={`flex justify-center items-center p-2 ${theme === "dark" ? "hover:bg-[#292A2A]" : "hover:bg-[#E7E6E4]"} rounded-full w-10 h-10`}>
-                            <MediaSvg />
+                            <MediaSvg/>
                         </div>
                         <input className='hidden' type="file" name="" id="media" />
                     </label>
