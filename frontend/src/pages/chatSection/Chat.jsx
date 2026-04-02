@@ -44,9 +44,6 @@ const Chat = () => {
         }
     }, [user?._id])
 
-    useEffect(()=>{
-        console.log("The current conversations is: ",currentConversation);
-    },[currentConversation])
 
     useEffect(() => {
         gettingAllUsers();
@@ -70,9 +67,7 @@ const Chat = () => {
         });
 
         setShowConversation(userId);
-        console.log("The conversations without updation: ",conversations)
         const updatedConversations = conversations.map((convo)=>convo?._id===currentUser?.conversation?._id?{...convo,unreadCount:0}:convo);
-        console.log("The updated conversations are:",updatedConversations);
         setConversations(updatedConversations);
         if (currentUser.conversation) {
             setCurrentConversation(currentUser.conversation)
@@ -117,15 +112,18 @@ const Chat = () => {
 
     function filterLastMessage(conversation){
         const filteredConversation = conversations.find((convo)=>convo?._id?.toString()===conversation?._id?.toString())
+        // console.log("the filtered conversations are: ",filteredConversation)
+        // console.log("it's sender id and the user's id: ",filteredConversation?.lastMessage?.sender,user._id)
+        // console.log("the message and the it's status: ",filteredConversation?.lastMessage?.content || "",filteredConversation?.lastMessage?.sender?.toString()===user._id.toString()?filteredConversation.lastMessage.messageStatus:null)
+        console.log("The filtered conversations are: ",filteredConversation)
         return {
             lastMessage:filteredConversation?.lastMessage?.content || "",
             unreadCount:filteredConversation?.unreadCount || 0,
-            time:filteredConversation?.lastMessage?.createdAt
+            time:filteredConversation?.lastMessage?.createdAt,
+            image:filteredConversation?.lastMessage?.media?.url?true:false,
+            messageStatus:filteredConversation?.lastMessage?.sender?.toString()===user._id.toString()?filteredConversation.lastMessage.messageStatus:null
         }
     }
-
-
-
 
 
 
@@ -180,7 +178,11 @@ const Chat = () => {
                             unreadCount={conversationData.unreadCount}
                             lastmessage={conversationData.lastMessage}
                             time={ formatConversationTime(conversationData.time)}
-                            onClick={() => { handleClick(otherUser._id) }} isActiveCard={isActiveCard} userId={otherUser._id}
+                            image={conversationData.image}
+                            isActiveCard={isActiveCard}
+                            userId={otherUser._id}
+                            messageStatus={conversationData.messageStatus}
+                            onClick={() => { handleClick(otherUser._id) }}
                         />)
                     })}
 

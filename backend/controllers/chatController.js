@@ -68,7 +68,7 @@ export const sendMessage = async (req, res) => { // handling normal message and 
         // sending message realtime through socket
         if (req.io) {
             req.io.to(receiverId.toString()).emit("receive_message", populatedMessage);
-            req.io.to(senderId.toString()).emit("send_message_sync", populatedMessage);
+            req.io.to(senderId.toString()).emit("send_message_sync", message);
         }
         return response(res, "message sent Successfully", 201, populatedMessage)
 

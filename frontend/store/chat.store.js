@@ -24,6 +24,7 @@ export const useChatStore = create((set, get) => ({
         const socket = getSocket();
         if (!socket) return;
         socket.off("receive_message")
+        socket.off("send_message_sync")
 
 
 
@@ -55,6 +56,15 @@ export const useChatStore = create((set, get) => ({
                     return convo
                 })
             }))
+        })
+
+        socket.on("send_message_sync",(newMessage)=>{
+            set((state)=>{
+                const currentConversation = {...state.currentConversation,lastMessage:newMessage};
+                const updatedConversations = state.conversations.map((convo)=>convo._id.toString()===state.currentConversation._id.toString()?{...convo,lastMessage:newMessage}:convo);
+                console.log("The conversations after updation are: ",updatedConversations)
+                return {currentConversation,conversations:updatedConversations}
+            })
         })
 
     },
