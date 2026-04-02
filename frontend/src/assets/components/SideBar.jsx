@@ -30,10 +30,10 @@ const SideBar = () => {
 
                 <div className="upperlogos flex flex-col justify-center gap-1">
 
-                    <div className="chatbox relative" onClick={() => { navigate("/") }}>
+                    <div className="chatbox relative group"  onClick={() => { navigate("/") }}>
                         <CircledButton notification={true} isActive={isActive("/")} svg={<ChatSvg currentColor={theme === "dark" ? "#A9AAAA" : "#5E5D5C"} />} filledSvg={<ChatFilled />}/>
 
-                       {totalCount > 0 &&<div className={`showNotifications absolute  top-0 right-0 -translate-y-[25%] translate-x-[25%] border-2  ${theme==="dark"?"border-black text-black":"border-white text-white"}  h-6 w-6 text-xs bg-[#21be62] rounded-full flex justify-center items-center p-2 font-semibold`}>{totalCount}</div>}
+                       {totalCount > 0 &&<div className={` cursor-pointer showNotifications absolute  top-0 right-0 -translate-y-[25%] translate-x-[25%] border-2  ${theme==="dark"?"border-black text-black":"border-white text-white"}  h-6 w-6 text-xs bg-[#21be62] rounded-full flex justify-center items-center p-2 font-semibold`}>{totalCount}</div>}
                     </div>
 
 

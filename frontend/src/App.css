@@ -102,9 +102,6 @@
   border-radius: 50%;
 }
 
-.addBeforeElement {
-  position: relative;
-}
 
 .addBeforeElement::before {
   content: "+";

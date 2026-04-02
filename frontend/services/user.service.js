@@ -38,6 +38,14 @@ export const updateProfile = async (data) => {
     }
 }
 
+export const uploadToCloudinary = async(file)=>{
+    try {
+        const response = await axiosInstance.post()
+    } catch (error) {
+        
+    }
+}
+
 
 export const checkAuth = async () => {
     try {
