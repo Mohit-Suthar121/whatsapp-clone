@@ -6,7 +6,6 @@ import ThreeDots from '../../assets/components/icons/ThreeDots'
 import LaptopSvg from '../../assets/components/icons/LaptopSvg'
 import { useThemeStore } from '../../../store/useThemeStore'
 import { useUserStore } from '../../../store/useUserStore'
-import { getAllUsers } from '../../../services/user.service'
 import UserConversation from '../../assets/components/UserConversation'
 import { formatConversationTime } from '../../../utils/TimeFormatter'
 import { useChatStore } from '../../../store/chat.store'
@@ -25,29 +24,25 @@ const Chat = () => {
     const { user } = useUserStore();
     const [userClick, setUserClick] = useState(false);
     const [showConversation, setShowConversation] = useState("");
-    const [allUsers, setAllUsers] = useState([])
-    const { subscribeToMessages, unsubscribeFromMessages, setCurrentConversation, onlineUsers, subscribeToUserStatus, unsubscribeFromUserStatus, connectSocket, subscribeToTyping, unsubscribeFromTyping, typingUsers, subscribeToMessageStatus, unsubscribeFromMessageStatus, conversations,setConversations,currentConversation } = useChatStore();
-
-
+    // const [allUsers, setAllUsers] = useState([])
+    const { subscribeToMessages, unsubscribeFromMessages, setCurrentConversation, onlineUsers, subscribeToUserStatus, unsubscribeFromUserStatus, connectSocket, subscribeToTyping, unsubscribeFromTyping, typingUsers, subscribeToMessageStatus, unsubscribeFromMessageStatus, conversations,setConversations,currentConversation,allUsers } = useChatStore();
+    console.log("all the users are: ",allUsers)
+    console.log("All of the converstaions are: ",conversations)
     useEffect(() => {
         if (!user?._id) return;
-        connectSocket(user._id)
-        subscribeToMessages()
+        // connectSocket(user._id)
+        // subscribeToMessages()
         subscribeToUserStatus(user._id)
         subscribeToTyping();
-        subscribeToMessageStatus();
+        // subscribeToMessageStatus();
         return () => {
-            unsubscribeFromMessages();
+            // unsubscribeFromMessages();
             unsubscribeFromUserStatus();
             unsubscribeFromTyping();
-            unsubscribeFromMessageStatus();
+            // unsubscribeFromMessageStatus();
         }
     }, [user?._id])
 
-
-    useEffect(() => {
-        gettingAllUsers();
-    }, [])
 
     
 
@@ -55,9 +50,7 @@ const Chat = () => {
 
 
     function handleClick(userId) {
-      
         const currentUser = allUsers.find(user => user._id === userId);
-
         setIsActiveCard({
             id: userId,
             profilePicture: currentUser.profilePicture,
@@ -90,32 +83,8 @@ const Chat = () => {
 
 
 
-
-
-    async function gettingAllUsers() {
-        try {
-            const response = await getAllUsers();
-            setAllUsers(response.data);
-
-            //setting up all the conversations
-            const allFilteredConversations = response.data.map((u)=>u.conversation).filter((convo)=>convo!=null).map((filteredConvo)=> ({...filteredConvo,unreadCount:filteredConvo.unreadCount?.[user._id.toString()]??0}));
-            setConversations(allFilteredConversations);
-        }
-        catch {
-            console.error("Some Error Occured", error)
-        }
-
-    }
-
-    
-
-
     function filterLastMessage(conversation){
         const filteredConversation = conversations.find((convo)=>convo?._id?.toString()===conversation?._id?.toString())
-        // console.log("the filtered conversations are: ",filteredConversation)
-        // console.log("it's sender id and the user's id: ",filteredConversation?.lastMessage?.sender,user._id)
-        // console.log("the message and the it's status: ",filteredConversation?.lastMessage?.content || "",filteredConversation?.lastMessage?.sender?.toString()===user._id.toString()?filteredConversation.lastMessage.messageStatus:null)
-        console.log("The filtered conversations are: ",filteredConversation)
         return {
             lastMessage:filteredConversation?.lastMessage?.content || "",
             unreadCount:filteredConversation?.unreadCount || 0,

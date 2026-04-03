@@ -1,7 +1,6 @@
 import './App.css'
 import { Routes, Route } from 'react-router'
 import About from './assets/components/About'
-import Home from './assets/components/Home'
 import Login from './pages/user-login/Login'
 import { ProtectedRoute, PublicRoute } from './Protected'
 import Status from './pages/status/Status'
@@ -10,9 +9,6 @@ import Settings from './pages/settingSection/Settings'
 import MainLayout from './assets/components/MainLayout'
 import Chat from './pages/chatSection/Chat'
 import { ToastContainer, Bounce } from 'react-toastify'
-import { useUserStore } from '../store/useUserStore'
-import { useEffect } from 'react'
-import { disconnectSocket, initializeSocket } from '../services/chat.service'
 
 function App() {
 

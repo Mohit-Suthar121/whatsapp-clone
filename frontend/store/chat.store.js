@@ -1,6 +1,8 @@
 
 import { create } from "zustand"
 import { getSocket } from "../services/chat.service"
+import { getAllUsers } from "../services/user.service";
+import { useUserStore } from "./useUserStore";
 
 
 export const useChatStore = create((set, get) => ({
@@ -11,13 +13,36 @@ export const useChatStore = create((set, get) => ({
     typingUsers: new Map(),
     onlineUsers: new Map(),
     error: null,
+    allUsers: [],
 
-     //settings messages which we got to set to show in a conversation realtime
+    //settings messages which we got to set to show in a conversation realtime
     setMessages: (messages) => set({ messages }),
     setCurrentConversation: (conversation) => set({ currentConversation: conversation }),
 
     //set the populated conversations to the store so that we have the access to the last messages
-    setConversations:(fetchedConversations)=>set({conversations:fetchedConversations}), 
+    setConversations: (fetchedConversations) => set({ conversations: fetchedConversations }),
+
+    initializeConversations: async () => {
+        try {
+            const user = useUserStore.getState().user;
+            console.log("The user is: ",user)
+            if(!user?._id) return;
+            const response = await getAllUsers();
+            set((state)=>(
+                {allUsers:response.data}
+            ))
+            // setAllUsers(response.data);
+            //setting up all the conversations
+            const allFilteredConversations = response.data.map((u) => u.conversation).filter((convo) => convo != null).map((filteredConvo) => ({ ...filteredConvo, unreadCount: filteredConvo.unreadCount?.[user._id.toString()] ?? 0 }));
+            set((state)=>({
+                conversations:allFilteredConversations
+            }))
+            // setConversations(allFilteredConversations);
+        }
+        catch(error) {
+            console.error("Some Error Occured", error)
+        }
+    },
 
 
     subscribeToMessages: () => {
@@ -33,8 +58,8 @@ export const useChatStore = create((set, get) => ({
 
             //insert a new message to the opened chat window
             if (newMessage.conversation.toString() === currentConversation?._id?.toString()) {
-                set((state)=>({
-                    messages:[...state.messages,newMessage]
+                set((state) => ({
+                    messages: [...state.messages, newMessage]
                 }))
             }
 
@@ -43,27 +68,27 @@ export const useChatStore = create((set, get) => ({
             //update the last message in the conversation
             set((state) => ({
                 conversations: state.conversations.map((convo) => (
-                    convo._id.toString() === newMessage.conversation.toString() ? { ...convo, lastMessage: newMessage} : convo
+                    convo?._id?.toString() === newMessage?.conversation?.toString() ? { ...convo, lastMessage: newMessage } : convo
                 ))
             }))
 
 
-            set((state)=>({
-                conversations:state.conversations.map((convo)=>{
-                    if(newMessage?.conversation?.toString()!==currentConversation?._id?.toString() && newMessage?.conversation?.toString() === convo?._id?.toString()){
-                        return {...convo,unreadCount:convo.unreadCount+1}
+            set((state) => ({
+                conversations: state.conversations.map((convo) => {
+                    if (newMessage?.conversation?.toString() !== currentConversation?._id?.toString() && newMessage?.conversation?.toString() === convo?._id?.toString()) {
+                        return { ...convo, unreadCount: convo.unreadCount + 1 }
                     }
                     return convo
                 })
             }))
         })
 
-        socket.on("send_message_sync",(newMessage)=>{
-            set((state)=>{
-                const currentConversation = {...state.currentConversation,lastMessage:newMessage};
-                const updatedConversations = state.conversations.map((convo)=>convo._id.toString()===state.currentConversation._id.toString()?{...convo,lastMessage:newMessage}:convo);
-                console.log("The conversations after updation are: ",updatedConversations)
-                return {currentConversation,conversations:updatedConversations}
+        socket.on("send_message_sync", (newMessage) => {
+            set((state) => {
+                const currentConversation = { ...state.currentConversation, lastMessage: newMessage };
+                const updatedConversations = state.conversations.map((convo) => convo._id.toString() === state.currentConversation._id.toString() ? { ...convo, lastMessage: newMessage } : convo);
+                console.log("The conversations after updation are: ", updatedConversations)
+                return { currentConversation, conversations: updatedConversations }
             })
         })
 
@@ -77,7 +102,7 @@ export const useChatStore = create((set, get) => ({
         }
     },
 
-   
+
 
     setOptimisticMessage: (message) => {
         set((state) => ({
@@ -226,7 +251,7 @@ export const useChatStore = create((set, get) => ({
 
 
 
-    
+
 
 
 }))
