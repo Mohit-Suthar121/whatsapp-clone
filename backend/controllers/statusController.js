@@ -1,5 +1,6 @@
-import  Conversation  from 'twilio/lib/twiml/VoiceResponse.js';
+
 import { uploadToCloudinary } from '../config/cloudinaryConfig.js';
+import Conversation from '../models/Conversation.js';
 import { Status } from '../models/statusSchema.js'
 import response from '../utils/responseHandler.js'
 
@@ -8,7 +9,8 @@ export const createStatus = async (req, res) => {
 
     try {
         const userId = req.user?.userId;
-        let { content, contentType } = req.body;
+        let { content} = req.body;
+        let contentType;
         const file = req.file;
         if (!userId) return response(res, "user is not authenticated!", 403)
 
@@ -23,7 +25,6 @@ export const createStatus = async (req, res) => {
         else if (!content?.trim()) return response(res, "Content is required for status", 400)
         if (!file) contentType = "text";
         const expiryDate = new Date(Date.now() + 24 * 60 * 60 * 1000)
-
         const status = new Status({
             user: userId,
             content,
@@ -61,11 +62,13 @@ export const createStatus = async (req, res) => {
 
 
 
-export const getStatus = async (req, res) => {
+// get all the existing status from the db
 
+export const getStatus = async (req, res) => {
     try {
         const now = new Date();
         const statusList = await Status.find({ expiresAt: { $gt: now } }).populate("user", "username profilePicture").populate("viewers", "username profilePicture").sort({ createdAt: -1 }).lean();
+        console.log("All the status are sent successfully!",statusList)
         return response(res, "statusList was retrieved successfully!", 200, statusList);
 
     } catch (error) {
@@ -74,6 +77,8 @@ export const getStatus = async (req, res) => {
     }
 
 }
+
+
 
 
 

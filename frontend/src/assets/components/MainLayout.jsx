@@ -4,6 +4,7 @@ import SideBar from './SideBar'
 import { useEffect } from 'react'
 import { useUserStore } from '../../../store/useUserStore'
 import { useChatStore } from '../../../store/chat.store'
+import { useStatusStore } from '../../../store/status.store'
 
 // the main layout with the sideBar and the children
 const MainLayout = () => {
@@ -11,12 +12,14 @@ const MainLayout = () => {
 
   const { subscribeToMessages, unsubscribeFromMessages, connectSocket, subscribeToMessageStatus, unsubscribeFromMessageStatus,initializeConversations } = useChatStore();
   const { user } = useUserStore();
+  const {initializeStatuses} = useStatusStore();
   useEffect(() => {
     if (!user?._id) return;
     connectSocket(user._id)
     subscribeToMessages()
     subscribeToMessageStatus();
     initializeConversations()
+    initializeStatuses()
     return () => {
       unsubscribeFromMessages();
       unsubscribeFromMessageStatus();

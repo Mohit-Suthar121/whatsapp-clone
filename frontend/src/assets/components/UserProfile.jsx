@@ -6,7 +6,7 @@ import PendingMessageIcon from './icons/PendingMessageIcon';
 import MessageSentTickIcon from './icons/MessageSentTickIcon';
 
 const UserProfile = ({
-    username, lastmessage, time, isSelfStatus, width, height, onClick, isActiveCard, userId, uploadTime, profilePicture, unreadCount, isOnline, isTyping,image,messageStatus
+    username, lastmessage, time, isSelfStatus, width, height, onClick, isActiveCard, userId, uploadTime, profilePicture, unreadCount, isOnline, isTyping, image, messageStatus
 }) => {
 
     const { theme } = useThemeStore();
@@ -18,7 +18,7 @@ const UserProfile = ({
         if (messageStatus === "read") return <DeliveredIcon currentColor={"#53bdeb"} />
         else if (messageStatus === "delivered") return <DeliveredIcon currentColor={"#8FABA0"} />
         else if (messageStatus === "pending") return <PendingMessageIcon currentColor={"#8FABA0"} />
-        else if(messageStatus === "sent") return <MessageSentTickIcon currentColor={"#8FABA0"} />
+        else if (messageStatus === "sent") return <MessageSentTickIcon currentColor={"#8FABA0"} />
         else return null;
     }
 
@@ -45,7 +45,7 @@ const UserProfile = ({
                     <div className="undertext flex items-center gap-1">
                         {messageStatus && returnMessageStatus()}
                         {image && <p><ImageIcon currentColor={"#999A9A"} /></p>}
-                        {isTyping ? <p className='text-sm text-green-500 font-semibold w-full overflow-x-hidden text-ellipsis whitespace-nowrap'>Typing...</p> : <p className={`text-sm  font-semibold w-full overflow-x-hidden text-ellipsis whitespace-nowrap ${theme === "dark" ? (unreadCount > 0 ? "text-white" : "text-gray-400") : (unreadCount > 0 ? "text-black" : "text-gray-400")}`}>{lastmessage?lastmessage:"Photo"}</p>}
+                        {isTyping ? <p className='text-sm text-green-500 font-semibold w-full overflow-x-hidden text-ellipsis whitespace-nowrap'>Typing...</p> : <p className={`text-sm  font-semibold w-full overflow-x-hidden text-ellipsis whitespace-nowrap ${theme === "dark" ? (unreadCount > 0 ? "text-white" : "text-gray-400") : (unreadCount > 0 ? "text-black" : "text-gray-400")}`}>{lastmessage ? lastmessage : "Photo"}</p>}
                     </div>
 
 

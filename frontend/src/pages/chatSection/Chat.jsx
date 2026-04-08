@@ -24,22 +24,14 @@ const Chat = () => {
     const { user } = useUserStore();
     const [userClick, setUserClick] = useState(false);
     const [showConversation, setShowConversation] = useState("");
-    // const [allUsers, setAllUsers] = useState([])
-    const { subscribeToMessages, unsubscribeFromMessages, setCurrentConversation, onlineUsers, subscribeToUserStatus, unsubscribeFromUserStatus, connectSocket, subscribeToTyping, unsubscribeFromTyping, typingUsers, subscribeToMessageStatus, unsubscribeFromMessageStatus, conversations,setConversations,currentConversation,allUsers } = useChatStore();
-    console.log("all the users are: ",allUsers)
-    console.log("All of the converstaions are: ",conversations)
+    const {  setCurrentConversation, onlineUsers, subscribeToUserStatus, unsubscribeFromUserStatus, subscribeToTyping, unsubscribeFromTyping, typingUsers,  conversations,setConversations,allUsers } = useChatStore();
     useEffect(() => {
         if (!user?._id) return;
-        // connectSocket(user._id)
-        // subscribeToMessages()
         subscribeToUserStatus(user._id)
         subscribeToTyping();
-        // subscribeToMessageStatus();
         return () => {
-            // unsubscribeFromMessages();
             unsubscribeFromUserStatus();
             unsubscribeFromTyping();
-            // unsubscribeFromMessageStatus();
         }
     }, [user?._id])
 
