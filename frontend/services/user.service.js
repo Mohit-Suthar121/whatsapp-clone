@@ -84,12 +84,3 @@ export const getAllUsers = async () => {
 }
 
 
-
-export const markMessagesAsRead = async (data) => {
-    try {
-        const response = await axiosInstance.put("/chat/mark-as-read", data)
-        return response.data;
-    } catch (error) {
-        throw error.response?error.response.data:error.message
-    }
-}

@@ -24,3 +24,13 @@ export const getStatus = async()=>{
         throw error.response?error.response.data:error.message
     }
 }
+
+
+export const viewStatus = async(statusId)=>{
+    try {
+        const response = await axiosInstance.get(`/status/view-status/${statusId}`)
+        return response.data;
+    } catch (error) {
+        throw error.response?error.response.data:error.message;
+    }
+}

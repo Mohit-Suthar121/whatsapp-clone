@@ -17,12 +17,12 @@ import DeliveredIcon from './icons/DeliveredIcon'
 import MessageSentTickIcon from './icons/MessageSentTickIcon'
 import PendingMessageIcon from './icons/PendingMessageIcon'
 import { getSocket } from '../../../services/chat.service'
-import { markMessagesAsRead as markMessagesAsReadApi } from "../../../services/user.service";
+// import { markMessagesAsRead as markMessagesAsReadApi } from '../../../services/chat.service'
 import { FcDocument, } from "react-icons/fc";
 import { MdPermMedia } from "react-icons/md";
 import CloseIcon from './icons/CloseIcon'
 
-
+ 
 const UserConversation = ({ profilePicture, username, lastSeen, receiverId, conversationId, senderId, isOnline }) => {
     const { theme } = useThemeStore();
     const scrollRef = useRef();
@@ -52,19 +52,20 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId, conv
         setImagePreviewUrl("");
     }
 
+
+
     //callling the marking messages as read api
-    async function markMessagesAsRead(messages) {
-        try {
-            console.log("messages before filter are: ", messages)
-            const requiredMessagesIds = messages.filter((message) => message.receiver._id?.toString() === senderId && message.messageStatus !== "read").map((msg) => msg._id)
-            console.log("The required messages are: ", requiredMessagesIds)
-            if (requiredMessagesIds.length === 0) return;
-            const response = await markMessagesAsReadApi({ messageIds: requiredMessagesIds, senderId: receiverId });
-            console.log("The response from the markmessage as read api: ", response);
-        } catch (error) {
-            console.error("error while sending mark as read request: ", error)
-        }
-    }
+    // async function markMessagesAsRead(messages) {
+    //     try {
+    //         const requiredMessagesIds = messages.filter((message) => message.receiver._id?.toString() === senderId && message.messageStatus !== "read").map((msg) => msg._id)
+    //         console.log("The required messages are: ", requiredMessagesIds)
+    //         if (requiredMessagesIds.length === 0) return;
+    //         const response = await markMessagesAsReadApi({ messageIds: requiredMessagesIds, senderId: receiverId });
+    //         console.log("The response from the markmessage as read api: ", response);
+    //     } catch (error) {
+    //         console.error("error while sending mark as read request: ", error)
+    //     }
+    // }
 
 
     const getDisplayStatus = () => {
@@ -166,11 +167,11 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId, conv
         getUserMessages();
     }, [conversationId, setMessages])
 
-    useEffect(() => {
-        if (messages.length > 0) {
-            markMessagesAsRead(messages);
-        }
-    }, [messages, conversationId])
+    // useEffect(() => {
+    //     if (messages.length > 0) {
+    //         markMessagesAsRead(messages);
+    //     }
+    // }, [messages, conversationId])
 
 
     useEffect(() => {

@@ -6,13 +6,14 @@ import { getStatus } from "../services/status.service";
 
 export const useStatusStore = create((set,get)=>({
     statuses:[],
+
     subscribeToStatus:()=>{
         const socket = getSocket();
         if(!socket) return;
         socket.on("")
-
-
     },
+
+
     initializeStatuses:async()=>{
        try {
             const response = await getStatus();
@@ -24,4 +25,8 @@ export const useStatusStore = create((set,get)=>({
             console.error("error fetching all the status: ",error)
         }
     }
+
+    
+
+
 }))

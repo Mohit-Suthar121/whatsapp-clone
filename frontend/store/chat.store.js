@@ -3,7 +3,7 @@ import { create } from "zustand"
 import { getSocket } from "../services/chat.service"
 import { getAllUsers } from "../services/user.service";
 import { useUserStore } from "./useUserStore";
-
+import { markMessagesAsRead as markMessagesAsReadApi } from "../services/chat.service";
 
 export const useChatStore = create((set, get) => ({
     conversations: [],
@@ -52,17 +52,19 @@ export const useChatStore = create((set, get) => ({
         socket.off("send_message_sync")
 
 
-
         socket.on("receive_message", (newMessage) => {
             const { currentConversation } = get();
 
             //insert a new message to the opened chat window
             if (newMessage.conversation.toString() === currentConversation?._id?.toString()) {
+                markMessagesAsReadApi({
+                    messageIds:[newMessage._id],
+                    senderId:newMessage.sender._id
+                })
                 set((state) => ({
                     messages: [...state.messages, newMessage]
                 }))
             }
-
 
 
             //update the last message in the conversation
@@ -71,6 +73,7 @@ export const useChatStore = create((set, get) => ({
                     convo?._id?.toString() === newMessage?.conversation?.toString() ? { ...convo, lastMessage: newMessage } : convo
                 ))
             }))
+
 
 
             set((state) => ({
@@ -83,16 +86,18 @@ export const useChatStore = create((set, get) => ({
             }))
         })
 
+  
+
         socket.on("send_message_sync", (newMessage) => {
             set((state) => {
                 const currentConversation = { ...state.currentConversation, lastMessage: newMessage };
                 const updatedConversations = state.conversations.map((convo) => convo._id.toString() === state.currentConversation._id.toString() ? { ...convo, lastMessage: newMessage } : convo);
                 console.log("The conversations after updation are: ", updatedConversations)
                 return { currentConversation, conversations: updatedConversations }
-            })
+            }) 
         })
-
     },
+
 
 
     unsubscribeFromMessages: () => {

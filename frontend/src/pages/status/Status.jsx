@@ -13,9 +13,11 @@ import { getStatus } from '../../../services/status.service'
 import { useStatusStore } from '../../../store/status.store'
 import PreviewStatusPage from '../../assets/components/PreviewStatusPage'
 import { formatTimestamp } from '../../../utils/TimeFormatter'
+
+
 const Status = () => {
+
     const { theme } = useThemeStore();
-    // const [isActiveStatus, setIsActiveStatus] = useState("");
     const [isUploadingStatus , setIsUploadingStatus] = useState(false);
     const { user } = useUserStore();
     const [showStatus,setShowStatus] = useState("");
@@ -25,17 +27,17 @@ const Status = () => {
     const [recentStatus,setRecentStatus] = useState([]);
     const [activeStatus,setActiveStatus] = useState({});
     const [recentUploadedUsers,setRecentUploadedUsers] = useState([]);
+    // console.log("My Status: ",myStatus)
     
-    // recentStatus.forEach((status)=>{
-    //     console.log("This status info: ",)
+
+
+    // recentStatus.forEach(status=>{
+    //     console.log("seenCount", filterRecentSeenCount(status))
     // })
 
-    // console.log("All the statuses are: ",statuses);
-    // console.log("And the recent status are: ",recentStatus);
-    console.log("my Status is: ",myStatus)
-
     function filterRecentSeenCount(status){
-        const seenCount = status.statuses.filter((s)=>s.viewers.includes(user._id.toString())).length;
+        // const seenCount = status?.statuses?.filter((s)=>s?.viewers?.includes(user?._id?.toString()))?.length;
+        const seenCount = status?.statuses?.filter((s)=>s?.viewers?.some(viewer=> viewer._id.toString()===user?._id.toString()))?.length;
         return seenCount
     }
 
@@ -45,7 +47,7 @@ const Status = () => {
         statuses.forEach((status)=>{
             if(!statusMap.has(status.user._id)){
                 statusMap.set(status.user._id,{
-                    _id:Date.now(),
+                    _id:status._id,
                     user:status.user,
                     statuses:[],
                     latestUploadTime:status.createdAt,
@@ -55,13 +57,14 @@ const Status = () => {
             const group = statusMap.get(status.user._id);
             group.statuses.push(status);
 
-            if(!status.viewers.includes(user._id)){
+            if(status.viewers.some( viewer=>viewer._id.toString() !== user._id)){
                 group.seenAll = false;
             }
         })
 
 
         const statusArray = Array.from(statusMap.values());
+        console.log("The status array is: ",statusArray)
         const recentStatuses = statusArray.filter((s)=> !s.seenAll && s.user._id !== user._id);
         const viewedStatuses = statusArray.filter((s)=>s.seenAll && s.user._id !== user._id);
         const myStatuses = statusArray.filter((s)=>s.user._id.toString() === user._id.toString()) ;
@@ -71,7 +74,6 @@ const Status = () => {
         setMyStatus(myStatuses[0])
         
     }
-
     
 
 
@@ -80,26 +82,13 @@ const Status = () => {
     },[statuses])
 
 
-
     function handleClick(status) {
         setShowStatus(status.user._id)
         console.log("status on the click of the button: ",status)
         setActiveStatus(status)
     }
 
-
-
-
-    // const [myStatus, setMyStatus] = useState(
-    //     {
-    //         username: "My Status",
-    //         uploadTime: "Today at 9.32 am",
-    //         isSelfStatus: true,
-    //     }
-    // );
-
     return (
-
         <div className='w-full h-full '>
              <div className='flex w-full h-full'>
 
@@ -112,8 +101,8 @@ const Status = () => {
                             Status
                         </div>
                         <div className="icons flex">
-                            <CircledButton svg={<AddSvgCircle />} />
-                            <CircledButton svg={<ThreeDots />} />
+                            <CircledButton svg={<AddSvgCircle />}   />
+                            <CircledButton svg={<ThreeDots />} />      
 
                         </div>
                     </div>
@@ -121,28 +110,29 @@ const Status = () => {
                     <div className={`profileScroller w-full flex-1 ${theme === "dark" ? "" : "profileScroller2"}`}>
 
                         <div onClick={()=>{setIsUploadingStatus(true)}} className="chats-section w-full p-2 flex flex-col gap-2 border-[#2E2F2F]">
-                            <StatusProfileComponent  profilePicture={myStatus?.user?.profilePicture} width={60} height={60} username={myStatus?.user?.username} uploadTime={formatTimestamp(myStatus?.latestUploadTime)} isSelfStatus={true} />
+                            <StatusProfileComponent totalStatusesOfOneUser={myStatus?.statuses?.length} seenCount={filterRecentSeenCount(myStatus)}  profilePicture={user?.profilePicture} width={60} height={60} username={user.username} uploadTime={formatTimestamp(myStatus?.latestUploadTime)} isSelfStatus={true} />
                         </div>
 
-                        <div className="recent-status p-3 flex flex-col gap-2 ">
+                       {recentStatus.length>0&& <div className="recent-status p-3 flex flex-col gap-2 ">
                             <div className='text-[#9E9F9F]'>Recent</div>
                             <div>
 
                                 {recentStatus.map((status) => (
-                                    <StatusProfileComponent seenCount={filterRecentSeenCount(status)} key={status.user._id} onClick={() => { handleClick(status) }} userId={status.user._id} width={60} height={60} username={status.user.username} uploadTime={formatTimestamp(status.latestUploadTime)}  isSelfStatus={status.user._id===user._id} profilePicture={status.user.profilePicture} />
+                                    <StatusProfileComponent totalStatusesOfOneUser={status.statuses.length} seenCount={filterRecentSeenCount(status)} key={status.user._id} onClick={() => { handleClick(status) }} userId={status.user._id} width={60} height={60} username={status.user.username} uploadTime={formatTimestamp(status.latestUploadTime)}  isSelfStatus={status.user._id===user._id} profilePicture={status.user.profilePicture} />
                                 ))}
 
-                            </div>
-                        </div>
 
-                        <div className="viewed-status p-3 flex flex-col gap-2 ">
+                            </div>
+                        </div>}
+
+                        {viewedStatus.length>0 && <div className="viewed-status p-3 flex flex-col gap-2 ">
                             <div className='text-[#9E9F9F]'>Viewed</div>
                             <div>
-                                {/* {viewdStatus.map((status) => (
-                                    <StatusProfileComponent key={status.username} onClick={() => { handleClick(status.username) }} userId={status.username} width={10} height={10} username={status.username} uploadTime={status.uploadTime} isSelfStatus={status.isSelfStatus} />
-                                ))} */}
+                                {viewedStatus.map((status) => (
+                                    <StatusProfileComponent totalStatusesOfOneUser={status.statuses.length} seenCount={status.statuses.length} key={status.user._id} onClick={() => { handleClick(status) }} userId={status.user._id} width={60} height={60} username={status.user.username} uploadTime={formatTimestamp(status.latestUploadTime)} isSelfStatus={status.user._id===user._id} profilePicture={status.user.profilePicture} />
+                                ))}
                             </div>
-                        </div>
+                        </div>}
                     </div>
                 </div>
 

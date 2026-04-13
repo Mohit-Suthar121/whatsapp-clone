@@ -62,8 +62,8 @@ export const createStatus = async (req, res) => {
 
 
 
-// get all the existing status from the db
 
+// get all the existing status from the db
 export const getStatus = async (req, res) => {
     try {
         const now = new Date();
@@ -93,6 +93,8 @@ export const viewStatus = async (req, res) => {
 
         //emit to the client that status has been viewed
         const statusUploaderId = populatedStatus.user._id.toString();
+
+
         if(req.io  && statusUploaderId !== userId.toString()){
             const viewerData = {
                 userId,

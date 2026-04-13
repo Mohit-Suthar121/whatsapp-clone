@@ -1,5 +1,5 @@
 import { io } from "socket.io-client";
-
+import { axiosInstance } from "./url.service";
 
 let socket = null;
 
@@ -49,3 +49,13 @@ export const disconnectSocket = () =>{
 }
 
 
+
+
+export const markMessagesAsRead = async (data) => {
+    try {
+        const response = await axiosInstance.put("/chat/mark-as-read", data)
+        return response.data;
+    } catch (error) {
+        throw error.response?error.response.data:error.message
+    }
+}

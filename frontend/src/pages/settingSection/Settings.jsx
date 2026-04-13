@@ -119,7 +119,7 @@ const Settings = () => {
                             <div className="wrapper  flex gap-4">
 
                                 <div onClick={() => { setSettingsActive("") }} className={`cancel cursor-pointer  flex justify-center items-center p-4  h-10
-                                     ${theme === "dark" ? "text-[#21C063]" : "text-[#1C8755]"} ${theme === "dark" ? "hover:bg-[#1D3026]" : "hover:bg-[#E8F6EF]"}  rounded-3xl`}>Cancel</div>
+                                    ${theme === "dark" ? "text-[#21C063]" : "text-[#1C8755]"} ${theme === "dark" ? "hover:bg-[#1D3026]" : "hover:bg-[#E8F6EF]"}  rounded-3xl`}>Cancel</div>
                                 <div onClick={() => { setSettingsActive("") }} className={`ok cursor-pointer flex justify-center items-center w-16  h-10 bg-[#21C063] rounded-3xl ${theme === "dark" ? "text-black" : "text-white"}`}>OK</div>
                             </div>
                         </div>

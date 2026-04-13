@@ -81,21 +81,21 @@ const CreateStatusCard = ({setIsUploadingStatus}) => {
                     <img src={imagePreviewUrl} alt="" className='w-full h-full object-contain object-center' />
                 </div>}
                 <div className="textAreaWrapper flex-1 flex min-h-0   ">
-                    <textarea value={statusText} onChange={handleTextAreaChange} placeholder="What's on your mind?" name="" id="" className={`resize-none statusScroller bg-gray-700 rounded-xl w-full focus:outline-none ${theme === "dark" ? "caret-white text-white" : "caret-black text-black"} p-4 max-h-full min-h-24 h-34 focus:ring focus:rounded-xl  focus:ring-blue-500 transition-all duration-300`}></textarea>
+                    <textarea value={statusText} onChange={handleTextAreaChange} placeholder="What's on your mind?" name="" id="" className={`resize-none statusScroller bg-gray-700 rounded-xl w-full focus:outline-none caret-white text-white ${theme === "dark" ? " text-white placeholder:text-[#9AA09B]" : " text-black placeholder:text-gray-400"} p-4 max-h-full min-h-24 h-34 focus:ring focus:rounded-xl  focus:ring-blue-500 transition-all duration-300`}></textarea>
                 </div>
 
-                <label htmlFor="StatusImage" className={`inline-flex self-start justify-center items-center px-4 py-2 rounded-lg ${theme === "dark" ? "text-white" : "text-black"} font-semibold gap-2 bg-gray-700 cursor-pointer active:scale-95 hover:brightness-110`}>
+                <label htmlFor="StatusImage" className={`inline-flex self-start justify-center items-center px-4 py-2 rounded-lg text-white font-semibold gap-2 bg-gray-700 cursor-pointer active:scale-95 hover:brightness-110`}>
                     <span>
                         📁
                     </span>
-                    <span>Choose file</span>
+                    <span className=''>Choose file</span>
                     <input onChange={handleChange} className='hidden' type="file" name="" id="StatusImage" />
                 </label>
             </div>
 
             <div className="buttons flex items-center gap-2 self-end">
-                <button onClick={handleCacelUploadStatus} className={`cursor-pointer cancel px-4 py-2 font-semibold ${theme === "dark" ? "text-white" : " text-black"}  flex justify-center items-center`}>Cancel</button>
-                <button onClick={handleUploadStatus} disabled={isSubmitting} className={`cursor-pointer create px-4 py-2 rounded-lg bg-green-600 font-semibold ${theme === "dark" ? "text-white" : " text-black"} flex justify-center items-center hover:brightness-110 active:scale-95 disabled:opacity-50`}>{!isSubmitting ? " Post Status" : "Posting Status..."}</button>
+                <button onClick={handleCacelUploadStatus} className={`cursor-pointer cancel px-4 py-2 font-semibold text-white  flex justify-center items-center`}>Cancel</button>
+                <button onClick={handleUploadStatus} disabled={isSubmitting} className={`cursor-pointer create px-4 py-2 rounded-lg bg-green-600 font-semibold text-white flex justify-center items-center hover:brightness-110 active:scale-95 disabled:opacity-50`}>{!isSubmitting ? " Post Status" : "Posting Status..."}</button>
             </div>
 
         </div>

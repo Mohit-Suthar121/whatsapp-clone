@@ -1,6 +1,6 @@
 import React from "react";
 
-const StatusRing = ({ total = 4, seenCount = 1, size = 58, image }) => {
+const StatusRing = ({ total , seenCount , size = 58, image }) => {
   const strokeWidth = 4;
   const radius = 46;
   const circumference = 2 * Math.PI * radius;

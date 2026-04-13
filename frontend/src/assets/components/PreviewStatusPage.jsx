@@ -7,8 +7,11 @@ import CloseIcon from './icons/CloseIcon';
 import GoBackArrow from './icons/GoBackArrow';
 import ArrowBack from './icons/ArrowBack';
 import { formatTimestamp } from '../../../utils/TimeFormatter';
+import { viewStatus } from '../../../services/status.service';
+
 
 const PreviewStatusPage = ({ image, text, setShowStatus, showStatus, status }) => {
+
     const [currentIndex, setCurrentIndex] = useState(0);
     const startTimeRef = useRef();
     const animationRef = useRef();
@@ -35,6 +38,7 @@ const PreviewStatusPage = ({ image, text, setShowStatus, showStatus, status }) =
 
 
     function fillerAnimation({duration}){
+
         const tick = (timestamp)=>{
             if(startTimeRef.current == null){
                 startTimeRef.current  = timestamp-pausedRef.current;
@@ -46,12 +50,12 @@ const PreviewStatusPage = ({ image, text, setShowStatus, showStatus, status }) =
             if(newProgress < 1 ) animationRef.current =  requestAnimationFrame(tick);
             else{
                 if(currentIndex === status.statuses.length - 1){
-                        setShowStatus(false)
-                        cancelAnimationFrame(animationRef.current);
-                        startTimeRef.current = null;
-                        pausedRef.current = 0;
-                        isPaused = false;
-                    }
+                    setShowStatus(false)
+                    cancelAnimationFrame(animationRef.current);
+                    startTimeRef.current = null;
+                    pausedRef.current = 0;
+                    setIsPaused(false);
+                }
                 else setCurrentIndex(currentIndex => currentIndex + 1);
             }
         }
@@ -59,8 +63,19 @@ const PreviewStatusPage = ({ image, text, setShowStatus, showStatus, status }) =
     }
 
 
+    async function markAsViewed(statusId){
+        try {
+            const response = await viewStatus(statusId);
+            console.log("Marked as read: ",response);
+        } catch (error) {
+            console.error("Some error occured!" , error)
+        }
 
+    }
 
+    useEffect(()=>{
+        markAsViewed(status?.statuses?.[currentIndex]?._id)
+    },[currentIndex])
 
 
     useEffect(()=>{
@@ -74,7 +89,6 @@ const PreviewStatusPage = ({ image, text, setShowStatus, showStatus, status }) =
                 cancelAnimationFrame(animationRef.current)
             }
         }
-
     },[currentIndex])
 
 
@@ -110,9 +124,7 @@ const PreviewStatusPage = ({ image, text, setShowStatus, showStatus, status }) =
 
     return (
 
-        <div onClick={handlePause} className={` fixed w-screen h-screen inset-0 flex justify-center items-center ${status.statuses[currentIndex].content.endsWith(".jpg") ? "bg-black" : "bg-[#06D6A0]"}`}>
-
-
+        <div onClick={handlePause} className={` fixed w-screen h-screen inset-0 flex justify-center items-center ${status?.statuses[currentIndex]?.content?.endsWith(".jpg") ? "bg-black" : "bg-[#06D6A0]"}`}>
             <div className="main-content h-full absolute z-10">
 
 
@@ -128,9 +140,7 @@ const PreviewStatusPage = ({ image, text, setShowStatus, showStatus, status }) =
                             ))}
 
                         </div>
-
-
-                        <UserStatusProfile username={status?.user?.username} profilePicture={status?.user?.profilePicture} uploadTime={formatTimestamp(status.statuses[currentIndex].createdAt)} width={"12"} height={"12"} />
+                        <UserStatusProfile username={status?.user?.username} profilePicture={status?.user?.profilePicture} uploadTime={formatTimestamp(status?.statuses?.[currentIndex]?.createdAt)} width={"12"} height={"12"} />
                     </div>
 
 
@@ -139,12 +149,12 @@ const PreviewStatusPage = ({ image, text, setShowStatus, showStatus, status }) =
 
 
 
-                {status.statuses[currentIndex].content.endsWith(".jpg") && <img src={status.statuses[currentIndex].content} alt="" className='w-full h-full ' />}
+                {status?.statuses[currentIndex]?.content?.endsWith(".jpg") && <img src={status?.statuses[currentIndex]?.content} alt="" className='w-full h-full ' />}
 
 
-                {!status.statuses[currentIndex].content.endsWith(".jpg") && <div className="text flex justify-center items-center w-screen h-full text-2xl">
+                {!status?.statuses[currentIndex]?.content?.endsWith(".jpg") && <div className="text flex justify-center items-center w-screen h-full text-2xl">
                     <div className="text w-[80%]">
-                        <p className='text-white '>{status.statuses[currentIndex].content}</p>
+                        <p className='text-white '>{status?.statuses[currentIndex]?.content}</p>
                     </div>
                 </div>}
 
@@ -153,7 +163,7 @@ const PreviewStatusPage = ({ image, text, setShowStatus, showStatus, status }) =
 
 
             <div className=" absolute w-full h-full opacity-50">
-                {status.statuses[currentIndex].content.endsWith(".jpg") && <img className='w-full h-full object-cover object-center blur-xl' src={status.statuses[currentIndex].content} alt="image" />}
+                {status?.statuses[currentIndex]?.content?.endsWith(".jpg") && <img className='w-full h-full object-cover object-center blur-xl' src={status?.statuses?.[currentIndex]?.content} alt="image" />}
 
             </div>
 
