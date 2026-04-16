@@ -13,6 +13,7 @@ import { getStatus } from '../../../services/status.service'
 import { useStatusStore } from '../../../store/status.store'
 import PreviewStatusPage from '../../assets/components/PreviewStatusPage'
 import { formatTimestamp } from '../../../utils/TimeFormatter'
+import ViewOrCreateStatusCard from '../../assets/components/ViewOrCreateStatusCard'
 
 
 const Status = () => {
@@ -26,17 +27,11 @@ const Status = () => {
     const [myStatus,setMyStatus] = useState([]);
     const [recentStatus,setRecentStatus] = useState([]);
     const [activeStatus,setActiveStatus] = useState({});
+    const [viewOrCreateStatus,setViewOrCreateStatus] = useState(false);
     const [recentUploadedUsers,setRecentUploadedUsers] = useState([]);
-    // console.log("My Status: ",myStatus)
-    
-
-
-    // recentStatus.forEach(status=>{
-    //     console.log("seenCount", filterRecentSeenCount(status))
-    // })
+   
 
     function filterRecentSeenCount(status){
-        // const seenCount = status?.statuses?.filter((s)=>s?.viewers?.includes(user?._id?.toString()))?.length;
         const seenCount = status?.statuses?.filter((s)=>s?.viewers?.some(viewer=> viewer._id.toString()===user?._id.toString()))?.length;
         return seenCount
     }
@@ -56,18 +51,23 @@ const Status = () => {
             }
             const group = statusMap.get(status.user._id);
             group.statuses.push(status);
+            const isViewedByMe = status.viewers.some( viewer=>viewer._id.toString() === user._id);
 
-            if(status.viewers.some( viewer=>viewer._id.toString() !== user._id)){
+            if(!isViewedByMe){
                 group.seenAll = false;
             }
-        })
+
+
+    })
+
 
 
         const statusArray = Array.from(statusMap.values());
-        console.log("The status array is: ",statusArray)
+        // console.log("The status array is: ",statusArray)
         const recentStatuses = statusArray.filter((s)=> !s.seenAll && s.user._id !== user._id);
         const viewedStatuses = statusArray.filter((s)=>s.seenAll && s.user._id !== user._id);
         const myStatuses = statusArray.filter((s)=>s.user._id.toString() === user._id.toString()) ;
+
 
         setRecentStatus(recentStatuses);
         setViewedStatus(viewedStatuses);
@@ -79,12 +79,15 @@ const Status = () => {
 
     useEffect(()=>{
         organizeStatus()
+        // if(myStatus){
+        //     setViewOrCreateStatus(true);
+        // }
     },[statuses])
+
 
 
     function handleClick(status) {
         setShowStatus(status.user._id)
-        console.log("status on the click of the button: ",status)
         setActiveStatus(status)
     }
 
@@ -109,7 +112,7 @@ const Status = () => {
 
                     <div className={`profileScroller w-full flex-1 ${theme === "dark" ? "" : "profileScroller2"}`}>
 
-                        <div onClick={()=>{setIsUploadingStatus(true)}} className="chats-section w-full p-2 flex flex-col gap-2 border-[#2E2F2F]">
+                        <div onClick={()=>{!myStatus?setIsUploadingStatus(true):setViewOrCreateStatus(true)}} className="chats-section w-full p-2 flex flex-col gap-2 border-[#2E2F2F]">
                             <StatusProfileComponent totalStatusesOfOneUser={myStatus?.statuses?.length} seenCount={filterRecentSeenCount(myStatus)}  profilePicture={user?.profilePicture} width={60} height={60} username={user.username} uploadTime={formatTimestamp(myStatus?.latestUploadTime)} isSelfStatus={true} />
                         </div>
 
@@ -142,12 +145,14 @@ const Status = () => {
 
 
             {isUploadingStatus && <div className="overlay fixed inset-0 w-screen h-screen bg-[#00000080] flex justify-center items-center">
-                <CreateStatusCard setIsUploadingStatus={setIsUploadingStatus}/>
+                 <CreateStatusCard setIsUploadingStatus={setIsUploadingStatus}/>
             </div>}
 
+            {viewOrCreateStatus && <ViewOrCreateStatusCard setIsUploadingStatus={setIsUploadingStatus} status={myStatus} handleClick={handleClick} setViewOrCreateStatus={setViewOrCreateStatus}/>}
 
 
-           {showStatus && <PreviewStatusPage status={activeStatus} showStatus={showStatus} setShowStatus={setShowStatus} />}
+
+           {showStatus && <PreviewStatusPage setViewOrCreateStatus={setViewOrCreateStatus} status={activeStatus} showStatus={showStatus} setShowStatus={setShowStatus} />}
 
         </div>
 

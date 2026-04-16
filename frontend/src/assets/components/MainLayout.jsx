@@ -12,16 +12,17 @@ const MainLayout = () => {
 
   const { subscribeToMessages, unsubscribeFromMessages, connectSocket, subscribeToMessageStatus, unsubscribeFromMessageStatus,initializeConversations } = useChatStore();
   const { user } = useUserStore();
-  const {initializeStatuses} = useStatusStore();
+  const {initializeStatuses,subscribeToStatus} = useStatusStore();
   useEffect(() => {
     if (!user?._id) return;
     connectSocket(user._id)
     subscribeToMessages()
     subscribeToMessageStatus();
-    initializeConversations()
-    initializeStatuses()
+    initializeConversations();
+    initializeStatuses();
+    subscribeToStatus();
     return () => {
-      unsubscribeFromMessages();
+      unsubscribeFromMessages(); 
       unsubscribeFromMessageStatus();
     }
   }, [user?._id])

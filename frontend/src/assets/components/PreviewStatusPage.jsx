@@ -10,7 +10,7 @@ import { formatTimestamp } from '../../../utils/TimeFormatter';
 import { viewStatus } from '../../../services/status.service';
 
 
-const PreviewStatusPage = ({ image, text, setShowStatus, showStatus, status }) => {
+const PreviewStatusPage = ({ image, text, setShowStatus, showStatus, status,setViewOrCreateStatus }) => {
 
     const [currentIndex, setCurrentIndex] = useState(0);
     const startTimeRef = useRef();
@@ -50,7 +50,9 @@ const PreviewStatusPage = ({ image, text, setShowStatus, showStatus, status }) =
             if(newProgress < 1 ) animationRef.current =  requestAnimationFrame(tick);
             else{
                 if(currentIndex === status.statuses.length - 1){
-                    setShowStatus(false)
+                    setShowStatus(false);
+                    setViewOrCreateStatus("");
+                    // setIsUploadingStatus(false);
                     cancelAnimationFrame(animationRef.current);
                     startTimeRef.current = null;
                     pausedRef.current = 0;
@@ -63,10 +65,10 @@ const PreviewStatusPage = ({ image, text, setShowStatus, showStatus, status }) =
     }
 
 
-    async function markAsViewed(statusId){
+    async function markAsViewedStatus(statusId){
         try {
             const response = await viewStatus(statusId);
-            console.log("Marked as read: ",response);
+            console.log("Marked the status as read: ",response);
         } catch (error) {
             console.error("Some error occured!" , error)
         }
@@ -74,7 +76,7 @@ const PreviewStatusPage = ({ image, text, setShowStatus, showStatus, status }) =
     }
 
     useEffect(()=>{
-        markAsViewed(status?.statuses?.[currentIndex]?._id)
+        markAsViewedStatus(status?.statuses?.[currentIndex]?._id)
     },[currentIndex])
 
 
@@ -92,8 +94,11 @@ const PreviewStatusPage = ({ image, text, setShowStatus, showStatus, status }) =
     },[currentIndex])
 
 
+
     function handleCloseStatus() {
         setShowStatus("")
+        setViewOrCreateStatus("")
+        // setIsUploadingStatus(false)
     }
 
 

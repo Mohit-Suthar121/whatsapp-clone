@@ -87,27 +87,28 @@ export const viewStatus = async (req, res) => {
         const { statusId } = req.params;
         const userId = req.user?.userId;
         if (!userId) return response(res, "user is not authorized!", 401);
-        const populatedStatus = await Status.findByIdAndUpdate(statusId, { $addToSet: { viewers: userId } }, { new: true }).populate("user", "username profilePicture")
+        const populatedStatus = await Status.findByIdAndUpdate(statusId, { $addToSet: { viewers: userId } }, { new: true }).populate("user", "username profilePicture").populate("viewers","username profilePicture")
+        
         if (!populatedStatus) return response(res, "Status not found!", 404);
+        const viewer = populatedStatus.viewers.find((v)=>v._id.toString()===userId.toString());
 
 
         //emit to the client that status has been viewed
         const statusUploaderId = populatedStatus.user._id.toString();
-
-
         if(req.io  && statusUploaderId !== userId.toString()){
             const viewerData = {
                 userId,
-                statusId
+                statusId,
+                viewer
             }
+            console.log("The request has been sent to the frontend successfully!")
             req.io.to(statusUploaderId).emit("status_viewed",viewerData);
+            req.io.to(userId).emit("status_viewed_sync",viewerData);
+            
         }
         else{
             console.log("status owner not connected!")
         }
-
-
-       
         return response(res, "status viewed successfully!", 200, populatedStatus);
 
     } catch (error) {

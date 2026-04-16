@@ -25,7 +25,7 @@ export const useChatStore = create((set, get) => ({
     initializeConversations: async () => {
         try {
             const user = useUserStore.getState().user;
-            console.log("The user is: ",user)
+            // console.log("The user is: ",user)
             if(!user?._id) return;
             const response = await getAllUsers();
             set((state)=>(
@@ -92,7 +92,7 @@ export const useChatStore = create((set, get) => ({
             set((state) => {
                 const currentConversation = { ...state.currentConversation, lastMessage: newMessage };
                 const updatedConversations = state.conversations.map((convo) => convo._id.toString() === state.currentConversation._id.toString() ? { ...convo, lastMessage: newMessage } : convo);
-                console.log("The conversations after updation are: ", updatedConversations)
+                // console.log("The conversations after updation are: ", updatedConversations)
                 return { currentConversation, conversations: updatedConversations }
             }) 
         })

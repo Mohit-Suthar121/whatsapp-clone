@@ -24,3 +24,5 @@ const statusSchema = new mongoose.Schema({
 
 
 export const Status = mongoose.model("Status",statusSchema);
+
+

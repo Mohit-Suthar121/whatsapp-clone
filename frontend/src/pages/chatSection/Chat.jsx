@@ -112,7 +112,7 @@ const Chat = () => {
                     <div className={`inputbardiv h-10 rounded-4xl ${theme === "dark" ? "bg-[#2e2f2f]" : "bg-[#F6F5F4]"} p-2 flex items-center gap-1
                     ${theme === "dark" ? "focus-within:bg-[#161717]" : "focus-within:bg-[#ffffff]"}
                       focus-within:border-2 focus-within:border-[#20BD61] `}>
-                        <div className="serachIcon flex justify-center items-center p-2 hover:bg-[#292A2A] w-10 h-10">
+                        <div className="serachIcon flex justify-center items-center p-2 w-10 h-10">
                             <Search currentColor={theme === "dark" ? "#ffffff" : "#626262"} />
                         </div>
                         <div className="inputBar w-full">
