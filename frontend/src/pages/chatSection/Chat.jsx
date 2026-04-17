@@ -25,6 +25,8 @@ const Chat = () => {
     const [userClick, setUserClick] = useState(false);
     const [showConversation, setShowConversation] = useState("");
     const {  setCurrentConversation, onlineUsers, subscribeToUserStatus, unsubscribeFromUserStatus, subscribeToTyping, unsubscribeFromTyping, typingUsers,  conversations,setConversations,allUsers } = useChatStore();
+
+
     useEffect(() => {
         if (!user?._id) return;
         subscribeToUserStatus(user._id)
@@ -32,7 +34,10 @@ const Chat = () => {
         return () => {
             unsubscribeFromUserStatus();
             unsubscribeFromTyping();
+            setCurrentConversation(null);
+
         }
+
     }, [user?._id])
 
 

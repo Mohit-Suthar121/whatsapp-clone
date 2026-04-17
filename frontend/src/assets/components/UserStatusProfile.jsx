@@ -5,7 +5,7 @@ const UserStatusProfile = ({ width, height, username, profilePicture, uploadTime
     const { theme } = useThemeStore();
    
     return (
-        <div className="wrapper  flex justify-center items-center">
+        <div className="wrapper w-full flex justify-start px-2 items-center">
             
             <div className={` userProfile flex items-center ${theme === "dark" ? "text-white" : "text-black"} gap-2 shrink-0 cursor-pointer rounded-xl `}>
                 
@@ -17,11 +17,11 @@ const UserStatusProfile = ({ width, height, username, profilePicture, uploadTime
 
                 <div className="userInfo flex justify-between items-center flex-1  min-w-0" >
                     <div className="textDetails w-full overflow-x-hidden text-ellipsis whitespace-nowrap flex flex-col">
-                        <h3 className=' font-semibold'>{username} </h3>
+                        <h3 className=' font-semibold text-white'>{username} </h3>
                         {/* {isSelfStatus && <div className={`text-gray-400 text-sm font-semibold`}>Click to add status update</div>} */}
                         
                         <div className="undertext flex items-center gap-1">
-                            <p className={`text-sm  font-semibold w-full overflow-x-hidden text-ellipsis whitespace-nowrap ${theme === "dark" ? "text-white" : "text-gray-400"} `}>{uploadTime}</p>
+                            <p className={`text-sm  font-semibold w-full overflow-x-hidden text-ellipsis whitespace-nowrap text-white `}>{uploadTime}</p>
                         </div>
 
 

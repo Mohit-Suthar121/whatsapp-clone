@@ -8,48 +8,67 @@ import GoBackArrow from './icons/GoBackArrow';
 import ArrowBack from './icons/ArrowBack';
 import { formatTimestamp } from '../../../utils/TimeFormatter';
 import { viewStatus } from '../../../services/status.service';
+import ViewIcon from './icons/ViewIcon';
+import ArrowDownIcon from './icons/ArrowDownIcon';
+import ArrowUp from './icons/ArrowUp';
+import { useUserStore } from '../../../store/useUserStore';
 
 
-const PreviewStatusPage = ({ image, text, setShowStatus, showStatus, status,setViewOrCreateStatus }) => {
+const PreviewStatusPage = ({ image, text, setShowStatus, showStatus, status, setViewOrCreateStatus }) => {
 
     const [currentIndex, setCurrentIndex] = useState(0);
     const startTimeRef = useRef();
     const animationRef = useRef();
     const pausedRef = useRef(0);
-    const [isPaused,setIsPaused] = useState(false);
-    const [progress,setProgress] = useState(0);
+    const [isPaused, setIsPaused] = useState(false);
+    const [progress, setProgress] = useState(0);
+    const [showViewers, setShowViewers] = useState(false);
+    const [viewers, setViewers] = useState();
+    const {user} = useUserStore();
+    const isSelfStatus = status.user._id.toString()===user._id.toString()
 
 
 
-    function handlePause(){
-        if(!isPaused){
-            setIsPaused(true); 
-            if(animationRef.current) {
+
+    useEffect(() => {
+        markAsViewedStatus(status?.statuses?.[currentIndex]?._id)
+        if(isSelfStatus){
+            setViewers(status?.statuses[currentIndex]?.viewers?.filter((viewer)=>viewer?._id?.toString() !== user?._id?.toString())?.length)
+        }
+    }, [currentIndex])
+
+        
+    
+
+    function handlePause() {
+        if (!isPaused) {
+            setIsPaused(true);
+            if (animationRef.current) {
                 cancelAnimationFrame(animationRef.current)
             }
         }
-        else{
+        else {
             setIsPaused(false);
             startTimeRef.current = null;
-            fillerAnimation({duration:5000})
+            fillerAnimation({ duration: 5000 })
         }
-        
+
     }
 
 
-    function fillerAnimation({duration}){
+    function fillerAnimation({ duration }) {
 
-        const tick = (timestamp)=>{
-            if(startTimeRef.current == null){
-                startTimeRef.current  = timestamp-pausedRef.current;
+        const tick = (timestamp) => {
+            if (startTimeRef.current == null) {
+                startTimeRef.current = timestamp - pausedRef.current;
             }
-            const elapsed = timestamp-startTimeRef.current;
-            const newProgress = Math.min(elapsed/duration,1);
+            const elapsed = timestamp - startTimeRef.current;
+            const newProgress = Math.min(elapsed / duration, 1);
             pausedRef.current = elapsed;
-            setProgress(newProgress);  
-            if(newProgress < 1 ) animationRef.current =  requestAnimationFrame(tick);
-            else{
-                if(currentIndex === status.statuses.length - 1){
+            setProgress(newProgress);
+            if (newProgress < 1) animationRef.current = requestAnimationFrame(tick);
+            else {
+                if (currentIndex === status.statuses.length - 1) {
                     setShowStatus(false);
                     setViewOrCreateStatus("");
                     // setIsUploadingStatus(false);
@@ -65,40 +84,36 @@ const PreviewStatusPage = ({ image, text, setShowStatus, showStatus, status,setV
     }
 
 
-    async function markAsViewedStatus(statusId){
+    async function markAsViewedStatus(statusId) {
         try {
             const response = await viewStatus(statusId);
-            console.log("Marked the status as read: ",response);
+            console.log("Marked the status as read: ", response);
         } catch (error) {
-            console.error("Some error occured!" , error)
+            console.error("Some error occured!", error)
         }
 
     }
 
-    useEffect(()=>{
-        markAsViewedStatus(status?.statuses?.[currentIndex]?._id)
-    },[currentIndex])
+   
 
-
-    useEffect(()=>{
+    useEffect(() => {
         setProgress(0);
         pausedRef.current = 0;
         startTimeRef.current = null;
         setIsPaused(false);
-        fillerAnimation({duration:5000})
-        return ()=>{
-            if(animationRef.current){
+        fillerAnimation({ duration: 5000 })
+        return () => {
+            if (animationRef.current) {
                 cancelAnimationFrame(animationRef.current)
             }
         }
-    },[currentIndex])
+    }, [currentIndex])
 
 
 
     function handleCloseStatus() {
         setShowStatus("")
         setViewOrCreateStatus("")
-        // setIsUploadingStatus(false)
     }
 
 
@@ -129,18 +144,20 @@ const PreviewStatusPage = ({ image, text, setShowStatus, showStatus, status,setV
 
     return (
 
-        <div onClick={handlePause} className={` fixed w-screen h-screen inset-0 flex justify-center items-center ${status?.statuses[currentIndex]?.content?.endsWith(".jpg") ? "bg-black" : "bg-[#06D6A0]"}`}>
-            <div className="main-content h-full absolute z-10">
+        <div onClick={handlePause} className={` fixed w-screen h-screen inset-0 flex justify-center items-center bg-[#1f1f1f]`}>
+
+            <div className="w-[50%] main-content h-full absolute z-10 bg-[#06D6A0]">
 
 
-                <div className="statusInfo w-[80%] flex flex-col justify-start items-center mx-auto ">
+                <div className="absolute statusInfo w-full flex flex-col justify-start items-center mx-auto ">
 
-                    <div className="timerBar  border-blue-500  flex flex-col justify-center items-start">
-                        <div className="wrapper min-w-40 w-100 max-w-200 flex justify-center items-center h-10 gap-1">
+                    <div className="timerBar w-full border-blue-500  flex flex-col gap-2 justify-center items-start">
 
-                            {status.statuses.map((s,index) => (
-                                <div key={s._id} className="stick rounded-2xl bg-black/10 h-1 flex-1">
-                                    <div className="insideStick origin-left h-full bg-white rounded-2xl" style={{ transform: `scaleX(${currentIndex>index?"1":currentIndex===index?progress:0})` }}></div>
+                        <div className="wrapper  min-w-40 w-full flex justify-center pt-4 px-2 items-center gap-1">
+
+                            {status.statuses.map((s, index) => (
+                                <div key={s._id} className="stick  top-2 rounded-2xl bg-black/30 h-1.25 flex-1">
+                                    <div className="insideStick origin-left h-full bg-white rounded-2xl" style={{ transform: `scaleX(${currentIndex > index ? "1" : currentIndex === index ? progress : 0})` }}></div>
                                 </div>
                             ))}
 
@@ -157,11 +174,52 @@ const PreviewStatusPage = ({ image, text, setShowStatus, showStatus, status,setV
                 {status?.statuses[currentIndex]?.content?.endsWith(".jpg") && <img src={status?.statuses[currentIndex]?.content} alt="" className='w-full h-full ' />}
 
 
-                {!status?.statuses[currentIndex]?.content?.endsWith(".jpg") && <div className="text flex justify-center items-center w-screen h-full text-2xl">
-                    <div className="text w-[80%]">
+                {!status?.statuses[currentIndex]?.content?.endsWith(".jpg") && <div className="text flex justify-center items-center w-full h-screen text-2xl">
+                    <div className="text w-full justify-center items-center flex ">
                         <p className='text-white '>{status?.statuses[currentIndex]?.content}</p>
                     </div>
                 </div>}
+
+
+               {isSelfStatus && <div className="absolute bottom-2 w-full rounded-lg p-2 flex flex-col gap-2">
+                    <div onClick={(e) => {
+                        setShowViewers(!showViewers)
+                        e.stopPropagation();
+                    }} className="cursor-pointer views h-full w-full rounded-xl flex items-center gap-2 hover:bg-black/75 bg-black/80 text-white p-2">
+
+                        <div className="viewIcon ">
+                            <ViewIcon />
+                        </div>
+                        <span className=' font-semibold'>{viewers} views</span>
+
+
+                        <div className="arrows flex justify-center items-center absolute right-4">
+                            {!showViewers  && <ArrowDownIcon />}
+                            {showViewers  && <ArrowUp />}
+                        </div>
+                    </div>
+
+
+                    {showViewers &&  <div className="viewers bg-black/80 text-white p-2 rounded-xl w-full flex-1">
+
+
+                        {viewers==0 && <div className="NoViewer w-full h-full flex justify-center items-center">
+                            <span className='font-semibold'>No Viewers Yet</span>
+                        </div>}
+
+                        {viewers>0 && <div className="NoViewer w-full h-full flex justify-center items-center flex-col gap-4 p-4">
+                            {status?.statuses[currentIndex]?.viewers?.map((viewer)=>{
+                                if(viewer._id.toString() !== user._id.toString()){
+                                    return <UserStatusProfile width={"10"} height={"10"} profilePicture={viewer.profilePicture} username={viewer.username} />
+                            }})}
+
+                        </div>}
+
+
+                    </div>}
+
+                </div>}
+
 
 
             </div>
@@ -183,7 +241,7 @@ const PreviewStatusPage = ({ image, text, setShowStatus, showStatus, status,setV
             }} className="nextButton p-4 flex justify-center items-center rounded-full bg-[#000000a5] font-bold absolute  w-12 h-12 z-10 right-5 cursor-pointer text-white hover:bg-[#0000005f]"> <ArrowForward currentColor={"white"} /> </button>}
 
 
-            <div onClick={handleCloseStatus} className="crossButton z-10 rounded-full p-2 w-10 h-10 hover:bg-[#00000032] flex justify-center items-center cursor-pointer absolute top-4 right-4"> <CloseIcon currentColor={"white"} /> </div>
+            <div onClick={handleCloseStatus} className="crossButton z-10 rounded-full p-2 w-10 h-10  hover:bg-[#00000032] flex justify-center items-center cursor-pointer absolute top-4 right-4"> <CloseIcon currentColor={"white"} /> </div>
 
 
             <div onClick={handleCloseStatus} className="backButton  z-10 rounded-full p-2 w-10 h-10 hover:bg-[#00000032] flex justify-center items-center cursor-pointer absolute top-4 left-4"> <ArrowBack currentColor={"white"} /> </div>
