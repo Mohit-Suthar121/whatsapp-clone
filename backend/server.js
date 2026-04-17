@@ -21,9 +21,11 @@ const corsOptions = {
 app.use(cors(corsOptions))
 
 
+const io = initializeSocket(server)
+
 app.use((req,res,next)=>{
   req.io = io;
-  req.socketUserMap = io.socketuserMap
+  req.socketUserMap = io.socketUserMap
   next();
 })
 
@@ -40,7 +42,6 @@ app.get('/', (req, res) => {
 })
 
 
-const io = initializeSocket(server)
 
 
 

@@ -146,9 +146,9 @@ const PreviewStatusPage = ({ image, text, setShowStatus, showStatus, status, set
 
         <div onClick={handlePause} className={` fixed w-screen h-screen inset-0 flex justify-center items-center bg-[#1f1f1f]`}>
 
+
             <div className="w-[50%] main-content h-full absolute z-10 bg-[#06D6A0]">
-
-
+                
                 <div className="absolute statusInfo w-full flex flex-col justify-start items-center mx-auto ">
 
                     <div className="timerBar w-full border-blue-500  flex flex-col gap-2 justify-center items-start">
@@ -165,16 +165,14 @@ const PreviewStatusPage = ({ image, text, setShowStatus, showStatus, status, set
                         <UserStatusProfile username={status?.user?.username} profilePicture={status?.user?.profilePicture} uploadTime={formatTimestamp(status?.statuses?.[currentIndex]?.createdAt)} width={"12"} height={"12"} />
                     </div>
 
-
-
                 </div>
 
 
 
-                {status?.statuses[currentIndex]?.content?.endsWith(".jpg") && <img src={status?.statuses[currentIndex]?.content} alt="" className='w-full h-full ' />}
+                {status?.statuses[currentIndex]?.contentType==="image" && <img src={status?.statuses[currentIndex]?.content} alt="image" className='w-full h-full ' />}
 
 
-                {!status?.statuses[currentIndex]?.content?.endsWith(".jpg") && <div className="text flex justify-center items-center w-full h-screen text-2xl">
+                {status?.statuses[currentIndex]?.contentType==="text" && <div className="text flex justify-center items-center w-full h-screen text-2xl">
                     <div className="text w-full justify-center items-center flex ">
                         <p className='text-white '>{status?.statuses[currentIndex]?.content}</p>
                     </div>
@@ -202,7 +200,6 @@ const PreviewStatusPage = ({ image, text, setShowStatus, showStatus, status, set
 
                     {showViewers &&  <div className="viewers bg-black/80 text-white p-2 rounded-xl w-full flex-1">
 
-
                         {viewers==0 && <div className="NoViewer w-full h-full flex justify-center items-center">
                             <span className='font-semibold'>No Viewers Yet</span>
                         </div>}
@@ -225,8 +222,10 @@ const PreviewStatusPage = ({ image, text, setShowStatus, showStatus, status, set
             </div>
 
 
+
             <div className=" absolute w-full h-full opacity-50">
-                {status?.statuses[currentIndex]?.content?.endsWith(".jpg") && <img className='w-full h-full object-cover object-center blur-xl' src={status?.statuses?.[currentIndex]?.content} alt="image" />}
+
+                {status?.statuses[currentIndex]?.contentType==="image" && <img className='w-full h-full object-cover object-center blur-xl' src={status?.statuses?.[currentIndex]?.content} alt="image" />}
 
             </div>
 

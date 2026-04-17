@@ -44,14 +44,11 @@ const CreateStatusCard = ({setIsUploadingStatus}) => {
         if ((!imageFile || !imagePreviewUrl) && !statusText) return;
         try {
             const content = statusText;
-            // console.log(content);
             const formData = new FormData();
             formData.append("media", imageFile);
             formData.append("content", content)
             setIsSubmitting(true);
-            // console.log("The image preview url is: ", imagePreviewUrl)
             const response = await uploadStatus(formData);
-            // console.log("the status data is : ",response.data);
             setIsUploadingStatus(false);
             setStatusText("");
             setIsSubmitting(false);

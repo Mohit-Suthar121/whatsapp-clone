@@ -37,19 +37,16 @@ export const createStatus = async (req, res) => {
         const populatedStatus = await Status.findById(status._id).populate("user", "username profilePicture").populate("viewers", "username profilePicture")
 
 
-        if (req.io && req.socketMap) {
+        if (req.io && req.socketUserMap) {
             //tell everyone through socket io that i've uploaded a status
             const conversation = await Conversation.find({ participants: userId });
             const friendIds = conversation.flatMap(convo => convo.participants.filter(id => id.toString() !== userId.toString()))
-
             const allIdSet = new Set([...friendIds,userId]);
             const allIdArray = [...allIdSet];
-
             allIdArray.forEach(id => {
                 req.io.to(id.toString()).emit("new_status_update",populatedStatus)
             })
         }
-
 
         return response(res, "Status created Successfully!", 200, populatedStatus);
     } catch (error) {

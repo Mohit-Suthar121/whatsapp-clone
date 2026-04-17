@@ -79,9 +79,7 @@ const Status = () => {
 
     useEffect(()=>{
         organizeStatus()
-        // if(myStatus){
-        //     setViewOrCreateStatus(true);
-        // }
+        console.log("The status just got changed!")
     },[statuses])
 
 

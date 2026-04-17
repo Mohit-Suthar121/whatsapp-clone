@@ -11,6 +11,8 @@ export const useStatusStore = create((set,get)=>({
         const socket = getSocket();
         if(!socket) return;
         socket.off("status_viewed")
+        socket.off("status_viewed_sync")
+        socket.off("new_status_update")
 
         socket.on("status_viewed",({statusId,viewer})=>{        
             console.log("the status_viewed is running")
@@ -26,6 +28,16 @@ export const useStatusStore = create((set,get)=>({
                 statuses:state.statuses.map((s)=>s._id.toString()===statusId.toString()?{...s,viewers:[...s.viewers,viewer]}:s)
             }))
         })
+
+        socket.on("new_status_update",(populatedStatus)=>{  
+            console.log("new_status_update is running right now!")
+            set((state)=>(
+               {
+                statuses:[...state.statuses,populatedStatus]
+               } 
+            ))
+        })
+
 
 
     },
