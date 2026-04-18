@@ -57,7 +57,7 @@ const Chat = () => {
         });
 
         setShowConversation(userId);
-        const updatedConversations = conversations.map((convo)=>convo?._id===currentUser?.conversation?._id?{...convo,unreadCount:0}:convo);
+        const updatedConversations = conversations?.map((convo)=>convo?._id===currentUser?.conversation?._id?{...convo,unreadCount:0}:convo);
         setConversations(updatedConversations);
         if (currentUser.conversation) {
             setCurrentConversation(currentUser.conversation)
@@ -66,14 +66,9 @@ const Chat = () => {
             setCurrentConversation({ _id: null });
         }
         setUserClick(true);
-          
+
     }
     
-
-    
-
-
-
     function tellIsTyping(conversationId, receiverId) {
         return typingUsers.get(conversationId) === receiverId;
     }
@@ -81,7 +76,7 @@ const Chat = () => {
 
 
     function filterLastMessage(conversation){
-        const filteredConversation = conversations.find((convo)=>convo?._id?.toString()===conversation?._id?.toString())
+        const filteredConversation = conversations?.find((convo)=>convo?._id?.toString()===conversation?._id?.toString())
         return {
             lastMessage:filteredConversation?.lastMessage?.content || "",
             unreadCount:filteredConversation?.unreadCount || 0,

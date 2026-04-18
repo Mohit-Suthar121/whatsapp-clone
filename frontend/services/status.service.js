@@ -34,3 +34,12 @@ export const viewStatus = async(statusId)=>{
         throw error.response?error.response.data:error.message;
     }
 }
+
+export const deleteStatus = async (statusId)=>{
+    try {
+        const response = await axiosInstance.delete(`/status/delete-status/${statusId}`)
+        return response.data
+    } catch (error) {
+        return error.response?error.response.data:error.message;
+    }
+}

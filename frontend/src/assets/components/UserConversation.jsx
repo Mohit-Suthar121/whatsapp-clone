@@ -9,7 +9,7 @@ import SendIcon from './icons/SendIcon'
 import { useThemeStore } from '../../../store/useThemeStore'
 import { useRef, useState, useEffect } from 'react'
 import ThreeDots from '../../assets/components/icons/ThreeDots'
-import { getMessages, sendMessage } from '../../../services/message.service'
+import { deleteMessage, getMessages, sendMessage } from '../../../services/message.service'
 import { formatLiveChatTimeStamp } from '../../../utils/TimeFormatter'
 import { useChatStore } from '../../../store/chat.store'
 import MessageBubble2 from './MessageBubble2'
@@ -52,20 +52,14 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId, conv
         setImagePreviewUrl("");
     }
 
-
-
-    //callling the marking messages as read api
-    // async function markMessagesAsRead(messages) {
-    //     try {
-    //         const requiredMessagesIds = messages.filter((message) => message.receiver._id?.toString() === senderId && message.messageStatus !== "read").map((msg) => msg._id)
-    //         console.log("The required messages are: ", requiredMessagesIds)
-    //         if (requiredMessagesIds.length === 0) return;
-    //         const response = await markMessagesAsReadApi({ messageIds: requiredMessagesIds, senderId: receiverId });
-    //         console.log("The response from the markmessage as read api: ", response);
-    //     } catch (error) {
-    //         console.error("error while sending mark as read request: ", error)
-    //     }
-    // }
+    async function handleDeleteMessage(messageId){
+        try {
+            const response = await deleteMessage(messageId);
+            console.log("The message has been deleted: ",response);
+        } catch (error) {
+            console.error("Some error occured deleting the message: ",error)
+        }
+    }
 
 
     const getDisplayStatus = () => {
@@ -133,10 +127,6 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId, conv
             setImagePreviewUrl("")
             formData.append("receiverId",receiverId);
             formData.append("media",imageFile)
-            // const data = {
-            //     receiverId,
-            //     content
-            // }
             const response = await sendMessage(formData);
             await updateMessageStatus(response.data, clientId)
 
@@ -167,15 +157,10 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId, conv
         getUserMessages();
     }, [conversationId, setMessages])
 
-    // useEffect(() => {
-    //     if (messages.length > 0) {
-    //         markMessagesAsRead(messages);
-    //     }
-    // }, [messages, conversationId])
-
 
     useEffect(() => {
         scrollRef.current.scrollIntoView({ behavior: "smooth" })
+        console.log("all of the messages are: ",messages)
     }, [messages])
 
 
@@ -222,7 +207,7 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId, conv
                 <div className="scrollwrapper flex-1 overflow-y-auto w-full">
 
                     <div className="messagesBox  min-h-full w-full flex flex-col justify-end gap-2 pr-10 pb-5 pl-10">
-                        {messages.map(message => (<MessageBubble2 messageStatusIcon={senderId === message.sender?._id ? returnMessageStatus(message) : ""} key={message._id} isMe={senderId === message.sender?._id ? true : false} message={message.content} time={formatLiveChatTimeStamp(message.createdAt)} image={message?.media?.url} />))}
+                        {messages.map(message => (<MessageBubble2 handleDeleteMessage={handleDeleteMessage} messageStatusIcon={senderId === message.sender?._id ? returnMessageStatus(message) : ""} messageId={message._id} key={message._id} isMe={senderId === message.sender?._id ? true : false} message={message.content} time={formatLiveChatTimeStamp(message.createdAt)} image={message?.media?.url} />))}
 
                         <div ref={scrollRef}></div>
                     </div>

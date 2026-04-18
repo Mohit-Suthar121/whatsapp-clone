@@ -7,11 +7,13 @@ import CloseIcon from './icons/CloseIcon';
 import GoBackArrow from './icons/GoBackArrow';
 import ArrowBack from './icons/ArrowBack';
 import { formatTimestamp } from '../../../utils/TimeFormatter';
-import { viewStatus } from '../../../services/status.service';
+import { deleteStatus, viewStatus } from '../../../services/status.service';
 import ViewIcon from './icons/ViewIcon';
 import ArrowDownIcon from './icons/ArrowDownIcon';
 import ArrowUp from './icons/ArrowUp';
 import { useUserStore } from '../../../store/useUserStore';
+import DeleteIcon from './icons/DeleteIcon';
+import { notifyFailure, notifySuccess } from '../../../utils/Toasts';
 
 
 const PreviewStatusPage = ({ image, text, setShowStatus, showStatus, status, setViewOrCreateStatus }) => {
@@ -32,6 +34,7 @@ const PreviewStatusPage = ({ image, text, setShowStatus, showStatus, status, set
 
     useEffect(() => {
         markAsViewedStatus(status?.statuses?.[currentIndex]?._id)
+        console.log("The current status id is: ",status?.statuses[currentIndex]?._id)
         if(isSelfStatus){
             setViewers(status?.statuses[currentIndex]?.viewers?.filter((viewer)=>viewer?._id?.toString() !== user?._id?.toString())?.length)
         }
@@ -54,6 +57,7 @@ const PreviewStatusPage = ({ image, text, setShowStatus, showStatus, status, set
         }
 
     }
+
 
 
     function fillerAnimation({ duration }) {
@@ -84,16 +88,31 @@ const PreviewStatusPage = ({ image, text, setShowStatus, showStatus, status, set
     }
 
 
+
     async function markAsViewedStatus(statusId) {
         try {
             const response = await viewStatus(statusId);
-            console.log("Marked the status as read: ", response);
+            // console.log("Marked the status as read: ", response);
         } catch (error) {
             console.error("Some error occured!", error)
         }
-
     }
 
+
+    async function handleDeleteStatus(status){
+        if(!status) return ;
+        try {
+            console.log("the status which is going for deletion is: ",status?._id)
+            const response = await deleteStatus(status?._id); 
+            console.log("The response is: ",response)
+            notifySuccess("Status Deleted Succesfully!");
+        } catch (error) {
+            console.error("Some error occured!")
+            notifyFailure("Status couldn't be deleted!");
+        }finally{
+            setShowStatus("")
+        }
+    }
    
 
     useEffect(() => {
@@ -242,8 +261,12 @@ const PreviewStatusPage = ({ image, text, setShowStatus, showStatus, status, set
 
             <div onClick={handleCloseStatus} className="crossButton z-10 rounded-full p-2 w-10 h-10  hover:bg-[#00000032] flex justify-center items-center cursor-pointer absolute top-4 right-4"> <CloseIcon currentColor={"white"} /> </div>
 
+           {isSelfStatus && <div onClick={ ()=>{ handleDeleteStatus(status?.statuses[currentIndex])}} className="deleteIcon crossButton z-10 rounded-full p-2 w-10 h-10  hover:bg-[#68000089] flex justify-center items-center cursor-pointer absolute top-4 right-16">
+                <DeleteIcon currentColor={"#EF4444"}/>
+            </div>}
 
-            <div onClick={handleCloseStatus} className="backButton  z-10 rounded-full p-2 w-10 h-10 hover:bg-[#00000032] flex justify-center items-center cursor-pointer absolute top-4 left-4"> <ArrowBack currentColor={"white"} /> </div>
+
+            <div onClick={handleCloseStatus} className="backButton  z-10 rounded-full p-2 w-10 h-10 hover:bg-[#00000032] flex justify-center items-center cursor-pointer absolute top-4 left-4"> <ArrowBack currentColor={"white"}/> </div>
 
 
 

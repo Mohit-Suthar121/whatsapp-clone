@@ -10,6 +10,6 @@ export const statusRouter = express.Router();
 statusRouter.post('/create-status',authMiddleware,multerMiddleware,createStatus)
 statusRouter.get('/get-status',authMiddleware,getStatus)
 statusRouter.get('/view-status/:statusId',authMiddleware,viewStatus)
-statusRouter.delete('/delete-status/:status-id',authMiddleware,deleteStatus)
+statusRouter.delete('/delete-status/:statusId',authMiddleware,deleteStatus)
 
 

@@ -185,7 +185,7 @@ export const markAsRead = async (req, res) => {
 export const deleteMessage = async (req, res) => {
     try {
         const userId = req.user.userId;
-        const { messageId } = req.body;
+        const { messageId } = req.params;
         const message = await Message.findById(messageId);
         if (!message) return response(res, "Message not found!", 404);
         const publicCloudinaryId = message.media?.publicCloudinaryId;

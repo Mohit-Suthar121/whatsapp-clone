@@ -21,7 +21,7 @@ const SideBar = () => {
     const navigate = useNavigate();
     const {user} = useUserStore();
     const {conversations} = useChatStore();
-    const totalCount = conversations.filter((convo)=>convo.unreadCount>0).length;
+    const totalCount = conversations?.filter((convo)=>convo?.unreadCount>0)?.length;
 
 
     return (

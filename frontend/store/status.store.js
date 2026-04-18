@@ -38,6 +38,12 @@ export const useStatusStore = create((set,get)=>({
             ))
         })
 
+        
+        socket.on("status_deleted",(statusId)=>{
+            set((state)=>({
+                statuses:state.statuses.filter((status)=>status?._id?.toString() !== statusId.toString())
+            }))
+        })
 
 
     },

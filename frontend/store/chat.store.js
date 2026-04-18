@@ -50,6 +50,7 @@ export const useChatStore = create((set, get) => ({
         if (!socket) return;
         socket.off("receive_message")
         socket.off("send_message_sync")
+        socket.off("message_deleted")
 
 
         socket.on("receive_message", (newMessage) => {
@@ -96,6 +97,16 @@ export const useChatStore = create((set, get) => ({
                 return { currentConversation, conversations: updatedConversations }
             }) 
         })
+
+        socket.on("message_deleted",({messageId,conversationId})=>{
+            set((state)=>({
+                messages:state.messages.filter((message)=> message._id.toString() !== messageId.toString()),
+
+                conversations:state?.converstaions?.map((convo)=>convo?._id?.toString() === conversationId?.toString()&&convo?.lastMessage?._id?.toString()===messageId?.toString()?{...convo,lastMessage:{...convo.lastMessage,content:messages[messages?.length-1]}?.content}:convo)
+            }))
+        })
+
+
     },
 
 

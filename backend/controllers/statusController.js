@@ -65,7 +65,6 @@ export const getStatus = async (req, res) => {
     try {
         const now = new Date();
         const statusList = await Status.find({ expiresAt: { $gt: now } }).populate("user", "username profilePicture").populate("viewers", "username profilePicture").sort({ createdAt: -1 }).lean();
-        console.log("All the status are sent successfully!",statusList)
         return response(res, "statusList was retrieved successfully!", 200, statusList);
 
     } catch (error) {
@@ -92,16 +91,14 @@ export const viewStatus = async (req, res) => {
 
         //emit to the client that status has been viewed
         const statusUploaderId = populatedStatus.user._id.toString();
-        if(req.io  && statusUploaderId !== userId.toString()){
-            const viewerData = {
+        if(req.io ){  //  && statusUploaderId !== userId.toString()
+             const viewerData = {
                 userId,
                 statusId,
                 viewer
             }
-            console.log("The request has been sent to the frontend successfully!")
             req.io.to(statusUploaderId).emit("status_viewed",viewerData);
             req.io.to(userId).emit("status_viewed_sync",viewerData);
-            
         }
         else{
             console.log("status owner not connected!")
@@ -122,6 +119,7 @@ export const deleteStatus = async (req, res) => {
         if (!userId) return response(res, "User is not authorized!", 401)
         const { statusId } = req.params;
         const status = await Status.findById(statusId);
+        console.log("I'm inside delete status")
         if (!status) return response(res, "Status not found", 404)
         if (status.user.toString() !== userId) return response(res, "You are not authorized to delete this status", 403)
         await status.deleteOne();
@@ -138,8 +136,9 @@ export const deleteStatus = async (req, res) => {
             })
         }
 
-
-        return response(res, "Status deleted Successfully!", 200);
+        console.log("The deleted Status: ", statusId)
+        return response(res, "Status deleted Successfully!", 200,statusId);
+        
     } catch (error) {
 
         console.error(error);
