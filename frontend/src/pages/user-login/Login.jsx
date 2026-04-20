@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { InteractiveGridPattern } from '../../assets/components/InteractiveGridPattern'
 import { FaWhatsapp } from 'react-icons/fa'
-import { countries3 } from '../../../utils/countries3'
+import { Countries3 } from '../../../utils/countries3'
 import { IoIosArrowDown } from "react-icons/io";
 import DropDownCountry from '../../assets/components/DropDownCountry'
 import PersonSvg from '../../assets/components/icons/PersonSvg'
