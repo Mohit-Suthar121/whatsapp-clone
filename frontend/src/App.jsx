@@ -9,6 +9,7 @@ import Settings from './pages/settingSection/Settings'
 import MainLayout from './assets/components/MainLayout'
 import Chat from './pages/chatSection/Chat'
 import { ToastContainer, Bounce } from 'react-toastify'
+import { Analytics } from "@vercel/analytics/react";
 
 function App() {
 
@@ -42,6 +43,7 @@ function App() {
           </Route>
         </Route>
       </Routes>
+      <Analytics/>
     </>
   )
 }
