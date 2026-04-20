@@ -344,7 +344,7 @@ const Login = () => {
                     e.stopPropagation();
                     setSearchTerm("");
 
-                  }} className=" absolute top-[110%] rounded-xl p-1 bg-green-500 w-[120%] h-40 flex flex-col">
+                  }} className=" absolute z-10 top-[110%] rounded-xl p-1 bg-green-500 w-[120%] h-40 flex flex-col">
 
                     <div className="searchcountries ">
                       <input value={searchTerm} onChange={(e) => { setSearchTerm(e.target.value) }} type="text" placeholder='Search Countries' className='w-full focus:outline-none h-8 border text-white text-sm border-blue-300 rounded-xl flex items-center p-2' />
@@ -352,7 +352,7 @@ const Login = () => {
 
                     <div className="profileScroller profileScroller3 showCountries overflow-x-hidden overflow-y-auto p-1 pt-2 flex-1 border">
 
-                      <div className="wrapper w-full gap-3 flex flex-col">
+                      <div className="wrapper w-full gap-3 flex flex-col ">
                         {(filterCountries || countries3).map((country) => (
                           <DropDownCountry showDropdown={showDropdown} setShowDropdown={setShowDropdown} setCurrentCountryInfo={setCurrentCountryInfo} countryCode={country.countryCode} countryName={country.countryName} png={country.png1} setPhonePrefix={setPhonePrefix} />
                         ))}
