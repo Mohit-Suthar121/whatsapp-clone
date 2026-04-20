@@ -16,16 +16,21 @@ export const useStatusStore = create((set,get)=>({
 
         socket.on("status_viewed",({statusId,viewer})=>{        
             console.log("the status_viewed is running")
-            set((state)=>({
-                statuses:state.statuses.map((s)=>s._id.toString()===statusId.toString()?{...s,viewers:[...s.viewers,viewer]}:s)
-            }))
+            set((state)=>{
+                const requiredStatus = state?.statuses?.find((status)=>status?._id?.toString() === statusId?.toString());
+                const isViewerPresent = requiredStatus?.viewers?.some((v)=>v?._id?.toString()===viewer?._id?.toString());
+                if(!isViewerPresent){
+                   return { statuses:state?.statuses?.map((s)=>s?._id?.toString()===statusId?.toString()?{...s,viewers:[...(s.viewers || []),viewer]}:s)}
+                }
+                return state;
+            })
 
         })
 
         socket.on("status_viewed_sync",({statusId,viewer})=>{
             console.log("Status_viewed_sync is runnning")
             set((state)=>({
-                statuses:state.statuses.map((s)=>s._id.toString()===statusId.toString()?{...s,viewers:[...s.viewers,viewer]}:s)
+                statuses:state?.statuses?.map((s)=>s?._id?.toString()===statusId?.toString()?{...s,viewers:[...(s.viewers || []),viewer]}:s)
             }))
         })
 

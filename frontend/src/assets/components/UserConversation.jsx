@@ -160,7 +160,6 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId, conv
 
     useEffect(() => {
         scrollRef.current.scrollIntoView({ behavior: "smooth" })
-        console.log("all of the messages are: ",messages)
     }, [messages])
 
 

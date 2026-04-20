@@ -73,16 +73,17 @@ const Chat = () => {
         return typingUsers.get(conversationId) === receiverId;
     }
 
-
+  
 
     function filterLastMessage(conversation){
         const filteredConversation = conversations?.find((convo)=>convo?._id?.toString()===conversation?._id?.toString())
+        const senderId = filteredConversation?.lastMessage?.sender?._id?.toString() ?? filteredConversation?.lastMessage?.sender?.toString()
         return {
             lastMessage:filteredConversation?.lastMessage?.content || "",
             unreadCount:filteredConversation?.unreadCount || 0,
             time:filteredConversation?.lastMessage?.createdAt,
             image:filteredConversation?.lastMessage?.media?.url?true:false,
-            messageStatus:filteredConversation?.lastMessage?.sender?.toString()===user._id.toString()?filteredConversation.lastMessage.messageStatus:null
+            messageStatus:senderId===user._id.toString()?filteredConversation.lastMessage.messageStatus:null
         }
     }
 
@@ -90,7 +91,6 @@ const Chat = () => {
 
 
     return (
-
         <div className='w-full flex h-full'>
             <div className={`  maincontent w-115 h-full flex flex-col border-r ${theme === "dark" ? "border-r-[#2E2F2F]" : "border-r-[#DEDCDA]"} ${theme === "dark" ? "bg-[#161717]" : "bg-[#FFFFFF]"}`} >
                 <div className='headers p-4 w-full h-16 justify-between flex items-center'>
@@ -107,8 +107,9 @@ const Chat = () => {
                     </div>
                 </div>
 
-                <div className='pl-4 pr-4 pb-4'>
 
+
+                <div className='pl-4 pr-4 pb-4'>
                     <div className={`inputbardiv h-10 rounded-4xl ${theme === "dark" ? "bg-[#2e2f2f]" : "bg-[#F6F5F4]"} p-2 flex items-center gap-1
                     ${theme === "dark" ? "focus-within:bg-[#161717]" : "focus-within:bg-[#ffffff]"}
                       focus-within:border-2 focus-within:border-[#20BD61] `}>

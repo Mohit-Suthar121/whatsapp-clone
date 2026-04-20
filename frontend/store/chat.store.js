@@ -99,11 +99,23 @@ export const useChatStore = create((set, get) => ({
         })
 
         socket.on("message_deleted",({messageId,conversationId})=>{
-            set((state)=>({
-                messages:state.messages.filter((message)=> message._id.toString() !== messageId.toString()),
+            set((state)=>{
+                const updatedMessages = state.messages?.filter((message)=> message._id.toString() !== messageId.toString())
+                
+                const updatedConversations = state.conversations.map((convo)=>{
+                    if(convo?._id?.toString() === conversationId?.toString() && convo?.lastMessage?._id?.toString()===messageId?.toString()){
+                        const newLastMessage = updatedMessages.length?updatedMessages[updatedMessages.length-1]:null
+                        return {...convo,lastMessage:newLastMessage}
+                    }
+                    else return convo;
+                })
 
-                conversations:state?.converstaions?.map((convo)=>convo?._id?.toString() === conversationId?.toString()&&convo?.lastMessage?._id?.toString()===messageId?.toString()?{...convo,lastMessage:{...convo.lastMessage,content:messages[messages?.length-1]}?.content}:convo)
-            }))
+                return {
+                    messages:updatedMessages,
+                    conversations:updatedConversations
+                }
+
+            })
         })
 
 

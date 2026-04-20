@@ -11,7 +11,7 @@ const MessageBubble2 = ({isMe,message,time,messageStatusIcon,image,handleDeleteM
             <div className={`${isMe?"alt":"other"}`}>
                 <div className="flex flex-col gap-1">
                    {image && <img src={image} alt="" />}                                      
-
+  
                    
                     <div className={`${theme==="dark"?"text-[white]":"text-black"} leading-tight wrap-break-word whitespace-pre-wrap `}>{message} </div>
                     <div className={`timestamp ml-auto ${theme==="dark"?"text-[#999]":"text-black"} flex gap-1 items-center text-sm `}>{time} {messageStatusIcon}  </div>
