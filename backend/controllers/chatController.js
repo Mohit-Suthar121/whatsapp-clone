@@ -181,7 +181,7 @@ export const markAsRead = async (req, res) => {
 }
 
 
-
+// HANDLING DELETION OF MESSAGES
 export const deleteMessage = async (req, res) => {
     try {
         const userId = req.user.userId;
