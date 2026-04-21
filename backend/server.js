@@ -14,12 +14,6 @@ const app = express()
 const port = 3000
 const server = http.createServer(app)
 
-// const corsOptions = {
-//   origin: process.env.FRONTEND_URL,
-//   credentials: true                                                                                                                                                               
-// }                                    
-// app.use(cors(corsOptions))
-
 
 const allowedOrigins = [
   "http://localhost:5173",

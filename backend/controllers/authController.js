@@ -73,7 +73,8 @@ const verifyOtp = async (req, res) => {
             res.cookie("auth_token", token, {
                 httpOnly: true,
                 secure: true,
-                maxAge: 365 * 24 * 60 * 60 * 1000
+                maxAge: 365 * 24 * 60 * 60 * 1000,
+                sameSite:"None"
             })
 
             await user.save();
