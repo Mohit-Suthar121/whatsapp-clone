@@ -19,7 +19,7 @@ const statusSchema = new mongoose.Schema({
         ref:"User"
     }],
 
-    expiresAt:{type:Date,required:true}
+    expiresAt:{type:Date,required:true,expires:0}
 },{timestamps:true})
 
 
