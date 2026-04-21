@@ -14,12 +14,35 @@ const app = express()
 const port = 3000
 const server = http.createServer(app)
 
-const corsOptions = {
-  origin: process.env.FRONTEND_URL,
-  credentials: true
-}
-app.use(cors(corsOptions))
+// const corsOptions = {
+//   origin: process.env.FRONTEND_URL,
+//   credentials: true                                                                                                                                                               
+// }                                    
+// app.use(cors(corsOptions))
 
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://whatsapp-clone-rouge-eight.vercel.app"
+]
+
+app.use(cors({
+  origin: function (origin,callback){
+    if(!origin){
+      return callback(null,true);
+    }
+
+    if(allowedOrigins.includes(origin)){
+      return callback(null,true)
+    }
+
+    else {
+      return callback(new Error("Not allowed by CORS"))
+    }
+
+  },
+  credentials:true
+}))
 
 const io = initializeSocket(server)
 

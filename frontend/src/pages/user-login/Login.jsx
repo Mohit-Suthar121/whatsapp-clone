@@ -16,8 +16,9 @@ import { useNavigate } from 'react-router'
 import LeftArrow from '../../assets/components/icons/LeftArrow'
 import { notifyFailure,notifySuccess } from '../../../utils/Toasts'
 
-const Login = () => {
 
+
+const Login = () => {
   const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -36,11 +37,6 @@ const Login = () => {
   const inputRefs = useRef([]);
   const [imageFile, setImageFile] = useState(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState("");
-  
-
-  
-
-
   async function onLoginSubmit(data) {
     console.log(data);
     if (!data) {
@@ -81,7 +77,7 @@ const Login = () => {
     }
   }
 
-  
+
   async function onOtpSubmit(joinedOtp) {
     try {
       setIsLoading(true);
@@ -104,15 +100,14 @@ const Login = () => {
         notifyFailure("Some Error Occured ! Please Try Again");
         console.error("some error occured while verifying the otp: ", response)
       }
-
     } catch (error) {
       notifyFailure("Some error occured, please try again later!")
       console.error('some error occured!', error)
     } finally {
       setIsLoading(false);
     }
-
   }
+
 
   async function onProfileSubmit(data) {
     try {
