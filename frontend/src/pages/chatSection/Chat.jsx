@@ -41,7 +41,9 @@ const Chat = () => {
     }, [user?._id])
 
 
-    
+    useEffect(()=>{
+        console.log("All thie conversations are :  ",conversations);
+    },[conversations])
 
 
 
@@ -78,6 +80,8 @@ const Chat = () => {
     function filterLastMessage(conversation){
         const filteredConversation = conversations?.find((convo)=>convo?._id?.toString()===conversation?._id?.toString())
         const senderId = filteredConversation?.lastMessage?.sender?._id?.toString() ?? filteredConversation?.lastMessage?.sender?.toString()
+        console.log("The conversation id is: ",conversation)
+        console.log("All the conversations are: ",conversations)
         return {
             lastMessage:filteredConversation?.lastMessage?.content || "",
             unreadCount:filteredConversation?.unreadCount || 0,

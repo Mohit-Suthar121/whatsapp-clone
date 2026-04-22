@@ -26,20 +26,20 @@ export const useChatStore = create((set, get) => ({
         try {
             const user = useUserStore.getState().user;
             // console.log("The user is: ",user)
-            if(!user?._id) return;
+            if (!user?._id) return;
             const response = await getAllUsers();
-            set((state)=>(
-                {allUsers:response.data}
+            set((state) => (
+                { allUsers: response.data }
             ))
             // setAllUsers(response.data);
             //setting up all the conversations
             const allFilteredConversations = response.data.map((u) => u.conversation).filter((convo) => convo != null).map((filteredConvo) => ({ ...filteredConvo, unreadCount: filteredConvo.unreadCount?.[user._id.toString()] ?? 0 }));
-            set((state)=>({
-                conversations:allFilteredConversations
+            set((state) => ({
+                conversations: allFilteredConversations
             }))
             // setConversations(allFilteredConversations);
         }
-        catch(error) {
+        catch (error) {
             console.error("Some Error Occured", error)
         }
     },
@@ -52,67 +52,81 @@ export const useChatStore = create((set, get) => ({
         socket.off("send_message_sync")
         socket.off("message_deleted")
 
-
-        socket.on("receive_message", (newMessage) => {
+        
+        socket.on("receive_message", ({ newMessage, conversationData }) => {
             const { currentConversation } = get();
+            console.log("The new Message and the new Conversation looks somethig like this: ", newMessage)
+            console.log("Conversation: ",conversationData)
 
-            //insert a new message to the opened chat window
-            if (newMessage.conversation.toString() === currentConversation?._id?.toString()) {
-                markMessagesAsReadApi({
-                    messageIds:[newMessage._id],
-                    senderId:newMessage.sender._id
-                })
-                set((state) => ({
-                    messages: [...state.messages, newMessage]
-                }))
-            }
+            set((state) => {
+                const exists = state.conversations.find((convo) => convo?._id?.toString() === newMessage?.conversation?.toString());
 
 
-            //update the last message in the conversation
-            set((state) => ({
-                conversations: state.conversations.map((convo) => (
-                    convo?._id?.toString() === newMessage?.conversation?.toString() ? { ...convo, lastMessage: newMessage } : convo
-                ))
-            }))
+                if (newMessage?.conversation?.toString() === currentConversation?._id?.toString()) {
+                    markMessagesAsReadApi({
+                        messageIds: [newMessage?._id],
+                        senderId: newMessage?.sender?._id
+                    })
+
+                    const updatedConversations = state.conversations.map((convo)=>convo?._id?.toString() === newMessage?.conversation?.toString()?{...convo,lastMessage:newMessage}:convo);
+                    return { messages: [...state.messages, newMessage] , conversations:updatedConversations};
+                }
+
+
+                else if (exists) {
+                    const updatedConversations = state.conversations.map((convo) => {
+                        if (convo?._id?.toString() === newMessage?.conversation?.toString()) {
+                            let updatedConvo = { ...convo, lastMessage: newMessage,unreadCount:convo.unreadCount + 1}
+                            return updatedConvo
+                        }
+                        else return convo
+                    })
+
+                    return { conversations: updatedConversations }
+                }
+
+
+                else {
+                    const newConversation = conversationData;
+                    return { conversations: [...state.conversations, newConversation] }
+
+                }
+
+
+            })
 
 
 
-            set((state) => ({
-                conversations: state.conversations.map((convo) => {
-                    if (newMessage?.conversation?.toString() !== currentConversation?._id?.toString() && newMessage?.conversation?.toString() === convo?._id?.toString()) {
-                        return { ...convo, unreadCount: convo.unreadCount + 1 }
-                    }
-                    return convo
-                })
-            }))
+
         })
 
-  
 
-        socket.on("send_message_sync", (newMessage) => {
+
+        socket.on("send_message_sync", ({newMessage,conversationData}) => {
             set((state) => {
                 const currentConversation = { ...state.currentConversation, lastMessage: newMessage };
                 const updatedConversations = state.conversations.map((convo) => convo._id.toString() === state.currentConversation._id.toString() ? { ...convo, lastMessage: newMessage } : convo);
-                // console.log("The conversations after updation are: ", updatedConversations)
                 return { currentConversation, conversations: updatedConversations }
-            }) 
+            })
         })
 
-        socket.on("message_deleted",({messageId,conversationId})=>{
-            set((state)=>{
-                const updatedMessages = state.messages?.filter((message)=> message._id.toString() !== messageId.toString())
-                
-                const updatedConversations = state.conversations.map((convo)=>{
-                    if(convo?._id?.toString() === conversationId?.toString() && convo?.lastMessage?._id?.toString()===messageId?.toString()){
-                        const newLastMessage = updatedMessages.length?updatedMessages[updatedMessages.length-1]:null
-                        return {...convo,lastMessage:newLastMessage}
+
+
+        socket.on("message_deleted", ({ messageId, conversationId }) => {
+            set((state) => {
+                const updatedMessages = state.messages?.filter((message) => message._id.toString() !== messageId.toString())
+
+                const updatedConversations = state.conversations.map((convo) => {
+                    if (convo?._id?.toString() === conversationId?.toString() && convo?.lastMessage?._id?.toString() === messageId?.toString()) {
+                        const newLastMessage = updatedMessages.length ? updatedMessages[updatedMessages.length - 1] : null
+                        return { ...convo, lastMessage: newLastMessage }
                     }
                     else return convo;
                 })
 
                 return {
-                    messages:updatedMessages,
-                    conversations:updatedConversations
+                    messages: updatedMessages,
+                    conversations: updatedConversations
                 }
 
             })

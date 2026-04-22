@@ -93,6 +93,8 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId, conv
         else return <MessageSentTickIcon currentColor={"#8FABA0"} />
     }
 
+
+    
     async function handleSendMessage(receiverId) {
         if (!messageContent.trim() && !imageFile) return;
         const clientId = Date.now().toString();

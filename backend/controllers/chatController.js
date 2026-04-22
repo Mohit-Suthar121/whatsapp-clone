@@ -4,6 +4,7 @@ import response from '../utils/responseHandler.js'
 import Message from '../models/Message.js';
 import { onlineUsers } from '../services/SocketService.js';
 
+
 export const sendMessage = async (req, res) => { // handling normal message and file or video using this function
     const { receiverId, content } = req.body;
     const senderId = req.user.userId;
@@ -64,11 +65,19 @@ export const sendMessage = async (req, res) => { // handling normal message and 
         await conversation.save();
 
         const populatedMessage = await Message.findOne({ _id: message._id }).populate("sender", "username profilePicture").populate("receiver", "username profilePicture")
+        
+
+        const conversationData = {
+            _id:conversation._id,
+            lastMessage:message,
+            unreadCount:conversation.unreadCount
+        }
+
 
         // sending message realtime through socket
         if (req.io) {
-            req.io.to(receiverId.toString()).emit("receive_message", populatedMessage);
-            req.io.to(senderId.toString()).emit("send_message_sync", message);
+            req.io.to(receiverId.toString()).emit("receive_message", {newMessage:populatedMessage,conversationData});
+            req.io.to(senderId.toString()).emit("send_message_sync",  {newMessage:populatedMessage,conversationData});
         }
         return response(res, "message sent Successfully", 201, populatedMessage)
 
