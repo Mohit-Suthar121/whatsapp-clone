@@ -24,7 +24,7 @@ const Chat = () => {
     const { user } = useUserStore();
     const [userClick, setUserClick] = useState(false);
     const [showConversation, setShowConversation] = useState("");
-    const {  setCurrentConversation, onlineUsers, subscribeToUserStatus, unsubscribeFromUserStatus, subscribeToTyping, unsubscribeFromTyping, typingUsers,  conversations,setConversations,allUsers } = useChatStore();
+    const {  setCurrentConversation, onlineUsers, subscribeToUserStatus, unsubscribeFromUserStatus, subscribeToTyping, unsubscribeFromTyping, typingUsers,  conversations,setConversations,allUsers,currentConversation } = useChatStore();
 
 
     useEffect(() => {
@@ -41,8 +41,10 @@ const Chat = () => {
     }, [user?._id])
 
 
+    
     useEffect(()=>{
-        console.log("All thie conversations are :  ",conversations);
+        console.log("All users are: ",allUsers)
+        console.log("All the conversations are: ",conversations)
     },[conversations])
 
 
@@ -77,11 +79,33 @@ const Chat = () => {
 
   
 
-    function filterLastMessage(conversation){
-        const filteredConversation = conversations?.find((convo)=>convo?._id?.toString()===conversation?._id?.toString())
-        const senderId = filteredConversation?.lastMessage?.sender?._id?.toString() ?? filteredConversation?.lastMessage?.sender?.toString()
-        console.log("The conversation id is: ",conversation)
-        console.log("All the conversations are: ",conversations)
+    // function filterLastMessage(conversation){
+    //     const filteredConversation = conversations?.find((convo)=>convo?._id?.toString()===conversation?._id?.toString())
+    //     const senderId = filteredConversation?.lastMessage?.sender?._id?.toString() ?? filteredConversation?.lastMessage?.sender?.toString()
+    //     return {
+    //         lastMessage:filteredConversation?.lastMessage?.content || "",
+    //         unreadCount:filteredConversation?.unreadCount || 0,
+    //         time:filteredConversation?.lastMessage?.createdAt,
+    //         image:filteredConversation?.lastMessage?.media?.url?true:false,
+    //         messageStatus:senderId===user._id.toString()?filteredConversation.lastMessage.messageStatus:null
+    //     }
+    // }
+
+
+
+    function filterLastMessage(userId){
+        // const filteredConversation = conversations?.find((convo)=>convo?._id?.toString()===conversation?._id?.toString())
+        // const filteredConversation = conversations?.find((convo)=> (convo?.lastMessage?.sender?._id?.toString()?? convo?.lastMessage?.sender?.toString() ) === (userId?.toString() || user?._id?.toString())  && (convo?.lastMessage?.receiver?._id?.toString() ?? convo?.lastMessage?.receiver?.toString() ) === (userId?.toString() || user?._id?.toString()) );
+
+
+        const filteredConversation = conversations.find((convo)=>{
+            const senderId = convo?.lastMessage?.sender?._id?.toString() ?? convo?.lastMessage?.sender?.toString();
+            const receiverId = convo?.lastMessage?.receiver?._id?.toString() ?? convo?.lastMessage?.receiver?.toString();
+            return (senderId=== user?._id?.toString() && receiverId === userId?.toString()) || (senderId === userId?.toString() && receiverId === user?._id?.toString());
+
+        })
+        const senderId = filteredConversation?.lastMessage?.sender?._id?.toString() ?? filteredConversation?.lastMessage?.sender?.toString();
+        console.log("The filtered conversation is: ",filteredConversation)
         return {
             lastMessage:filteredConversation?.lastMessage?.content || "",
             unreadCount:filteredConversation?.unreadCount || 0,
@@ -132,7 +156,7 @@ const Chat = () => {
                 <div className={`chats-section w-full p-2 flex flex-col flex-1 overflow-auto gap-2 profileScroller border-t ${theme === "dark" ? "border-[#2E2F2F]" : "border-[#DEDCDA]"} `}>
 
                     {allUsers.map((otherUser)=>{
-                        const conversationData = filterLastMessage(otherUser.conversation);
+                        const conversationData = filterLastMessage(otherUser?._id);
                         return ( <UserProfile
                             isTyping={tellIsTyping(otherUser.conversation?._id, otherUser._id)}
                             isOnline={onlineUsers.get(otherUser?._id)}

@@ -47,6 +47,7 @@ export const useChatStore = create((set, get) => ({
 
     subscribeToMessages: () => {
         const socket = getSocket();
+        const user = useUserStore.getState().user;
         if (!socket) return;
         socket.off("receive_message")
         socket.off("send_message_sync")
@@ -61,7 +62,6 @@ export const useChatStore = create((set, get) => ({
             set((state) => {
                 const exists = state.conversations.find((convo) => convo?._id?.toString() === newMessage?.conversation?.toString());
 
-
                 if (newMessage?.conversation?.toString() === currentConversation?._id?.toString()) {
                     markMessagesAsReadApi({
                         messageIds: [newMessage?._id],
@@ -69,6 +69,7 @@ export const useChatStore = create((set, get) => ({
                     })
 
                     const updatedConversations = state.conversations.map((convo)=>convo?._id?.toString() === newMessage?.conversation?.toString()?{...convo,lastMessage:newMessage}:convo);
+
                     return { messages: [...state.messages, newMessage] , conversations:updatedConversations};
                 }
 
@@ -87,7 +88,8 @@ export const useChatStore = create((set, get) => ({
 
 
                 else {
-                    const newConversation = conversationData;
+                    let newConversation = conversationData;
+                    newConversation = {...newConversation,unreadCount:newConversation?.unreadCount?.[user?._id?.toString()] || 0};
                     return { conversations: [...state.conversations, newConversation] }
 
                 }
@@ -102,14 +104,23 @@ export const useChatStore = create((set, get) => ({
 
 
 
-        socket.on("send_message_sync", ({newMessage,conversationData}) => {
-            set((state) => {
-                const currentConversation = { ...state.currentConversation, lastMessage: newMessage };
-                const updatedConversations = state.conversations.map((convo) => convo._id.toString() === state.currentConversation._id.toString() ? { ...convo, lastMessage: newMessage } : convo);
-                return { currentConversation, conversations: updatedConversations }
+        socket.on("send_message_sync",({newMessage,conversationData}) =>{
+            set((state)=>{
+                const requiredConversation  = state.conversations.find((convo)=>convo?._id?.toString() === conversationData?._id?.toString());
+                let updatedConversations;
+                let newCurrentConversation;
+                if(requiredConversation){
+                    updatedConversations = state.conversations.map((convo)=>convo?._id?.toString()===conversationData?._id?.toString() ? {...convo,lastMessage:newMessage}:convo)
+                    newCurrentConversation = {...state.currentConversation,lastMessage:newMessage};
+
+                }
+                else{
+                    updatedConversations = [...state.conversations,conversationData];
+                    newCurrentConversation = conversationData;
+                }
+                return {currentConversation:newCurrentConversation,conversations:updatedConversations};
             })
         })
-
 
 
         socket.on("message_deleted", ({ messageId, conversationId }) => {
