@@ -47,14 +47,6 @@ const SideBar = () => {
 
                 <div className="bottomlogos flex flex-col items-center gap-2" >
 
-                    <label htmlFor="media">
-                        <div className={`flex justify-center items-center p-2 ${theme === "dark" ? "hover:bg-[#292A2A]" : "hover:bg-[#E7E6E4]"} rounded-full w-10 h-10`}>
-                            <MediaSvg/>
-                        </div>
-                        <input className='hidden' type="file" name="" id="media" />
-                    </label>
-
-
                     <div className="settingsButton" onClick={()=>{navigate("/settings")}}>
                         <CircledButton notification={false} isActive={isActive("/settings")} svg={<SettingsIcon currentColor={theme === "dark" ? "#999A9A" : "#5E5D5C"} />} filledSvg={<SettingsFilled currentColor={theme === "dark" ? "white" : "black"} />} />
                     </div>

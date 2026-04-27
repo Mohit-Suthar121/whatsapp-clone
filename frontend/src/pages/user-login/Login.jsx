@@ -37,8 +37,11 @@ const Login = () => {
   const inputRefs = useRef([]);
   const [imageFile, setImageFile] = useState(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState("");
+
+
   async function onLoginSubmit(data) {
-    console.log(data);
+    console.log("The data is: ",data);
+    data = {...data,phoneNoPrefix:currentCountryInfo.countryCode};
     if (!data) {
       console.error("Form data is missing");
       notifyFailure("Form data is missing!");
@@ -47,6 +50,7 @@ const Login = () => {
     try {
       setIsLoading(true);
       const response = await sendOtp(data);
+
       if (data.email) {
         if (response.status === "success") {
           notifySuccess("Otp Sent Successfully to your email!");
@@ -57,6 +61,7 @@ const Login = () => {
           notifyFailure("Some Error Occured ! Please Try Again");
         }
       }
+
 
       else {
         if (response.status === "success") {
@@ -348,8 +353,8 @@ const Login = () => {
                     <div className="profileScroller profileScroller3 showCountries overflow-x-hidden overflow-y-auto p-1 pt-2 flex-1 border">
 
                       <div className="wrapper w-full gap-3 flex flex-col ">
-                        {(filterCountries || countries3).map((country) => (
-                          <DropDownCountry showDropdown={showDropdown} setShowDropdown={setShowDropdown} setCurrentCountryInfo={setCurrentCountryInfo} countryCode={country.countryCode} countryName={country.countryName} png={country.png1} setPhonePrefix={setPhonePrefix} />
+                        {(filterCountries || countries3).map((country,index) => (
+                          <DropDownCountry key={index} showDropdown={showDropdown} setShowDropdown={setShowDropdown} setCurrentCountryInfo={setCurrentCountryInfo} countryCode={country.countryCode} countryName={country.countryName} png={country.png1} setPhonePrefix={setPhonePrefix} />
                         ))}
                       </div>
 
