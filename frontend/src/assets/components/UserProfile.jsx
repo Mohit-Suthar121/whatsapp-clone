@@ -43,8 +43,8 @@ const UserProfile = ({
                     {isSelfStatus && <div className={`text-gray-400 text-sm font-semibold`}>Click to add status update</div>}
 
                     <div className="undertext flex items-center gap-1">
-                        {messageStatus && returnMessageStatus()}
-                        {image && <p><ImageIcon currentColor={"#999A9A"} /></p>}
+                        {messageStatus && !isTyping && returnMessageStatus()}
+                        {image && !isTyping && <p><ImageIcon currentColor={"#999A9A"} /></p>}
                         {isTyping ? <p className='text-sm text-green-500 font-semibold w-full overflow-x-hidden text-ellipsis whitespace-nowrap'>Typing...</p> : <p className={`text-sm  font-semibold w-full overflow-x-hidden text-ellipsis whitespace-nowrap ${theme === "dark" ? (unreadCount > 0 ? "text-white" : "text-gray-400") : (unreadCount > 0 ? "text-black" : "text-gray-400")}`}>{lastmessage ? lastmessage : (image?"Photo":"")}</p>}
                     </div>
 
