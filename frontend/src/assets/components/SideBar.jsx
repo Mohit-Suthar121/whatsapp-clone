@@ -23,7 +23,7 @@ const SideBar = () => {
     const {conversations} = useChatStore();
     const totalCount = conversations?.filter((convo)=>convo?.unreadCount>0)?.length;
 
-
+    // console.log("The conversations are ")
     return (
         <div className={`sidebar w-16 h-full border-r ${theme === "dark" ? "border-r-[#2E2F2F]" : "border-r-[#DEDCDA]"} ${theme === "dark" ? "bg-[#1D1F1F]" : "bg-[#f7f5f3]"} flex flex-col gap-2`}>
             <div className="logos flex h-full flex-col justify-between items-center p-4" >

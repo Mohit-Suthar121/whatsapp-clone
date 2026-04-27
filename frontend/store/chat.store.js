@@ -52,6 +52,7 @@ export const useChatStore = create((set, get) => ({
         socket.off("receive_message")
         socket.off("send_message_sync")
         socket.off("message_deleted")
+        socket.off("delete_message_sync")
 
         
         socket.on("receive_message", ({ newMessage, conversationData }) => {
@@ -123,26 +124,45 @@ export const useChatStore = create((set, get) => ({
         })
 
 
-        socket.on("message_deleted", ({ messageId, conversationId }) => {
-            set((state) => {
-                const updatedMessages = state.messages?.filter((message) => message._id.toString() !== messageId.toString())
 
+        socket.on("message_delete", ({ messageId, conversationId,newLastMessage,newUnreadCount }) => {
+            console.log("The message data coming from the backend after deletion is with messageId: ",messageId)
+            console.log("conversationId ",conversationId);
+            set((state) => {
+                console.log("All the messages before the filteration is: ",state.messages)
+                const filteredMessages = state.messages?.filter((message) => message?._id?.toString() !== messageId.toString())
                 const updatedConversations = state.conversations.map((convo) => {
-                    if (convo?._id?.toString() === conversationId?.toString() && convo?.lastMessage?._id?.toString() === messageId?.toString()) {
-                        const newLastMessage = updatedMessages.length ? updatedMessages[updatedMessages.length - 1] : null
-                        return { ...convo, lastMessage: newLastMessage }
+
+                    //update the last message if the deleted message was the last message of the conversation
+                    if (convo?._id?.toString() === conversationId?.toString()) {
+                        if(newUnreadCount !== undefined){
+                            convo = {...convo,unreadCount:newUnreadCount}
+                        }
+
+                        if(convo?.lastMessage?._id?.toString() === messageId?.toString()){
+                            convo = { ...convo, lastMessage: newLastMessage}
+                        }
+                        return convo;
                     }
                     else return convo;
                 })
-
                 return {
-                    messages: updatedMessages,
+                    messages: filteredMessages,
                     conversations: updatedConversations
                 }
 
             })
         })
 
+
+
+        socket.on("delete_message_sync",({messageId,conversationid})=>{
+            set((state)=>{
+                const filteredMessages = state.messages?.filter((message) => message?._id?.toString() !== messageId.toString());
+
+            })
+
+        })
 
     },
 
@@ -204,6 +224,7 @@ export const useChatStore = create((set, get) => ({
         if (socket) socket.off("user_status")
     },
 
+
     subscribeToTyping: () => {
         const socket = getSocket();
         if (!socket) return;
@@ -237,6 +258,7 @@ export const useChatStore = create((set, get) => ({
             socket.off("hide_typing");
         }
     },
+
 
     subscribeToMessageStatus: () => {
         const socket = getSocket();

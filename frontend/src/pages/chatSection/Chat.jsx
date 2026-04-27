@@ -43,7 +43,7 @@ const Chat = () => {
 
     
     useEffect(()=>{
-        console.log("All users are: ",allUsers)
+        // console.log("All users are: ",allUsers)
         console.log("All the conversations are: ",conversations)
     },[conversations])
 
@@ -76,36 +76,18 @@ const Chat = () => {
     function tellIsTyping(conversationId, receiverId) {
         return typingUsers.get(conversationId) === receiverId;
     }
-
-  
-
-    // function filterLastMessage(conversation){
-    //     const filteredConversation = conversations?.find((convo)=>convo?._id?.toString()===conversation?._id?.toString())
-    //     const senderId = filteredConversation?.lastMessage?.sender?._id?.toString() ?? filteredConversation?.lastMessage?.sender?.toString()
-    //     return {
-    //         lastMessage:filteredConversation?.lastMessage?.content || "",
-    //         unreadCount:filteredConversation?.unreadCount || 0,
-    //         time:filteredConversation?.lastMessage?.createdAt,
-    //         image:filteredConversation?.lastMessage?.media?.url?true:false,
-    //         messageStatus:senderId===user._id.toString()?filteredConversation.lastMessage.messageStatus:null
-    //     }
-    // }
-
-
-
+    
+    
     function filterLastMessage(userId){
-        // const filteredConversation = conversations?.find((convo)=>convo?._id?.toString()===conversation?._id?.toString())
-        // const filteredConversation = conversations?.find((convo)=> (convo?.lastMessage?.sender?._id?.toString()?? convo?.lastMessage?.sender?.toString() ) === (userId?.toString() || user?._id?.toString())  && (convo?.lastMessage?.receiver?._id?.toString() ?? convo?.lastMessage?.receiver?.toString() ) === (userId?.toString() || user?._id?.toString()) );
-
-
+        
         const filteredConversation = conversations.find((convo)=>{
             const senderId = convo?.lastMessage?.sender?._id?.toString() ?? convo?.lastMessage?.sender?.toString();
             const receiverId = convo?.lastMessage?.receiver?._id?.toString() ?? convo?.lastMessage?.receiver?.toString();
             return (senderId=== user?._id?.toString() && receiverId === userId?.toString()) || (senderId === userId?.toString() && receiverId === user?._id?.toString());
-
+            
         })
         const senderId = filteredConversation?.lastMessage?.sender?._id?.toString() ?? filteredConversation?.lastMessage?.sender?.toString();
-        console.log("The filtered conversation is: ",filteredConversation)
+        // console.log("The filtered conversation is: ",filteredConversation)
         return {
             lastMessage:filteredConversation?.lastMessage?.content || "",
             unreadCount:filteredConversation?.unreadCount || 0,

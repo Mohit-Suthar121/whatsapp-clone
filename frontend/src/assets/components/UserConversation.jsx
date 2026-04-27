@@ -60,6 +60,9 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId, conv
             console.error("Some error occured deleting the message: ",error)
         }
     }
+    useEffect(()=>{
+        console.log("All of the messages are: ",messages)
+    },[messages])
 
 
     const getDisplayStatus = () => {
