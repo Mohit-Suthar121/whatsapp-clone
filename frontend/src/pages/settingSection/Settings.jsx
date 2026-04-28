@@ -41,7 +41,7 @@ const Settings = () => {
 
             <div className='flex w-full'>
 
-                <div className={` maincontent w-115 h-full flex flex-col border-r ${theme === "dark" ? "border-r-[#2E2F2F]" : "border-r-[#DEDCDA]"} ${theme === "dark" ? "bg-[#161717]" : "bg-[#ffffff]"}`}>
+                <div className={` maincontent max-md:w-full md:min-w-115 flex flex-col border-r ${theme === "dark" ? "border-r-[#2E2F2F]" : "border-r-[#DEDCDA]"} ${theme === "dark" ? "bg-[#161717]" : "bg-[#ffffff]"}`}>
                     <div className='headers p-4 w-full h-16 justify-between flex items-center'>
                         <div className={`name ${theme === "dark" ? "text-white" : "text-[#0A0A0A]"} font-semibold tracking-tighter text-2xl`}>
                             Settings
@@ -72,7 +72,7 @@ const Settings = () => {
 
                 </div>
 
-                <RightSideSection svgComponent={<SettingsFilled currentColor={theme === "dark" ? "#999A9A" : "#C6C4C2"} width={"66px"} height={"66px"} />} text={"Settings"} />
+                <RightSideSection svgComponent={<SettingsFilled currentColor={theme === "dark" ? "#999A9A" : "#C6C4C2"} className={"w-16.5 h-16.5 max-md:w-12 max-md:h-12"} />} text={"Settings"} />
 
 
             </div>

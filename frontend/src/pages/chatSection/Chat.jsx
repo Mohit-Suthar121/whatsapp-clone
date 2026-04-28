@@ -102,7 +102,9 @@ const Chat = () => {
 
     return (
         <div className='w-full flex h-screen'>
-            <div className={`maincontent max-md:w-full  md:min-w-115 h-full flex flex-col border-r ${theme === "dark" ? "border-r-[#2E2F2F]" : "border-r-[#DEDCDA]"} ${theme === "dark" ? "bg-[#161717]" : "bg-[#FFFFFF]"}`} >
+
+
+            <div className={`${userClick && " max-sm:hidden"} maincontent max-md:w-full  md:min-w-115 h-full flex flex-col border-r ${theme === "dark" ? "border-r-[#2E2F2F]" : "border-r-[#DEDCDA]"} ${theme === "dark" ? "bg-[#161717]" : "bg-[#FFFFFF]"}`} >
                 <div className='headers p-4 w-full h-16 justify-between flex items-center'>
                     <div className={`name ${theme === "dark" ? "text-white" : "text-[#1DAA61]"} font-semibold tracking-tighter text-2xl`}>
                         WhatsApp
@@ -161,6 +163,8 @@ const Chat = () => {
                 </div>
 
             </div>
+
+            
 
             {userClick && <UserConversation
                 isOnline={onlineUsers.get(isActiveCard.id)}

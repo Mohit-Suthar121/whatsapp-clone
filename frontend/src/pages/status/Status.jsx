@@ -92,8 +92,7 @@ const Status = () => {
     return (
         <div className='w-full h-full '>
              <div className='flex w-full h-full'>
-
-                <div className={` maincontent w-115 h-full flex flex-col border-r ${theme === "dark" ? "border-r-[#2E2F2F]" : "border-r-[#DEDCDA]"} ${theme === "dark" ? "bg-[#161717]" : "bg-[#ffffff]"}`}>
+                <div className={` maincontent max-md:w-full md:min-w-115 h-full flex flex-col border-r ${theme === "dark" ? "border-r-[#2E2F2F]" : "border-r-[#DEDCDA]"} ${theme === "dark" ? "bg-[#161717]" : "bg-[#ffffff]"}`}>
 
                     
 
@@ -137,7 +136,7 @@ const Status = () => {
                     </div>
                 </div>
 
-                <RightSideSection svgComponent={<StatusFilled currentColor={theme === "dark" ? "#999A9A" : "#C6C4C2"} width={"66px"} height={"66px"} />} text={"Share Status Updates"} />
+                <RightSideSection svgComponent={<StatusFilled currentColor={theme === "dark" ? "#999A9A" : "#C6C4C2"} className={"w-16.5 h-16.5 max-md:w-12 max-md:h-12"} />} text={"Share Status Updates"} />
             </div>
 
 
