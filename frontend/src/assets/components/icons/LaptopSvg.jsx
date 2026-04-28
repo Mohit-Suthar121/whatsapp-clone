@@ -1,8 +1,8 @@
 import React from 'react'
 
-const LaptopSvg = () => {
+const LaptopSvg = (className) => {
   return (
-   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 156 132" width="156" height="132">
+   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 156 132" className={className} >
   <defs>
     <clipPath id="lottie_element_2">
       <rect width="156" height="132" x="0" y="0" />

@@ -102,7 +102,7 @@ const Chat = () => {
 
     return (
         <div className='w-full flex h-full'>
-            <div className={`  maincontent w-115 h-full flex flex-col border-r ${theme === "dark" ? "border-r-[#2E2F2F]" : "border-r-[#DEDCDA]"} ${theme === "dark" ? "bg-[#161717]" : "bg-[#FFFFFF]"}`} >
+            <div className={`maincontent max-md:w-full  md:min-w-115 h-full flex flex-col border-r ${theme === "dark" ? "border-r-[#2E2F2F]" : "border-r-[#DEDCDA]"} ${theme === "dark" ? "bg-[#161717]" : "bg-[#FFFFFF]"}`} >
                 <div className='headers p-4 w-full h-16 justify-between flex items-center'>
                     <div className={`name ${theme === "dark" ? "text-white" : "text-[#1DAA61]"} font-semibold tracking-tighter text-2xl`}>
                         WhatsApp
@@ -173,11 +173,11 @@ const Chat = () => {
             />
             }
 
-            {!userClick && <div className={`right-side-section flex-1 flex justify-center items-center ${theme === "dark" ? "bg-[#161717]" : "bg-[#F7F5F3]"}`}>
+            {!userClick && <div className={`max-sm:hidden right-side-section flex-1 flex justify-center items-center ${theme === "dark" ? "bg-[#161717]" : "bg-[#F7F5F3]"}`}>
                 <div className="content flex flex-col ">
-                    <div className={`box1 w-88 h-91 rounded-2xl ${theme === "dark" ? "bg-[#1D1F1F]" : "bg-white"} flex items-center flex-col gap-12 p-4`}>
-                        <LaptopSvg />
-                        <div className={`${theme === "dark" ? "text-white" : "text-black"} text-2xl font-bold w-full flex justify-center items-center  text-center`}>Select a Conversation to Start Chatting</div>
+                    <div className={`box1 max-w-88 max-h-91  rounded-2xl ${theme === "dark" ? "bg-[#1D1F1F]" : "bg-white"} flex items-center flex-col gap-12 p-4`}>
+                        <LaptopSvg   />
+                        <div className={`${theme === "dark" ? "text-white" : "text-black"} max-md:text-base max-md:font-semibold text-2xl font-bold w-full flex justify-center items-center  text-center`}>Select a Conversation to Start Chatting</div>
                     </div>
                 </div>
             </div>}
