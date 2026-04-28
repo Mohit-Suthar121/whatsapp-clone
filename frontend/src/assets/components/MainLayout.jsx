@@ -32,10 +32,10 @@ const MainLayout = () => {
 
 
   return (
-    <div className='main-container flex w-full h-screen bg-red-400'>
+    <div className='main-container flex w-full h-screen'>
       {/* <SideBar  setIsActive={setIsActive} isActive={isActive}/> */}
       <SideBar />
-      <div className="childContent flex-1 h-full">
+      <div className="childContent flex-1 h-screen">
         <Outlet />
       </div>
 

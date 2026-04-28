@@ -25,10 +25,11 @@ const SideBar = () => {
 
     // console.log("The conversations are ")
     return (
-        <div className={`sidebar w-16 h-full border-r ${theme === "dark" ? "border-r-[#2E2F2F]" : "border-r-[#DEDCDA]"} ${theme === "dark" ? "bg-[#1D1F1F]" : "bg-[#f7f5f3]"} flex flex-col gap-2`}>
-            <div className="logos flex h-full flex-col justify-between items-center p-4" >
+        <div className={`max-sm:fixed max-sm:bottom-0  max-sm:h-16 max-sm:w-full max-sm:flex-row max-sm:flex max-sm:items-center sidebar w-16 h-screen border-r ${theme === "dark" ? "border-r-[#2E2F2F]" : "border-r-[#DEDCDA]"} ${theme === "dark" ? "bg-[#1D1F1F]" : "bg-[#f7f5f3]"} flex flex-col gap-2`}>
+            
+            <div className="logos flex h-full flex-col justify-between items-center p-4 max-sm:flex-row max-sm:justify-around max-sm:w-full" >
 
-                <div className="upperlogos flex flex-col justify-center gap-1">
+                <div className="max-sm:contents upperlogos flex flex-col max-sm:flex-row justify-center gap-1">
 
                     <div className="chatbox relative group"  onClick={() => { navigate("/") }}>
                         <CircledButton notification={true} isActive={isActive("/")} svg={<ChatSvg currentColor={theme === "dark" ? "#A9AAAA" : "#5E5D5C"} />} filledSvg={<ChatFilled />}/>
@@ -45,7 +46,7 @@ const SideBar = () => {
 
 
 
-                <div className="bottomlogos flex flex-col items-center gap-2" >
+                <div className="max-sm:contents bottomlogos flex flex-col max-sm:flex-row items-center gap-2" >
 
                     <div className="settingsButton" onClick={()=>{navigate("/settings")}}>
                         <CircledButton notification={false} isActive={isActive("/settings")} svg={<SettingsIcon currentColor={theme === "dark" ? "#999A9A" : "#5E5D5C"} />} filledSvg={<SettingsFilled currentColor={theme === "dark" ? "white" : "black"} />} />
