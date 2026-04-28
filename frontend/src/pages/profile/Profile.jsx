@@ -1,25 +1,31 @@
-import {  useState } from 'react'
+import { useState } from 'react'
 import UserSelfInfo from '../../assets/components/UserSelfInfo'
 import AccountFilledSvg from '../../assets/components/icons/Account_filled'
 import RightSideSection from '../../assets/components/RightSideSection'
 import { useThemeStore } from '../../../store/useThemeStore'
 import { useUserStore } from '../../../store/useUserStore'
 import { updateProfile } from '../../../services/user.service'
+import CameraIcon from '../../assets/components/icons/CameraIcon'
+import { notifyFailure, notifySuccess } from '../../../utils/Toasts'
+import { TailSpin } from 'react-loader-spinner'
 const Profile = () => {
   const { theme } = useThemeStore();
-  const { user } = useUserStore();
+  const { user,setUser } = useUserStore();
   const [isEditing, setIsEditing] = useState("");
   const [inputText, setInputText] = useState({
     username: "",
     about: ""
   });
-  const [userData,setUserData] = useState({
-    username:user?.username,
-    about:user?.about,
-    phonNo:user?.phoneNo,
-    email:user?.email
+  const [userData, setUserData] = useState({
+    username: user?.username,
+    about: user?.about,
+    phonNo: user?.phoneNo,
+    email: user?.email
   })
 
+  const [imageFile, setImageFile] = useState();
+  const [imagePreviewUrl, setImagePreviewUrl] = useState("");
+  const [isLoading,setIsLoading] = useState(false);
   function handleInputChange(e, key) {
     setInputText(prev => ({ ...prev, [key]: e.target.value }))
   }
@@ -50,7 +56,7 @@ const Profile = () => {
       about
     }
     console.log(data);
-    setUserData(prev=>({...prev,[key]:inputText[key]}))
+    setUserData(prev => ({ ...prev, [key]: inputText[key] }))
     setIsEditing("");
     setInputText({
       username: "",
@@ -60,6 +66,39 @@ const Profile = () => {
 
     console.log("The response after updating the profile is: ", response);
   }
+
+
+  async function handleUpdateProfilePicture(e) {
+    try {
+      
+      const newImageFile = e.target.files[0];
+      if(!newImageFile) return;
+      if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
+      const imageUrl = URL.createObjectURL(newImageFile);
+      setImageFile(newImageFile);
+      setImagePreviewUrl(imageUrl)
+      const formData = new FormData()
+      formData.append("media", newImageFile);
+
+      setIsLoading(true);
+      const response = await updateProfile(formData);
+      console.log("The response after the uploadation of the form is: ", response.data);
+      let updatedUser = response.data;
+      setUser(updatedUser);
+      
+
+      console.log("The updated user is: ",updatedUser)
+      notifySuccess("Profile Picture updated Successfully")
+
+    } catch (error) {
+      console.error("some error occured during updation of profile Picture: ", error)
+      notifyFailure("Some error occured updating the profile picture!")
+    }finally{
+
+      setIsLoading(false);
+    }
+  }
+
 
 
   return (
@@ -72,13 +111,34 @@ const Profile = () => {
             Profile
           </div>
 
-          <div className='flex justify-center items-center w-full'>
+
+          <div className='flex justify-center items-center w-full relative'>
 
             <div className={`profilepicture w-32 h-32 rounded-full`}>
-              <img className='w-full h-full rounded-full' src={user?.profilePicture} alt="" />
+             {!isLoading && <img className='w-full h-full rounded-full' src={ user?.profilePicture} alt="" />}
+             {isLoading && <TailSpin
+                visible={true}
+                height="80"
+                width="80"
+                color="#4fa94d"
+                ariaLabel="tail-spin-loading"
+                radius="1"
+                wrapperStyle={{}}
+                wrapperClass=""
+              />}
+
             </div>
 
+            {!isLoading && <label onChange={handleUpdateProfilePicture} htmlFor="profilePicture" className={`absolute bottom-0 translate-y-[50%] w-24 h-12 rounded-full ${theme === "dark" ? "bg-[#101010]" : "bg-[white]"} flex items-center p-4 gap-2 cursor-pointer `}>
+
+              <input className='hidden' type="file" name="" id="profilePicture" />
+              <CameraIcon currentColor={"#21C063"} />
+              <span className='text-[#21C063]'>Edit</span>
+
+            </label>}
           </div>
+
+
 
         </div>
 
