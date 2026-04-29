@@ -159,7 +159,7 @@ const userAuthenticated = async (req, res) => {
 const logout = (req, res) => {
     try {
 
-        res.clearCookie("auth_token", { httpOnly: true, secure: true });
+        res.clearCookie("auth_token", { httpOnly: true, secure: true,sameSite:"None" });
         return response(res, "Logged out successfully!", 200);
     } catch (error) {
         return response(res, "Internal server error!", 500)
