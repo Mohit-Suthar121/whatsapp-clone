@@ -178,7 +178,7 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId, conv
 
                
 
-                <div className={`profile-nav sticky top-0  w-full ${theme === "dark" ? "bg-[#161717]" : "bg-white"} p-2 pl-4 pr-4`}>
+                <div className={`profile-nav sticky top-0 z-10  w-full ${theme === "dark" ? "bg-[#161717]" : "bg-white"} p-2 pl-4 pr-4`}>
                
 
                     <div className="userProfile flex text-white w-full gap-4 shrink-0 cursor-pointer items-center">
@@ -220,9 +220,9 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId, conv
                 </div>
 
 
-                <div className="scrollwrapper flex-1 overflow-y-auto w-full ">
+                <div className="scrollwrapper flex-1 flex overflow-y-auto w-full ">
 
-                    <div className="messagesBox h-full w-full flex flex-col justify-end gap-2 pr-10 pb-5 pl-10">
+                    <div className="messagesBox max-h-full border w-full flex flex-col justify-end  gap-2 pr-10 pb-5 pl-10">
                         {messages.map(message => (<MessageBubble2 handleDeleteMessage={handleDeleteMessage} messageStatusIcon={senderId === message.sender?._id ? returnMessageStatus(message) : ""} messageId={message._id} key={message._id} isMe={senderId === message.sender?._id ? true : false} message={message.content} time={formatLiveChatTimeStamp(message.createdAt)} image={message?.media?.url} />))}
 
                         <div ref={scrollRef}></div>
