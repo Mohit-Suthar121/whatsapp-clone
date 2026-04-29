@@ -102,7 +102,8 @@ const verifyOtp = async (req, res) => {
         res.cookie("auth_token", token, {
             httpOnly: true,
             secure: true,
-            maxAge: 365 * 24 * 60 * 60 * 1000
+            maxAge: 365 * 24 * 60 * 60 * 1000,
+            sameSite:"None"
         })
         await user.save();
         return response(res, "Phone number verified successfully!", 200, { user })
@@ -134,7 +135,7 @@ const updateProfile = async (req, res) => {
         await user.save();
         return response(res, "profile updated successfully!", 200, user)
     } catch (error) {
-        console.    log("some error occured in the authController updateProfile!", error)
+        console.log("some error occured in the authController updateProfile!", error)
         return response(res, "Internal server error!", 500)
     }
 }
