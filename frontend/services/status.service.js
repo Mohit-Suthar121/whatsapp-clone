@@ -8,6 +8,7 @@ export const uploadStatus = async(data)=>{
                 "Content-Type":"multipart/form-data"
             }
         });
+        
         return response.data
     } catch (error) {
         throw error.reponse?error.response.data:error.message

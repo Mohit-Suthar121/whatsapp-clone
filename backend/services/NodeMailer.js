@@ -1,26 +1,29 @@
-import nodemailer from 'nodemailer';
+// import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
-const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false,
-    requireTLS: true,
-    family: 4,  
-    auth: {
-        pass: process.env.GMAIL_PASS,
-        user: process.env.GMAIL_USER
-    }
-});
+// const transporter = nodemailer.createTransport({
+//     host: "smtp.gmail.com",
+//     port: 587,
+//     secure: false,
+//     requireTLS: true,
+//     family: 4,  
+//     auth: {
+//         pass: process.env.GMAIL_PASS,
+//         user: process.env.GMAIL_USER
+//     }
+// });
 
-(async () => {
-    try {
-        await transporter.verify()
-        console.log("gmail configuration succesfull and ready to be used!!")
-    }
-    catch (error) {
-        console.error("gmail configuration failed!", error.message)
-    }
-})()
+const resend = new Resend(process.env.RESEND_API_KEY)
+
+// (async () => {
+//     try {
+//         await transporter.verify()
+//         console.log("gmail configuration succesfull and ready to be used!!")
+//     }
+//     catch (error) {
+//         console.error("gmail configuration failed!", error.message)
+//     }
+// })()
 
 
 
@@ -57,8 +60,8 @@ export const sendOtpToEmail = async (email, otp) => {
 
 
     try {
-        await transporter.sendMail({
-            from: process.env.GMAIL_USER,
+        await resend.emails.send({
+            from: "onboarding@resend.dev",
             to: email,
             subject: "Email otp",
             html
