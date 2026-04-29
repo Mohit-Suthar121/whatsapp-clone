@@ -1,10 +1,12 @@
 import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
-    service: "gmail",
+    host: "smtp-relay.brevo.com",
+  port: 587,
+  secure: false,
     auth: {
-        pass: process.env.GMAIL_PASS,
-        user: process.env.GMAIL_USER
+        pass: process.env.BREVO_SMTP_KEY,
+        user: process.env.BREVO_SMTP_USER
     }
 });
 
@@ -54,7 +56,7 @@ export const sendOtpToEmail = async (email, otp) => {
 
     try {
         await transporter.sendMail({
-            from: process.env.GMAIL_USER,
+            from: process.env.BREVO_SMTP_USER,
             to: email,
             subject: "Email otp",
             html
