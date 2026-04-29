@@ -164,10 +164,11 @@ const Chat = () => {
 
             </div>
 
-            
+
 
             {userClick && <UserConversation
-                isOnline={onlineUsers.get(isActiveCard.id)}
+                setUserClick={setUserClick}
+                isOnline={onlineUsers.get(isActiveCard.id)}  
                 conversationId={isActiveCard.conversationId}
                 receiverId={isActiveCard.id}
                 profilePicture={isActiveCard.profilePicture}

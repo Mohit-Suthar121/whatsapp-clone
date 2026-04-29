@@ -21,9 +21,11 @@ import { getSocket } from '../../../services/chat.service'
 import { FcDocument, } from "react-icons/fc";
 import { MdPermMedia } from "react-icons/md";
 import CloseIcon from './icons/CloseIcon'
+import ArrowBackward from './icons/ArrowBackward'
+import GoBackArrow from './icons/GoBackArrow'
 
  
-const UserConversation = ({ profilePicture, username, lastSeen, receiverId, conversationId, senderId, isOnline }) => {
+const UserConversation = ({ profilePicture, username, lastSeen, receiverId, conversationId, senderId, isOnline,setUserClick }) => {
     const { theme } = useThemeStore();
     const scrollRef = useRef();
     const [messageContent, setMessageContent] = useState("");
@@ -174,18 +176,28 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId, conv
 
             <div className={`relative z-1 right-side-section w-full h-full  flex-1 flex flex-col ${theme === "dark" ? "bg-[#161717f4]" : "bg-[#f5f1ebed]"}`}>
 
+               
+
                 <div className={`profile-nav w-full ${theme === "dark" ? "bg-[#161717]" : "bg-white"} p-2 pl-4 pr-4`}>
 
-                    <div className="userProfile flex text-white w-full gap-4 shrink-0 cursor-pointer">
+                     
+
+                    <div className="userProfile flex text-white w-full gap-4 shrink-0 cursor-pointer items-center">
+
+                        <div onClick={()=>{setUserClick(false)}} className={`backButton hidden justify-center items-center max-sm:flex`}>
+                            <GoBackArrow currentColor={"white"}/>
+                        </div>
 
                         <div className="userImage w-12.5 h-12.5 rounded-full shrink-0">
                             <img className='w-full h-full rounded-full' src={profilePicture} alt="" />
                         </div>
 
 
+                            
                         <div className="userInfo flex justify-between items-center flex-1  min-w-0 " >
 
                             <div className="textDetails w-full overflow-x-hidden text-ellipsis whitespace-nowrap">
+                                
                                 <h3 className={`text-lg font-semibold ${theme === "dark" ? "text-white" : "text-black"}`}>{username}</h3>
                                 {isTyping ? <p className='text-sm text-green-500 font-semibold w-full overflow-x-hidden text-ellipsis whitespace-nowrap'>Typing...</p> : <p className='text-sm text-gray-400 font-semibold w-full overflow-x-hidden text-ellipsis whitespace-nowrap'> {getDisplayStatus()}</p>}
 
