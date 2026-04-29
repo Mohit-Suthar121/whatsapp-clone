@@ -17,8 +17,7 @@ const server = http.createServer(app)
 
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://whatsapp-clone-rouge-eight.vercel.app",
-  "http://10.155.210.213:5173"
+  "https://whatsapp-clone-rouge-eight.vercel.app"
 ]
 
 app.use(cors({
