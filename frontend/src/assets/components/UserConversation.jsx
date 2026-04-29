@@ -1,113 +1,398 @@
-import React from 'react'
+// import React from 'react'
 
-import VideoCall from '../../assets/components/icons/VideoCall'
-import AddIcon from '../../assets/components/icons/AddIcon'
-import EmojiIcon from '../../assets/components/icons/EmojiIcon'
-import MicIcon from '../../assets/components/icons/MicIcon'
-import TextareaAutosize from 'react-textarea-autosize';
-import SendIcon from './icons/SendIcon'
-import { useThemeStore } from '../../../store/useThemeStore'
-import { useRef, useState, useEffect } from 'react'
-import ThreeDots from '../../assets/components/icons/ThreeDots'
-import { deleteMessage, getMessages, sendMessage } from '../../../services/message.service'
-import { formatLiveChatTimeStamp } from '../../../utils/TimeFormatter'
-import { useChatStore } from '../../../store/chat.store'
-import MessageBubble2 from './MessageBubble2'
-import DeliveredIcon from './icons/DeliveredIcon'
-import MessageSentTickIcon from './icons/MessageSentTickIcon'
-import PendingMessageIcon from './icons/PendingMessageIcon'
-import { getSocket } from '../../../services/chat.service'
-// import { markMessagesAsRead as markMessagesAsReadApi } from '../../../services/chat.service'
-import { FcDocument, } from "react-icons/fc";
-import { MdPermMedia } from "react-icons/md";
-import CloseIcon from './icons/CloseIcon'
-import ArrowBackward from './icons/ArrowBackward'
-import GoBackArrow from './icons/GoBackArrow'
+// import VideoCall from '../../assets/components/icons/VideoCall'
+// import AddIcon from '../../assets/components/icons/AddIcon'
+// import EmojiIcon from '../../assets/components/icons/EmojiIcon'
+// import MicIcon from '../../assets/components/icons/MicIcon'
+// import TextareaAutosize from 'react-textarea-autosize';
+// import SendIcon from './icons/SendIcon'
+// import { useThemeStore } from '../../../store/useThemeStore'
+// import { useRef, useState, useEffect } from 'react'
+// import ThreeDots from '../../assets/components/icons/ThreeDots'
+// import { deleteMessage, getMessages, sendMessage } from '../../../services/message.service'
+// import { formatLiveChatTimeStamp } from '../../../utils/TimeFormatter'
+// import { useChatStore } from '../../../store/chat.store'
+// import MessageBubble2 from './MessageBubble2'
+// import DeliveredIcon from './icons/DeliveredIcon'
+// import MessageSentTickIcon from './icons/MessageSentTickIcon'
+// import PendingMessageIcon from './icons/PendingMessageIcon'
+// import { getSocket } from '../../../services/chat.service'
+// // import { markMessagesAsRead as markMessagesAsReadApi } from '../../../services/chat.service'
+// import { FcDocument, } from "react-icons/fc";
+// import { MdPermMedia } from "react-icons/md";
+// import CloseIcon from './icons/CloseIcon'
+// import ArrowBackward from './icons/ArrowBackward'
+// import GoBackArrow from './icons/GoBackArrow'
 
  
-const UserConversation = ({ profilePicture, username, lastSeen, receiverId, conversationId, senderId, isOnline,setUserClick }) => {
+// const UserConversation = ({ profilePicture, username, lastSeen, receiverId, conversationId, senderId, isOnline,setUserClick }) => {
+//     const { theme } = useThemeStore();
+//     const scrollRef = useRef();
+//     const [messageContent, setMessageContent] = useState("");
+//     const [isEmpty, setIsEmpty] = useState(true);
+//     const { messages, setMessages, setOptimisticMessage, updateMessageStatus, typingUsers } = useChatStore();
+//     const isTyping = typingUsers.get(conversationId) === receiverId;
+//     const socket = getSocket();
+//     const [showMenu, setShowMenu] = useState(false);
+//     const [imagePreviewUrl,setImagePreviewUrl] = useState("");
+//     const [imageFile,setImageFile] = useState();
+
+
+//     async function handleFileUpload(e){
+//         setShowMenu(false);
+//         setIsEmpty(false);
+//         const file = e.target.files[0];
+//         if(!file) return;
+//         setImageFile(file); // saving the file in a state so that we can send it to coudinary
+//         if(imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
+//         const imageUrl = URL.createObjectURL(file);
+//         setImagePreviewUrl(imageUrl);
+//     }
+
+//     async function handleCancelUpload(){
+//         setImageFile(null);
+//         setImagePreviewUrl("");
+//     }
+
+//     async function handleDeleteMessage(messageId){
+//         try {
+//             const response = await deleteMessage(messageId);
+//             console.log("The message has been deleted: ",response);
+//         } catch (error) {
+//             console.error("Some error occured deleting the message: ",error)
+//         }
+//     }
+//     useEffect(()=>{
+//         console.log("All of the messages are: ",messages)
+//     },[messages])
+
+
+//     const getDisplayStatus = () => {
+
+//         if (isOnline && isOnline === "online") {
+//             return isOnline
+//         }
+//         if (isOnline && isOnline !== "online") {
+//             return `last seen at ${formatLiveChatTimeStamp(isOnline)}`
+//         }
+//         if (lastSeen) {
+//             return `last seen at ${formatLiveChatTimeStamp(lastSeen)}`
+//         }
+//     }
+
+//     function handleTextArea(e) {
+//         setMessageContent(e.target.value);
+//         if (e.target.value.trim() !== "" || imageFile) {
+//             setIsEmpty(false)
+//         }
+//         else setIsEmpty(true);
+//         if (!socket || !conversationId) return;
+//         socket.emit("typing_start", { conversationId, receiverId });
+//     }
+
+
+//     function returnMessageStatus(message) {
+//         if (message.messageStatus === "read") return <DeliveredIcon currentColor={"#53bdeb"} />
+//         else if (message.messageStatus === "delivered") return <DeliveredIcon currentColor={"#8FABA0"} />
+//         else if (message.messageStatus === "pending") return <PendingMessageIcon currentColor={"#8FABA0"} />
+//         else return <MessageSentTickIcon currentColor={"#8FABA0"} />
+//     }
+
+
+    
+//     async function handleSendMessage(receiverId) {
+//         if (!messageContent.trim() && !imageFile) return;
+//         const clientId = Date.now().toString();
+//         const socket = getSocket();
+//         //stopping the typing... name
+//         socket.emit("typing_stop", { conversationId, receiverId })
+
+//         // a temprary message to save to the store for instant preview
+//         const optimisticMessage = {
+//             _id: clientId,
+//             clientId,
+//             content: messageContent,
+//             messageStatus: "pending",
+//             sender: { _id: senderId },
+//             receiver: { _id: receiverId },
+//             createdAt: new Date().toISOString(),
+//             media: imagePreviewUrl? {
+//                 url:imagePreviewUrl
+//             }:null
+//         }
+
+//         setOptimisticMessage(optimisticMessage);
+
+
+//         try {
+//             const formData = new FormData();
+//             formData.append("content",messageContent)
+//             // const content = messageContent;
+//             setMessageContent("");
+//             setIsEmpty(true)
+//             setImageFile(null);
+//             setImagePreviewUrl("")
+//             formData.append("receiverId",receiverId);
+//             formData.append("media",imageFile)
+//             const response = await sendMessage(formData);
+//             await updateMessageStatus(response.data, clientId)
+
+//         } catch (error) {
+//             console.error("Some error occured while sending the message", error);
+//         }
+//     }
+
+
+
+//     // fetching all the messages of a conversation through mongoDb and insert it to zustand store
+//     async function getUserMessages() {
+//         try {
+//             if (!conversationId) {
+//                 setMessages([]);
+//                 return;
+//             }
+//             const response = await getMessages(conversationId);
+//             setMessages(response.data)
+//         } catch (error) {
+//             console.error("Some error occured while getting the user messages")
+//         }
+//     }
+
+
+
+//     useEffect(() => {
+//         getUserMessages();
+//     }, [conversationId, setMessages])
+
+
+//     useEffect(() => {
+//         scrollRef.current.scrollIntoView({ behavior: "smooth" })
+//     }, [messages])
+
+
+//     return (
+//         <div className="flex-1 border relative">
+//             <div className="backgroundWrapper"></div>
+
+//             <div className={`relative z-1 right-side-section pb-4 w-full h-dvh flex-1 flex flex-col ${theme === "dark" ? "bg-[#161717f4]" : "bg-[#f5f1ebed]"}`}>
+
+               
+
+//                 <div className={`profile-nav sticky top-0 z-10  w-full ${theme === "dark" ? "bg-[#161717]" : "bg-white"} p-2 pl-4 pr-4`}>
+               
+
+//                     <div className="userProfile flex text-white w-full gap-4 shrink-0 cursor-pointer items-center">
+
+//                         <div onClick={()=>{setUserClick(false)}} className={`backButton hidden justify-center items-center max-sm:flex`}>
+//                             <GoBackArrow currentColor={"white"}/>
+//                         </div>
+
+//                         <div className="userImage w-12.5 h-12.5 rounded-full shrink-0">
+//                             <img className='w-full h-full rounded-full' src={profilePicture} alt="" />
+//                         </div>
+
+
+                            
+//                         <div className="userInfo flex justify-between items-center flex-1  min-w-0 " >
+
+//                             <div className="textDetails w-full overflow-x-hidden text-ellipsis whitespace-nowrap">
+                                
+//                                 <h3 className={`text-lg font-semibold ${theme === "dark" ? "text-white" : "text-black"}`}>{username}</h3>
+//                                 {isTyping ? <p className='text-sm text-green-500 font-semibold w-full overflow-x-hidden text-ellipsis whitespace-nowrap'>Typing...</p> : <p className='text-sm text-gray-400 font-semibold w-full overflow-x-hidden text-ellipsis whitespace-nowrap'> {getDisplayStatus()}</p>}
+
+
+//                             </div>
+
+//                             <div className="videocall-and-other flex items-center">
+//                                 <div className="videocall w-12 h-12 rounded-full justify-center items-center hover:bg-[#2E2F2F] p-2 font-semibold text-white flex gap-2">
+//                                     <VideoCall />
+//                                 </div>
+//                                 <div className="threeDots flex justify-center items-center p-2 hover:bg-[#292A2A] rounded-full w-10 h-10 ">
+//                                     <ThreeDots />
+//                                 </div>
+//                             </div>
+
+
+//                         </div>
+
+//                     </div>
+
+//                 </div>
+
+
+//                 <div className="scrollwrapper flex-1 overflow-y-auto w-full ">
+
+//                     <div className="messagesBox max-h-full  w-full flex flex-col justify-end  gap-2 pr-10 pb-5 pl-10">
+//                         {messages.map(message => (<MessageBubble2 handleDeleteMessage={handleDeleteMessage} messageStatusIcon={senderId === message.sender?._id ? returnMessageStatus(message) : ""} messageId={message._id} key={message._id} isMe={senderId === message.sender?._id ? true : false} message={message.content} time={formatLiveChatTimeStamp(message.createdAt)} image={message?.media?.url} />))}
+
+//                         <div ref={scrollRef}></div>
+//                     </div>
+
+
+//                 </div>
+
+
+//                {imageFile && <div className={`absolute mx-auto left-[50%] -translate-x-[50%] w-[95%] p-6 bottom-20 ${theme === 'dark' ? "bg-[#1D1F1F]" : "bg-[#F7F5F3]"} rounded-xl flex justify-center items-center `}>
+//                     <img className='w-auto h-auto object-none object-center' src={imagePreviewUrl} alt="" />
+//                     <div onClick={handleCancelUpload} className="crossButton rounded-full p-2 w-10 h-10 hover:bg-[#ff858532] flex justify-center items-center cursor-pointer absolute top-2 right-2"> <CloseIcon currentColor={"#ff5858"}/> </div>
+//                 </div>}
+
+
+//                 <div className=" inputWrapper pl-4 pr-4 pb-3 w-full min-h-13 flex">
+
+//                     <div className={` inputbox w-full h-full flex items-center p-2  ${theme === "dark" ? "bg-[#242626] text-white" : "bg-white text-black"} rounded-4xl`}>
+//                         <div onClick={() => { setShowMenu(!showMenu) }} className={`relative addIcon flex justify-center items-center p-2  ${theme === "dark" ? "hover:bg-[#393B3B]" : "hover:bg-[#F6F5F4]"} rounded-full w-10 h-10 self-end cursor-pointer`}>
+//                             <AddIcon />
+
+//                         </div>
+
+//                         {showMenu && <div className={`absolute -translate-y-[90%]  rounded-xl border border-[#2E2F2F] ${theme === "dark" ? "bg-[#161717] text-white" : "bg-white text-black"} p-2 flex flex-col gap-1`}>
+
+//                             <div onClick={() => { setShowMenu(false) }} className={`document flex gap-2 items-center p-2 w-full rounded-lg ${theme === "dark" ? "hover:bg-[#2E2F2F]" : "hover:bg[#F6F5F4]   "} cursor-pointer `}><FcDocument className=' w-6 h-6' /> <span className='text-sm'>Document</span></div>
+
+//                             <label htmlFor="fileUpload">
+//                                 <div className={`file flex gap-2 items-center p-2 w-full  rounded-lg ${theme === "dark" ? "hover:bg-[#2E2F2F]" : "hover:bg[#F6F5F4]"} cursor-pointer `}><MdPermMedia fill='blue' className=' w-6 h-6 shrink-0' />  <span className='text-sm whitespace-nowrap'>Photos and Videos</span> </div>
+//                                 <input onChange={handleFileUpload} type="file" name="" id="fileUpload" className='hidden' />
+//                             </label>
+//                         </div>}
+
+
+
+
+
+
+//                         <div className={`cursor-pointer emojiIcon flex justify-center items-center p-2 ${theme === "dark" ? "hover:bg-[#393B3B]" : "hover:bg-[#F6F5F4]"} rounded-full w-10 h-10 self-end`}>
+//                             <EmojiIcon currentColor={theme === "dark" ? "white" : "black"} />
+//                         </div>
+
+
+
+//                         <TextareaAutosize
+//                             minRows={1}
+//                             maxRows={5}
+//                             placeholder="Type a message"
+//                             className={`whatsapp-input resize-none flex-1 ${theme === "dark" ? "bg-[#242626] text-white caret-white" : "bg-white text-black caret-black"} p-2 max-h-47 focus:outline-none `}
+//                             onChange={handleTextArea}
+//                             value={messageContent}
+//                         />
+
+
+//                         {isEmpty && <div role='textbox' className={`cursor-pointer micIcon flex justify-center items-center p-2 ${theme === "dark" ? "hover:bg-[#393B3B]" : "hover:bg-[#F6F5F4]"} rounded-full w-10 h-10 self-end`}>
+//                             <MicIcon currentColor={theme === "dark" ? "white" : "black"} />
+//                         </div>}
+
+//                         {!isEmpty && <div role='textbox' onClick={() => {
+//                             handleSendMessage(receiverId)
+//                         }} className=" flex justify-center items-center p-2 hover:bg-[#21C063] rounded-full w-10 h-10 self-end bg-[#37C572] cursor-pointer">
+//                             <SendIcon />
+//                         </div>}
+//                     </div>
+//                 </div>
+
+
+
+//             </div>
+//         </div>
+
+//     )
+// }
+
+// export default UserConversation
+
+import React, { useRef, useState, useEffect } from 'react';
+import TextareaAutosize from 'react-textarea-autosize';
+import { FcDocument } from "react-icons/fc";
+import { MdPermMedia } from "react-icons/md";
+
+// Icons & Services (Assuming these paths are correct as per your snippet)
+import VideoCall from '../../assets/components/icons/VideoCall';
+import AddIcon from '../../assets/components/icons/AddIcon';
+import EmojiIcon from '../../assets/components/icons/EmojiIcon';
+import MicIcon from '../../assets/components/icons/MicIcon';
+import SendIcon from './icons/SendIcon';
+import ThreeDots from '../../assets/components/icons/ThreeDots';
+import CloseIcon from './icons/CloseIcon';
+import GoBackArrow from './icons/GoBackArrow';
+import DeliveredIcon from './icons/DeliveredIcon';
+import MessageSentTickIcon from './icons/MessageSentTickIcon';
+import PendingMessageIcon from './icons/PendingMessageIcon';
+import MessageBubble2 from './MessageBubble2';
+
+// Stores & Utilities
+import { useThemeStore } from '../../../store/useThemeStore';
+import { useChatStore } from '../../../store/chat.store';
+import { deleteMessage, getMessages, sendMessage } from '../../../services/message.service';
+import { formatLiveChatTimeStamp } from '../../../utils/TimeFormatter';
+import { getSocket } from '../../../services/chat.service';
+
+const UserConversation = ({ profilePicture, username, lastSeen, receiverId, conversationId, senderId, isOnline, setUserClick }) => {
     const { theme } = useThemeStore();
     const scrollRef = useRef();
     const [messageContent, setMessageContent] = useState("");
     const [isEmpty, setIsEmpty] = useState(true);
     const { messages, setMessages, setOptimisticMessage, updateMessageStatus, typingUsers } = useChatStore();
+    
     const isTyping = typingUsers.get(conversationId) === receiverId;
     const socket = getSocket();
+    
     const [showMenu, setShowMenu] = useState(false);
-    const [imagePreviewUrl,setImagePreviewUrl] = useState("");
-    const [imageFile,setImageFile] = useState();
+    const [imagePreviewUrl, setImagePreviewUrl] = useState("");
+    const [imageFile, setImageFile] = useState(null);
 
+    // Auto-scroll to bottom when messages change
+    useEffect(() => {
+        scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [messages]);
 
-    async function handleFileUpload(e){
+    // Fetch messages
+    useEffect(() => {
+        const getUserMessages = async () => {
+            try {
+                if (!conversationId) {
+                    setMessages([]);
+                    return;
+                }
+                const response = await getMessages(conversationId);
+                setMessages(response.data);
+            } catch (error) {
+                console.error("Error getting messages", error);
+            }
+        };
+        getUserMessages();
+    }, [conversationId, setMessages]);
+
+    async function handleFileUpload(e) {
         setShowMenu(false);
-        setIsEmpty(false);
         const file = e.target.files[0];
-        if(!file) return;
-        setImageFile(file); // saving the file in a state so that we can send it to coudinary
-        if(imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
-        const imageUrl = URL.createObjectURL(file);
-        setImagePreviewUrl(imageUrl);
+        if (!file) return;
+        setIsEmpty(false);
+        setImageFile(file);
+        if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
+        setImagePreviewUrl(URL.createObjectURL(file));
     }
 
-    async function handleCancelUpload(){
+    async function handleCancelUpload() {
         setImageFile(null);
         setImagePreviewUrl("");
-    }
-
-    async function handleDeleteMessage(messageId){
-        try {
-            const response = await deleteMessage(messageId);
-            console.log("The message has been deleted: ",response);
-        } catch (error) {
-            console.error("Some error occured deleting the message: ",error)
-        }
-    }
-    useEffect(()=>{
-        console.log("All of the messages are: ",messages)
-    },[messages])
-
-
-    const getDisplayStatus = () => {
-
-        if (isOnline && isOnline === "online") {
-            return isOnline
-        }
-        if (isOnline && isOnline !== "online") {
-            return `last seen at ${formatLiveChatTimeStamp(isOnline)}`
-        }
-        if (lastSeen) {
-            return `last seen at ${formatLiveChatTimeStamp(lastSeen)}`
-        }
+        if (!messageContent.trim()) setIsEmpty(true);
     }
 
     function handleTextArea(e) {
-        setMessageContent(e.target.value);
-        if (e.target.value.trim() !== "" || imageFile) {
-            setIsEmpty(false)
+        const val = e.target.value;
+        setMessageContent(val);
+        setIsEmpty(val.trim() === "" && !imageFile);
+        
+        if (socket && conversationId) {
+            socket.emit("typing_start", { conversationId, receiverId });
         }
-        else setIsEmpty(true);
-        if (!socket || !conversationId) return;
-        socket.emit("typing_start", { conversationId, receiverId });
     }
 
-
-    function returnMessageStatus(message) {
-        if (message.messageStatus === "read") return <DeliveredIcon currentColor={"#53bdeb"} />
-        else if (message.messageStatus === "delivered") return <DeliveredIcon currentColor={"#8FABA0"} />
-        else if (message.messageStatus === "pending") return <PendingMessageIcon currentColor={"#8FABA0"} />
-        else return <MessageSentTickIcon currentColor={"#8FABA0"} />
-    }
-
-
-    
-    async function handleSendMessage(receiverId) {
+    async function handleSendMessage() {
         if (!messageContent.trim() && !imageFile) return;
-        const clientId = Date.now().toString();
-        const socket = getSocket();
-        //stopping the typing... name
-        socket.emit("typing_stop", { conversationId, receiverId })
 
-        // a temprary message to save to the store for instant preview
+        const clientId = Date.now().toString();
+        socket.emit("typing_stop", { conversationId, receiverId });
+
         const optimisticMessage = {
             _id: clientId,
             clientId,
@@ -116,185 +401,162 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId, conv
             sender: { _id: senderId },
             receiver: { _id: receiverId },
             createdAt: new Date().toISOString(),
-            media: imagePreviewUrl? {
-                url:imagePreviewUrl
-            }:null
-        }
+            media: imagePreviewUrl ? { url: imagePreviewUrl } : null
+        };
 
         setOptimisticMessage(optimisticMessage);
-
+        
+        // Reset states immediately for UI responsiveness
+        const currentContent = messageContent;
+        const currentFile = imageFile;
+        setMessageContent("");
+        setIsEmpty(true);
+        setImageFile(null);
+        setImagePreviewUrl("");
 
         try {
             const formData = new FormData();
-            formData.append("content",messageContent)
-            // const content = messageContent;
-            setMessageContent("");
-            setIsEmpty(true)
-            setImageFile(null);
-            setImagePreviewUrl("")
-            formData.append("receiverId",receiverId);
-            formData.append("media",imageFile)
+            formData.append("content", currentContent);
+            formData.append("receiverId", receiverId);
+            if (currentFile) formData.append("media", currentFile);
+            
             const response = await sendMessage(formData);
-            await updateMessageStatus(response.data, clientId)
-
+            await updateMessageStatus(response.data, clientId);
         } catch (error) {
-            console.error("Some error occured while sending the message", error);
+            console.error("Failed to send message", error);
         }
     }
 
-
-
-    // fetching all the messages of a conversation through mongoDb and insert it to zustand store
-    async function getUserMessages() {
-        try {
-            if (!conversationId) {
-                setMessages([]);
-                return;
-            }
-            const response = await getMessages(conversationId);
-            setMessages(response.data)
-        } catch (error) {
-            console.error("Some error occured while getting the user messages")
-        }
+    function returnMessageStatus(message) {
+        if (message.messageStatus === "read") return <DeliveredIcon currentColor={"#53bdeb"} />;
+        if (message.messageStatus === "delivered") return <DeliveredIcon currentColor={"#8FABA0"} />;
+        if (message.messageStatus === "pending") return <PendingMessageIcon currentColor={"#8FABA0"} />;
+        return <MessageSentTickIcon currentColor={"#8FABA0"} />;
     }
 
-
-
-    useEffect(() => {
-        getUserMessages();
-    }, [conversationId, setMessages])
-
-
-    useEffect(() => {
-        scrollRef.current.scrollIntoView({ behavior: "smooth" })
-    }, [messages])
-
+    const getDisplayStatus = () => {
+        if (isOnline === "online") return "online";
+        return isOnline || lastSeen ? `last seen at ${formatLiveChatTimeStamp(isOnline || lastSeen)}` : "";
+    };
 
     return (
-        <div className="flex-1 border relative">
+        /* FIXED: Added h-[100dvh] and overflow-hidden to the main container */
+        <div className="flex-1 relative h-[100dvh] flex flex-col overflow-hidden border">
             <div className="backgroundWrapper"></div>
 
-            <div className={`relative z-1 right-side-section pb-4 w-full max-h-full flex-1 flex flex-col ${theme === "dark" ? "bg-[#161717f4]" : "bg-[#f5f1ebed]"}`}>
-
-               
-
-                <div className={`profile-nav sticky top-0 z-10  w-full ${theme === "dark" ? "bg-[#161717]" : "bg-white"} p-2 pl-4 pr-4`}>
-               
-
-                    <div className="userProfile flex text-white w-full gap-4 shrink-0 cursor-pointer items-center">
-
-                        <div onClick={()=>{setUserClick(false)}} className={`backButton hidden justify-center items-center max-sm:flex`}>
-                            <GoBackArrow currentColor={"white"}/>
+            <div className={`relative z-10 flex flex-col h-full w-full ${theme === "dark" ? "bg-[#161717f4]" : "bg-[#f5f1ebed]"}`}>
+                
+                {/* STICKY NAVBAR */}
+                <div className={`sticky top-0 z-20 w-full shrink-0 ${theme === "dark" ? "bg-[#161717]" : "bg-white"} p-2 px-4 border-b ${theme === 'dark' ? 'border-white/5' : 'border-black/5'}`}>
+                    <div className="flex items-center gap-4 cursor-pointer">
+                        <div onClick={() => setUserClick(false)} className="hidden max-sm:flex items-center justify-center">
+                            <GoBackArrow currentColor={theme === "dark" ? "white" : "black"} />
                         </div>
-
-                        <div className="userImage w-12.5 h-12.5 rounded-full shrink-0">
-                            <img className='w-full h-full rounded-full' src={profilePicture} alt="" />
+                        <div className="w-10 h-10 rounded-full shrink-0 overflow-hidden">
+                            <img className='w-full h-full object-cover' src={profilePicture} alt="" />
                         </div>
-
-
-                            
-                        <div className="userInfo flex justify-between items-center flex-1  min-w-0 " >
-
-                            <div className="textDetails w-full overflow-x-hidden text-ellipsis whitespace-nowrap">
-                                
-                                <h3 className={`text-lg font-semibold ${theme === "dark" ? "text-white" : "text-black"}`}>{username}</h3>
-                                {isTyping ? <p className='text-sm text-green-500 font-semibold w-full overflow-x-hidden text-ellipsis whitespace-nowrap'>Typing...</p> : <p className='text-sm text-gray-400 font-semibold w-full overflow-x-hidden text-ellipsis whitespace-nowrap'> {getDisplayStatus()}</p>}
-
-
-                            </div>
-
-                            <div className="videocall-and-other flex items-center">
-                                <div className="videocall w-12 h-12 rounded-full justify-center items-center hover:bg-[#2E2F2F] p-2 font-semibold text-white flex gap-2">
-                                    <VideoCall />
-                                </div>
-                                <div className="threeDots flex justify-center items-center p-2 hover:bg-[#292A2A] rounded-full w-10 h-10 ">
-                                    <ThreeDots />
-                                </div>
-                            </div>
-
-
+                        <div className="flex-1 min-w-0">
+                            <h3 className={`text-base font-semibold truncate ${theme === "dark" ? "text-white" : "text-black"}`}>{username}</h3>
+                            {isTyping ? 
+                                <p className='text-xs text-green-500 font-medium'>Typing...</p> : 
+                                <p className='text-xs text-gray-400 font-medium truncate'>{getDisplayStatus()}</p>
+                            }
                         </div>
-
+                        <div className="flex items-center gap-1">
+                            <button className="p-2 rounded-full hover:bg-white/10"><VideoCall /></button>
+                            <button className="p-2 rounded-full hover:bg-white/10"><ThreeDots /></button>
+                        </div>
                     </div>
-
                 </div>
 
-
-                <div className="scrollwrapper flex-1 overflow-y-auto w-full ">
-
-                    <div className="messagesBox max-h-full  w-full flex flex-col justify-end  gap-2 pr-10 pb-5 pl-10">
-                        {messages.map(message => (<MessageBubble2 handleDeleteMessage={handleDeleteMessage} messageStatusIcon={senderId === message.sender?._id ? returnMessageStatus(message) : ""} messageId={message._id} key={message._id} isMe={senderId === message.sender?._id ? true : false} message={message.content} time={formatLiveChatTimeStamp(message.createdAt)} image={message?.media?.url} />))}
-
+                {/* MESSAGES AREA - Takes remaining space */}
+                <div className="flex-1 overflow-y-auto w-full custom-scrollbar">
+                    <div className="flex flex-col justify-end gap-2 p-4 md:px-10">
+                        {messages.map(message => (
+                            <MessageBubble2 
+                                key={message._id}
+                                messageId={message._id}
+                                isMe={senderId === message.sender?._id}
+                                message={message.content}
+                                time={formatLiveChatTimeStamp(message.createdAt)}
+                                image={message?.media?.url}
+                                messageStatusIcon={senderId === message.sender?._id ? returnMessageStatus(message) : ""}
+                            />
+                        ))}
                         <div ref={scrollRef}></div>
                     </div>
-
-
                 </div>
 
+                {/* INPUT SECTION - Stays at bottom */}
+                <div className="w-full p-2 md:p-4 shrink-0">
+                    {/* IMAGE PREVIEW - Now part of the flex flow above the input */}
+                    {imageFile && (
+                        <div className={`mb-2 p-4 rounded-xl relative inline-block ${theme === 'dark' ? "bg-[#1D1F1F]" : "bg-white"} border ${theme === 'dark' ? 'border-white/10' : 'border-black/10'}`}>
+                            <img className='max-h-40 w-auto rounded-lg' src={imagePreviewUrl} alt="Preview" />
+                            <button 
+                                onClick={handleCancelUpload} 
+                                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-lg"
+                            >
+                                <CloseIcon currentColor="white" />
+                            </button>
+                        </div>
+                    )}
 
-               {imageFile && <div className={`absolute mx-auto left-[50%] -translate-x-[50%] w-[95%] p-6 bottom-20 ${theme === 'dark' ? "bg-[#1D1F1F]" : "bg-[#F7F5F3]"} rounded-xl flex justify-center items-center `}>
-                    <img className='w-auto h-auto object-none object-center' src={imagePreviewUrl} alt="" />
-                    <div onClick={handleCancelUpload} className="crossButton rounded-full p-2 w-10 h-10 hover:bg-[#ff858532] flex justify-center items-center cursor-pointer absolute top-2 right-2"> <CloseIcon currentColor={"#ff5858"}/> </div>
-                </div>}
-
-
-                <div className=" inputWrapper pl-4 pr-4 pb-3 w-full min-h-13 flex">
-
-                    <div className={` inputbox w-full h-full flex items-center p-2  ${theme === "dark" ? "bg-[#242626] text-white" : "bg-white text-black"} rounded-4xl`}>
-                        <div onClick={() => { setShowMenu(!showMenu) }} className={`relative addIcon flex justify-center items-center p-2  ${theme === "dark" ? "hover:bg-[#393B3B]" : "hover:bg-[#F6F5F4]"} rounded-full w-10 h-10 self-end cursor-pointer`}>
-                            <AddIcon />
-
+                    <div className={`flex items-end gap-2 p-2 rounded-[24px] ${theme === "dark" ? "bg-[#242626]" : "bg-white"} shadow-sm`}>
+                        <div className="relative">
+                            <button 
+                                onClick={() => setShowMenu(!showMenu)} 
+                                className={`p-2 rounded-full ${theme === "dark" ? "hover:bg-[#393B3B]" : "hover:bg-gray-100"}`}
+                            >
+                                <AddIcon />
+                            </button>
+                            {showMenu && (
+                                <div className={`absolute bottom-full left-0 mb-2 rounded-xl border ${theme === "dark" ? "bg-[#161717] border-[#2E2F2F] text-white" : "bg-white border-gray-200 text-black"} p-2 shadow-xl z-50`}>
+                                    <label className="flex items-center gap-2 p-3 hover:bg-white/5 cursor-pointer rounded-lg">
+                                        <MdPermMedia fill='#3b82f6' className='w-5 h-5' />
+                                        <span className='text-sm whitespace-nowrap'>Photos & Videos</span>
+                                        <input onChange={handleFileUpload} type="file" className='hidden' accept="image/*,video/*" />
+                                    </label>
+                                </div>
+                            )}
                         </div>
 
-                        {showMenu && <div className={`absolute -translate-y-[90%]  rounded-xl border border-[#2E2F2F] ${theme === "dark" ? "bg-[#161717] text-white" : "bg-white text-black"} p-2 flex flex-col gap-1`}>
-
-                            <div onClick={() => { setShowMenu(false) }} className={`document flex gap-2 items-center p-2 w-full rounded-lg ${theme === "dark" ? "hover:bg-[#2E2F2F]" : "hover:bg[#F6F5F4]   "} cursor-pointer `}><FcDocument className=' w-6 h-6' /> <span className='text-sm'>Document</span></div>
-
-                            <label htmlFor="fileUpload">
-                                <div className={`file flex gap-2 items-center p-2 w-full  rounded-lg ${theme === "dark" ? "hover:bg-[#2E2F2F]" : "hover:bg[#F6F5F4]"} cursor-pointer `}><MdPermMedia fill='blue' className=' w-6 h-6 shrink-0' />  <span className='text-sm whitespace-nowrap'>Photos and Videos</span> </div>
-                                <input onChange={handleFileUpload} type="file" name="" id="fileUpload" className='hidden' />
-                            </label>
-                        </div>}
-
-
-
-
-
-
-                        <div className={`cursor-pointer emojiIcon flex justify-center items-center p-2 ${theme === "dark" ? "hover:bg-[#393B3B]" : "hover:bg-[#F6F5F4]"} rounded-full w-10 h-10 self-end`}>
+                        <button className={`p-2 rounded-full ${theme === "dark" ? "hover:bg-[#393B3B]" : "hover:bg-gray-100"}`}>
                             <EmojiIcon currentColor={theme === "dark" ? "white" : "black"} />
-                        </div>
+                        </button>
 
-
-
-                        <TextareaAutosize
-                            minRows={1}
-                            maxRows={5}
-                            placeholder="Type a message"
-                            className={`whatsapp-input resize-none flex-1 ${theme === "dark" ? "bg-[#242626] text-white caret-white" : "bg-white text-black caret-black"} p-2 max-h-47 focus:outline-none `}
-                            onChange={handleTextArea}
+                        <TextareaAutosize 
+                            minRows={1} 
+                            maxRows={5} 
+                            placeholder="Type a message" 
+                            className={`flex-1 mb-1 bg-transparent resize-none focus:outline-none p-1 ${theme === "dark" ? "text-white" : "text-black"}`}
+                            onChange={handleTextArea} 
                             value={messageContent}
+                            onKeyDown={(e) => {
+                                if(e.key === 'Enter' && !e.shiftKey) {
+                                    e.preventDefault();
+                                    handleSendMessage();
+                                }
+                            }}
                         />
 
-
-                        {isEmpty && <div role='textbox' className={`cursor-pointer micIcon flex justify-center items-center p-2 ${theme === "dark" ? "hover:bg-[#393B3B]" : "hover:bg-[#F6F5F4]"} rounded-full w-10 h-10 self-end`}>
-                            <MicIcon currentColor={theme === "dark" ? "white" : "black"} />
-                        </div>}
-
-                        {!isEmpty && <div role='textbox' onClick={() => {
-                            handleSendMessage(receiverId)
-                        }} className=" flex justify-center items-center p-2 hover:bg-[#21C063] rounded-full w-10 h-10 self-end bg-[#37C572] cursor-pointer">
-                            <SendIcon />
-                        </div>}
+                        {isEmpty ? (
+                            <button className={`p-2 rounded-full ${theme === "dark" ? "hover:bg-[#393B3B]" : "hover:bg-gray-100"}`}>
+                                <MicIcon currentColor={theme === "dark" ? "white" : "black"} />
+                            </button>
+                        ) : (
+                            <button 
+                                onClick={handleSendMessage} 
+                                className="p-2 bg-[#37C572] hover:bg-[#21C063] rounded-full transition-colors"
+                            >
+                                <SendIcon />
+                            </button>
+                        )}
                     </div>
                 </div>
-
-
-
             </div>
         </div>
+    );
+};
 
-    )
-}
-
-export default UserConversation
+export default UserConversation;
