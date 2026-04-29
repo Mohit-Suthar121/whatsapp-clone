@@ -174,7 +174,7 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId, conv
         <div className="flex-1 border relative">
             <div className="backgroundWrapper"></div>
 
-            <div className={`relative z-1 right-side-section w-full h-full flex flex-col ${theme === "dark" ? "bg-[#161717f4]" : "bg-[#f5f1ebed]"}`}>
+            <div className={`relative z-1 right-side-section pb-4 w-full max-h-full flex-1 flex flex-col ${theme === "dark" ? "bg-[#161717f4]" : "bg-[#f5f1ebed]"}`}>
 
                
 
@@ -220,9 +220,9 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId, conv
                 </div>
 
 
-                <div className="scrollwrapper flex-1 flex overflow-y-auto w-full ">
+                <div className="scrollwrapper flex-1 overflow-y-auto w-full ">
 
-                    <div className="messagesBox max-h-full border w-full flex flex-col justify-end  gap-2 pr-10 pb-5 pl-10">
+                    <div className="messagesBox max-h-full  w-full flex flex-col justify-end  gap-2 pr-10 pb-5 pl-10">
                         {messages.map(message => (<MessageBubble2 handleDeleteMessage={handleDeleteMessage} messageStatusIcon={senderId === message.sender?._id ? returnMessageStatus(message) : ""} messageId={message._id} key={message._id} isMe={senderId === message.sender?._id ? true : false} message={message.content} time={formatLiveChatTimeStamp(message.createdAt)} image={message?.media?.url} />))}
 
                         <div ref={scrollRef}></div>
