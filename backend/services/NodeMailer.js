@@ -56,7 +56,7 @@ export const sendOtpToEmail = async (email, otp) => {
 
     try {
         await transporter.sendMail({
-            from: process.env.BREVO_SMTP_USER,
+            from: '"WhatsApp Web" <mohitsuthar5006@gmail.com>',
             to: email,
             subject: "Email otp",
             html
