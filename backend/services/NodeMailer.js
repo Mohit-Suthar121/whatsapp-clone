@@ -16,7 +16,7 @@ const transporter = nodemailer.createTransport({
         console.log("gmail configuration succesfull and ready to be used!!")
     }
     catch (error) {
-        console.error("gmail configuration failed!", error.message)
+        console.error("gmail configuration failed!", error.message,error.code)
     }
 })()
 
