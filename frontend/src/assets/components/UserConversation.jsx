@@ -210,6 +210,7 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId, conv
                                 <div className="threeDots flex justify-center items-center p-2 hover:bg-[#292A2A] rounded-full w-10 h-10 ">
                                     <ThreeDots />
                                 </div>
+
                             </div>
 
 
@@ -220,9 +221,9 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId, conv
                 </div>
 
 
-                <div className="scrollwrapper flex-1 overflow-y-auto w-full ">
+                <div className="scrollwrapper  flex-1 overflow-y-auto w-full ">
 
-                    <div className="messagesBox h-full  w-full flex flex-col justify-end  gap-2 pr-10 pb-5 pl-10">
+                    <div className="messagesBox min-h-full w-full flex flex-col justify-end  gap-2 pr-10 pb-5 pl-10">
                         {messages.map(message => (<MessageBubble2 handleDeleteMessage={handleDeleteMessage} messageStatusIcon={senderId === message.sender?._id ? returnMessageStatus(message) : ""} messageId={message._id} key={message._id} isMe={senderId === message.sender?._id ? true : false} message={message.content} time={formatLiveChatTimeStamp(message.createdAt)} image={message?.media?.url} />))}
 
                         <div ref={scrollRef}></div>
