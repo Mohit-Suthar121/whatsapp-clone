@@ -173,12 +173,8 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId, conv
     return (
         <div className="flex-1 border relative">
             <div className="backgroundWrapper"></div>
-
-            <div className={`relative z-1 right-side-section pb-4 w-full h-full max-h-full flex-1 flex flex-col ${theme === "dark" ? "bg-[#161717f4]" : "bg-[#f5f1ebed]"}`}>
-
-               
-
-                <div className={`profile-nav fixed top-0 z-10  w-full ${theme === "dark" ? "bg-[#161717]" : "bg-white"} p-2 pl-4 pr-4`}>
+            
+             <div className={`profile-nav fixed top-0 z-10  w-full ${theme === "dark" ? "bg-[#161717]" : "bg-white"} p-2 pl-4 pr-4`}>
                
 
                     <div className="userProfile flex text-white w-full gap-4 shrink-0 cursor-pointer items-center">
@@ -220,6 +216,9 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId, conv
 
                 </div>
 
+            <div className={`relative z-1 right-side-section pb-4 w-full h-full max-h-full flex-1 flex flex-col ${theme === "dark" ? "bg-[#161717f4]" : "bg-[#f5f1ebed]"}`}>
+
+            
 
                 <div className="scrollwrapper  flex-1 overflow-y-auto w-full ">
 
