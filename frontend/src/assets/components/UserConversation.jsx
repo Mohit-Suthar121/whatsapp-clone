@@ -178,7 +178,7 @@ const UserConversation = ({ profilePicture, username, lastSeen, receiverId, conv
 
                
 
-                <div className={`profile-nav sticky top-0 z-10  w-full ${theme === "dark" ? "bg-[#161717]" : "bg-white"} p-2 pl-4 pr-4`}>
+                <div className={`profile-nav fixed top-0 z-10  w-full ${theme === "dark" ? "bg-[#161717]" : "bg-white"} p-2 pl-4 pr-4`}>
                
 
                     <div className="userProfile flex text-white w-full gap-4 shrink-0 cursor-pointer items-center">
